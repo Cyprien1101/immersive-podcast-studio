@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { cn } from "@/lib/utils";
 
-const contentTypes = ["Podcasts", "Vidéos YouTubes", "Shorts"];
+const contentTypes = ["podcasts", "vidéos", "YouTubes", "TikToks"];
 
 const ImpactSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -36,7 +36,7 @@ const ImpactSection = () => {
         {/* 1. Animated Text */}
         <div className="mb-12 text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white animate-fade-in">
-            On vous aide à faire des{" "}
+            Le lieu idéal pour vos{" "}
             <span className={cn(
               "text-gradient-static inline-block transition-opacity duration-600",
               isAnimating ? "opacity-0" : "opacity-100"
