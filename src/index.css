@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -105,7 +106,7 @@
   
   .video-container {
     aspect-ratio: 9/16;
-    max-height: 80vh;
+    max-height: 350px;
     width: auto;
   }
   
