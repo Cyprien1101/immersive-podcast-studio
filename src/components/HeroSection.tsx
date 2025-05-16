@@ -1,15 +1,8 @@
 
-import React, { useRef } from 'react';
-import { ArrowDown } from 'lucide-react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 
 const HeroSection = () => {
-  const nextSectionRef = useRef<HTMLDivElement>(null);
-  
-  const scrollToNextSection = () => {
-    nextSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
     <>
       <section className="relative h-screen w-full overflow-hidden">
@@ -34,8 +27,8 @@ const HeroSection = () => {
         {/* Contenu centré */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
           <h1 className="mb-6 max-w-3xl text-3xl font-bold leading-tight animate-fade-in md:text-5xl lg:text-7xl">
-            <span className="text-gradient-hero">Studio Premium</span> pour vos 
-            <span className="text-podcast-accent"> podcasts</span>
+            <span className="text-gradient-static">Studio Premium</span> pour vos 
+            <span className="text-gradient-static"> podcasts</span>
           </h1>
           
           <p className="mb-8 max-w-xl text-lg text-gray-200 animate-fade-in md:text-xl">
@@ -48,17 +41,8 @@ const HeroSection = () => {
           >
             Réserver maintenant
           </Button>
-          
-          <button 
-            onClick={scrollToNextSection}
-            className="absolute bottom-8 animate-float cursor-pointer rounded-full p-2 text-white hover:text-podcast-accent"
-            aria-label="Défiler vers le bas"
-          >
-            <ArrowDown size={32} />
-          </button>
         </div>
       </section>
-      <div ref={nextSectionRef}></div>
     </>
   );
 };

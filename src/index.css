@@ -100,6 +100,10 @@
     @apply bg-gradient-to-r from-podcast-accent to-purple-400 bg-clip-text text-transparent;
   }
   
+  .text-gradient-static {
+    @apply bg-gradient-to-r from-podcast-accent to-pink-500 bg-clip-text text-transparent;
+  }
+  
   .text-gradient-hero {
     @apply bg-gradient-to-r from-podcast-accent via-purple-400 to-pink-500 bg-clip-text text-transparent animate-pulse-slow;
   }

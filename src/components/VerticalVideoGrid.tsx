@@ -1,8 +1,7 @@
 
-import React from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Button } from "@/components/ui/button";
+import React, { useEffect } from 'react';
+import { useEmblaCarousel } from 'embla-carousel-react';
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 
 // Données simulées pour les vidéos
 const videoData = Array(6).fill({
@@ -11,24 +10,35 @@ const videoData = Array(6).fill({
 });
 
 const VerticalVideoGrid = () => {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: true,
+    align: "start",
+    skipSnaps: false,
+  });
+  
+  // Auto-scrolling effect
+  useEffect(() => {
+    if (emblaApi) {
+      const interval = setInterval(() => {
+        emblaApi.scrollNext();
+      }, 3000); // Scroll every 3 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [emblaApi]);
+
   return (
     <section className="py-8 bg-podcast-muted">
       <div className="container px-4 mx-auto">
         <h2 className="mb-4 text-center text-2xl font-bold">
-          <span className="text-gradient">Exemples de Formats Verticaux Livrés</span>
+          <span className="text-gradient-static">Exemples de Formats Verticaux Livrés</span>
         </h2>
         
         <div className="relative max-w-4xl mx-auto">
-          <Carousel 
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="w-full"
-          >
-            <CarouselContent>
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex -ml-4">
               {videoData.map((item, index) => (
-                <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/4">
+                <div key={index} className="min-w-0 shrink-0 grow-0 pl-4 md:basis-1/3 lg:basis-1/4">
                   <div className="group overflow-hidden rounded-lg shadow-xl transition-all hover:shadow-2xl">
                     <div className="video-container mx-auto bg-black h-[300px] md:h-[350px]">
                       <video
@@ -47,24 +57,9 @@ const VerticalVideoGrid = () => {
                       <p className="text-xs text-gray-400">Format optimisé pour les réseaux sociaux</p>
                     </div>
                   </div>
-                </CarouselItem>
+                </div>
               ))}
-            </CarouselContent>
-            <div className="hidden md:block">
-              <CarouselPrevious className="left-0" />
-              <CarouselNext className="right-0" />
             </div>
-          </Carousel>
-          
-          <div className="flex justify-center gap-4 mt-3 md:hidden">
-            <Button variant="outline" size="icon" className="rounded-full bg-podcast-dark hover:bg-podcast-accent">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="sr-only">Précédent</span>
-            </Button>
-            <Button variant="outline" size="icon" className="rounded-full bg-podcast-dark hover:bg-podcast-accent">
-              <ArrowRight className="h-4 w-4" />
-              <span className="sr-only">Suivant</span>
-            </Button>
           </div>
         </div>
       </div>
