@@ -34,7 +34,7 @@ const HeroSection = () => {
         {/* Contenu centré */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
           <h1 className="mb-6 max-w-3xl text-3xl font-bold leading-tight animate-fade-in md:text-5xl lg:text-7xl">
-            <span className="text-gradient">Studio Premium</span> pour vos 
+            <span className="text-gradient-hero">Studio Premium</span> pour vos 
             <span className="text-podcast-accent"> podcasts</span>
           </h1>
           

@@ -1,5 +1,8 @@
 
 import React from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
 
 // Données simulées pour les vidéos
 const videoData = Array(6).fill({
@@ -9,33 +12,60 @@ const videoData = Array(6).fill({
 
 const VerticalVideoGrid = () => {
   return (
-    <section className="py-20 bg-podcast-muted">
+    <section className="py-12 bg-podcast-muted">
       <div className="container px-4 mx-auto">
-        <h2 className="mb-12 text-center text-4xl font-bold">
+        <h2 className="mb-8 text-center text-3xl font-bold">
           <span className="text-gradient">Exemples de Formats Verticaux Livrés</span>
         </h2>
         
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {videoData.map((item, index) => (
-            <div key={index} className="group overflow-hidden rounded-lg shadow-xl transition-all hover:shadow-2xl">
-              <div className="video-container mx-auto bg-black">
-                <video
-                  className="h-full w-full object-cover"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                >
-                  <source src={item.videoUrl} type="video/mp4" />
-                  Votre navigateur ne prend pas en charge les vidéos HTML5.
-                </video>
-              </div>
-              <div className="bg-podcast-dark p-4">
-                <h3 className="text-podcast-accent font-medium">Format Vertical #{index + 1}</h3>
-                <p className="text-sm text-gray-400">Format optimisé pour les réseaux sociaux</p>
-              </div>
+        <div className="relative">
+          <Carousel 
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent>
+              {videoData.map((item, index) => (
+                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                  <div className="group overflow-hidden rounded-lg shadow-xl transition-all hover:shadow-2xl">
+                    <div className="video-container mx-auto bg-black">
+                      <video
+                        className="h-full w-full object-cover"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                      >
+                        <source src={item.videoUrl} type="video/mp4" />
+                        Votre navigateur ne prend pas en charge les vidéos HTML5.
+                      </video>
+                    </div>
+                    <div className="bg-podcast-dark p-4">
+                      <h3 className="text-podcast-accent font-medium">Format Vertical #{index + 1}</h3>
+                      <p className="text-sm text-gray-400">Format optimisé pour les réseaux sociaux</p>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="hidden md:block">
+              <CarouselPrevious className="left-0" />
+              <CarouselNext className="right-0" />
             </div>
-          ))}
+          </Carousel>
+          
+          <div className="flex justify-center gap-4 mt-6 md:hidden">
+            <Button variant="outline" size="icon" className="rounded-full bg-podcast-dark hover:bg-podcast-accent">
+              <ArrowLeft className="h-4 w-4" />
+              <span className="sr-only">Précédent</span>
+            </Button>
+            <Button variant="outline" size="icon" className="rounded-full bg-podcast-dark hover:bg-podcast-accent">
+              <ArrowRight className="h-4 w-4" />
+              <span className="sr-only">Suivant</span>
+            </Button>
+          </div>
         </div>
       </div>
     </section>
