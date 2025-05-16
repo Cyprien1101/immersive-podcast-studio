@@ -24,23 +24,30 @@ const VerticalVideoGrid = () => {
     if (!emblaApi) return;
 
     // Vitesse de défilement - valeur plus basse pour un défilement plus lent et fluide
-    const scrollSpeed = 0.005;
+    const scrollInterval = 50; // milliseconds between scrolls
+    const scrollAmount = 0.5; // small increment for smooth scrolling
     
     const scroll = () => {
       if (emblaApi) {
-        // Utilisation de scrollBy pour un défilement plus fluide
-        emblaApi.scrollBy(scrollSpeed);
-        autoplayRef.current = requestAnimationFrame(scroll);
+        // Using scrollNext with a small increment for a smooth continuous scrolling effect
+        emblaApi.scrollNext(true);
+        
+        // Schedule the next scroll
+        autoplayRef.current = window.setTimeout(() => {
+          requestAnimationFrame(scroll);
+        }, scrollInterval);
       }
     };
     
     // Démarrer l'animation fluide
-    autoplayRef.current = requestAnimationFrame(scroll);
+    autoplayRef.current = window.setTimeout(() => {
+      requestAnimationFrame(scroll);
+    }, scrollInterval);
     
     // Nettoyage
     return () => {
       if (autoplayRef.current !== null) {
-        cancelAnimationFrame(autoplayRef.current);
+        clearTimeout(autoplayRef.current);
       }
     };
   }, [emblaApi]);
@@ -59,7 +66,7 @@ const VerticalVideoGrid = () => {
     return () => {
       cleanup && cleanup();
       if (autoplayRef.current !== null) {
-        cancelAnimationFrame(autoplayRef.current);
+        clearTimeout(autoplayRef.current);
       }
     };
   }, [emblaApi, autoplay]);
