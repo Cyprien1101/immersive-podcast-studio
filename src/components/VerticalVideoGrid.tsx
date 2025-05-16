@@ -1,8 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { EmblaCarouselType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-react';
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 
 // Données simulées pour les vidéos
 const videoData = Array(6).fill({
@@ -15,21 +13,34 @@ const VerticalVideoGrid = () => {
     loop: true,
     align: "start",
     skipSnaps: false,
+    dragFree: true,  // Enable continuous scrolling
   });
   
-  // Auto-scrolling effect
+  // Auto-scrolling effect with continuous movement
   useEffect(() => {
     if (emblaApi) {
-      const interval = setInterval(() => {
-        emblaApi.scrollNext();
-      }, 3000); // Scroll every 3 seconds
-
-      return () => clearInterval(interval);
+      let animationFrame: number;
+      const scroll = () => {
+        if (emblaApi.canScrollNext()) {
+          // Use a small increment for smooth continuous scrolling
+          emblaApi.scrollProgress(0.001);
+          animationFrame = requestAnimationFrame(scroll);
+        } else {
+          // When we reach the end, loop back to the beginning
+          emblaApi.scrollTo(0);
+          animationFrame = requestAnimationFrame(scroll);
+        }
+      };
+      
+      animationFrame = requestAnimationFrame(scroll);
+      
+      // Clean up animation frame on unmount
+      return () => cancelAnimationFrame(animationFrame);
     }
   }, [emblaApi]);
 
   return (
-    <section className="py-6 bg-podcast-muted">
+    <section className="py-6 bg-black">
       <div className="container px-4 mx-auto">
         <h2 className="mb-4 text-center text-xl font-bold">
           <span className="text-gradient-static">Exemples de Formats Verticaux Livrés</span>
@@ -53,7 +64,7 @@ const VerticalVideoGrid = () => {
                         Votre navigateur ne prend pas en charge les vidéos HTML5.
                       </video>
                     </div>
-                    <div className="bg-podcast-dark p-2">
+                    <div className="bg-black p-2">
                       <h3 className="text-podcast-accent font-medium text-xs">Format Vertical #{index + 1}</h3>
                       <p className="text-xs text-gray-400">Format optimisé pour les réseaux sociaux</p>
                     </div>
