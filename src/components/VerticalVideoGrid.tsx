@@ -1,8 +1,6 @@
 
-import React, { useEffect } from 'react';
-import { EmblaCarouselType } from 'embla-carousel';
+import React, { useEffect, useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 
 // Données simulées pour les vidéos
 const videoData = Array(6).fill({
@@ -13,23 +11,53 @@ const videoData = Array(6).fill({
 const VerticalVideoGrid = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: true,
-    align: "start",
-    skipSnaps: false,
+    align: "center",
+    dragFree: true,
+    containScroll: false,
+    slidesToScroll: 1
   });
-  
+
+  // Configuration pour un défilement automatique continu
+  const autoScroll = useCallback((emblaApi) => {
+    if (!emblaApi) return;
+    
+    let scrollDirection = 1;
+    
+    const animate = () => {
+      if (!emblaApi.canScrollNext()) {
+        scrollDirection = -1;
+      } else if (!emblaApi.canScrollPrev()) {
+        scrollDirection = 1;
+      }
+      
+      emblaApi.scrollNext(true);
+      timeoutId = setTimeout(() => {
+        animationId = requestAnimationFrame(animate);
+      }, 3000);
+    };
+    
+    let animationId = requestAnimationFrame(animate);
+    let timeoutId = null;
+    
+    return () => {
+      clearTimeout(timeoutId);
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
+
   // Auto-scrolling effect
   useEffect(() => {
-    if (emblaApi) {
-      const interval = setInterval(() => {
-        emblaApi.scrollNext();
-      }, 3000); // Scroll every 3 seconds
-
-      return () => clearInterval(interval);
-    }
-  }, [emblaApi]);
+    if (!emblaApi) return;
+    
+    const cleanup = autoScroll(emblaApi);
+    
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [emblaApi, autoScroll]);
 
   return (
-    <section className="py-6 bg-podcast-muted">
+    <section className="py-6 bg-black">
       <div className="container px-4 mx-auto">
         <h2 className="mb-4 text-center text-xl font-bold">
           <span className="text-gradient-static">Exemples de Formats Verticaux Livrés</span>
@@ -37,7 +65,7 @@ const VerticalVideoGrid = () => {
         
         <div className="relative max-w-4xl mx-auto">
           <div className="overflow-hidden" ref={emblaRef}>
-            <div className="flex -ml-4">
+            <div className="flex">
               {videoData.map((item, index) => (
                 <div key={index} className="min-w-0 shrink-0 grow-0 pl-4 md:basis-1/3 lg:basis-1/4">
                   <div className="group overflow-hidden rounded-lg shadow-xl transition-all hover:shadow-2xl">
@@ -53,7 +81,7 @@ const VerticalVideoGrid = () => {
                         Votre navigateur ne prend pas en charge les vidéos HTML5.
                       </video>
                     </div>
-                    <div className="bg-podcast-dark p-2">
+                    <div className="bg-black p-2">
                       <h3 className="text-podcast-accent font-medium text-xs">Format Vertical #{index + 1}</h3>
                       <p className="text-xs text-gray-400">Format optimisé pour les réseaux sociaux</p>
                     </div>
