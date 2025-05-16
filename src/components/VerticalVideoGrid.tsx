@@ -1,60 +1,68 @@
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 
-// Données simulées pour les vidéos
-const videoData = Array(6).fill({
+// Données simulées pour les vidéos - doublées pour un effet de boucle infinie plus fluide
+const videoData = Array(12).fill({
   videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//03252-1-1.mp4",
   title: "Format vertical"
 });
 
 const VerticalVideoGrid = () => {
+  const autoplayRef = useRef<number | null>(null);
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: true,
-    align: "center",
+    align: "start",
     dragFree: true,
-    containScroll: false,
-    slidesToScroll: 1
+    containScroll: "trimSnaps",
+    slidesToScroll: 1,
+    inViewThreshold: 0.7
   });
 
-  // Configuration pour un défilement automatique continu
-  const autoScroll = useCallback((emblaApi) => {
+  // Configuration pour un défilement fluide et continu
+  const autoplay = useCallback(() => {
     if (!emblaApi) return;
-    
-    let scrollDirection = 1;
-    
-    const animate = () => {
-      if (!emblaApi.canScrollNext()) {
-        scrollDirection = -1;
-      } else if (!emblaApi.canScrollPrev()) {
-        scrollDirection = 1;
-      }
-      
-      emblaApi.scrollNext(true);
-      timeoutId = setTimeout(() => {
-        animationId = requestAnimationFrame(animate);
-      }, 3000);
-    };
-    
-    let animationId = requestAnimationFrame(animate);
-    let timeoutId = null;
-    
-    return () => {
-      clearTimeout(timeoutId);
-      cancelAnimationFrame(animationId);
-    };
-  }, []);
 
-  // Auto-scrolling effect
+    // Vitesse de défilement - valeur plus basse pour un défilement plus lent et fluide
+    const scrollSpeed = 0.005;
+    
+    const scroll = () => {
+      if (emblaApi) {
+        // Utilisation de scrollBy pour un défilement plus fluide
+        emblaApi.scrollBy(scrollSpeed);
+        autoplayRef.current = requestAnimationFrame(scroll);
+      }
+    };
+    
+    // Démarrer l'animation fluide
+    autoplayRef.current = requestAnimationFrame(scroll);
+    
+    // Nettoyage
+    return () => {
+      if (autoplayRef.current !== null) {
+        cancelAnimationFrame(autoplayRef.current);
+      }
+    };
+  }, [emblaApi]);
+
+  // Démarrer le défilement automatique
   useEffect(() => {
     if (!emblaApi) return;
     
-    const cleanup = autoScroll(emblaApi);
+    // Attendre que le carousel soit prêt
+    emblaApi.on('init', autoplay);
+    emblaApi.on('reInit', autoplay);
+    
+    // Lancer l'autoplay directement après le montage
+    const cleanup = autoplay();
     
     return () => {
-      if (cleanup) cleanup();
+      cleanup && cleanup();
+      if (autoplayRef.current !== null) {
+        cancelAnimationFrame(autoplayRef.current);
+      }
     };
-  }, [emblaApi, autoScroll]);
+  }, [emblaApi, autoplay]);
 
   return (
     <section className="py-6 bg-black">
@@ -63,7 +71,7 @@ const VerticalVideoGrid = () => {
           <span className="text-gradient-static">Exemples de Formats Verticaux Livrés</span>
         </h2>
         
-        <div className="relative max-w-4xl mx-auto">
+        <div className="relative max-w-full mx-auto overflow-hidden">
           <div className="overflow-hidden" ref={emblaRef}>
             <div className="flex">
               {videoData.map((item, index) => (
@@ -82,7 +90,7 @@ const VerticalVideoGrid = () => {
                       </video>
                     </div>
                     <div className="bg-black p-2">
-                      <h3 className="text-podcast-accent font-medium text-xs">Format Vertical #{index + 1}</h3>
+                      <h3 className="text-podcast-accent font-medium text-xs">Format Vertical #{(index % 6) + 1}</h3>
                       <p className="text-xs text-gray-400">Format optimisé pour les réseaux sociaux</p>
                     </div>
                   </div>
