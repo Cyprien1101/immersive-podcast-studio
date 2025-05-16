@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
-import { EmblaCarouselType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-react';
+import type { EmblaCarouselType } from 'embla-carousel-react';
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 
 // Données simulées pour les vidéos
