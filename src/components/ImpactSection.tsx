@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { cn } from "@/lib/utils";
 
-const contentTypes = ["podcasts", "vidéos", "YouTubes", "TikToks"];
+const contentTypes = ["Podcasts", "Youtube Videos", "Shorts"];
 
 const ImpactSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -35,7 +35,7 @@ const ImpactSection = () => {
       <div className="container mx-auto">
         {/* 1. Animated Text - Modified layout */}
         <div className="mb-8 text-center">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white animate-fade-in flex flex-col items-center">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white animate-fade-in flex flex-col items-center">
             <span className="mb-2">Le lieu idéal pour vos</span>
             <span className={cn(
               "text-gradient-static text-5xl md:text-6xl lg:text-7xl transition-opacity duration-600",
