@@ -23,7 +23,7 @@ const VerticalVideoGrid = () => {
       const scroll = () => {
         if (emblaApi.canScrollNext()) {
           // Use a small increment for smooth continuous scrolling
-          emblaApi.scrollProgress(0.001);
+          emblaApi.scrollNext(true);
           animationFrame = requestAnimationFrame(scroll);
         } else {
           // When we reach the end, loop back to the beginning
