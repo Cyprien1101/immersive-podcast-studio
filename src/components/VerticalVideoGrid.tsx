@@ -1,6 +1,7 @@
 
 import React, { useEffect } from 'react';
-import { useEmblaCarousel } from 'embla-carousel-react';
+import { EmblaCarouselType } from 'embla-carousel';
+import useEmblaCarousel from 'embla-carousel-react';
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 
 // Données simulées pour les vidéos
@@ -28,9 +29,9 @@ const VerticalVideoGrid = () => {
   }, [emblaApi]);
 
   return (
-    <section className="py-8 bg-podcast-muted">
+    <section className="py-6 bg-podcast-muted">
       <div className="container px-4 mx-auto">
-        <h2 className="mb-4 text-center text-2xl font-bold">
+        <h2 className="mb-4 text-center text-xl font-bold">
           <span className="text-gradient-static">Exemples de Formats Verticaux Livrés</span>
         </h2>
         
@@ -40,7 +41,7 @@ const VerticalVideoGrid = () => {
               {videoData.map((item, index) => (
                 <div key={index} className="min-w-0 shrink-0 grow-0 pl-4 md:basis-1/3 lg:basis-1/4">
                   <div className="group overflow-hidden rounded-lg shadow-xl transition-all hover:shadow-2xl">
-                    <div className="video-container mx-auto bg-black h-[300px] md:h-[350px]">
+                    <div className="video-container mx-auto bg-black h-[250px] md:h-[280px]">
                       <video
                         className="h-full w-full object-cover"
                         autoPlay
@@ -53,7 +54,7 @@ const VerticalVideoGrid = () => {
                       </video>
                     </div>
                     <div className="bg-podcast-dark p-2">
-                      <h3 className="text-podcast-accent font-medium text-sm">Format Vertical #{index + 1}</h3>
+                      <h3 className="text-podcast-accent font-medium text-xs">Format Vertical #{index + 1}</h3>
                       <p className="text-xs text-gray-400">Format optimisé pour les réseaux sociaux</p>
                     </div>
                   </div>
