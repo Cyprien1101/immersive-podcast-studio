@@ -48,25 +48,47 @@ const ImpactSection = () => {
 
         {/* 2. Three-column Grid with consistent media heights */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          {/* Left Column - Horizontal Video */}
+          {/* Left Column - Horizontal Videos (Stacked) */}
           <div className="overflow-hidden rounded-lg bg-black shadow-lg transform hover:scale-[1.02] transition-transform duration-300 animate-fade-in h-full">
             <div className="h-full flex flex-col">
-              <div className="flex-grow">
-                <AspectRatio ratio={16/9} className="w-full">
-                  <video
-                    className="w-full h-full object-cover rounded-t-lg"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                  >
-                    <source 
-                      src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//site-web-1.mp4" 
-                      type="video/mp4" 
-                    />
-                    Votre navigateur ne prend pas en charge les vidéos HTML5.
-                  </video>
-                </AspectRatio>
+              <div className="flex-grow flex flex-col">
+                {/* First Video */}
+                <div className="flex-1">
+                  <AspectRatio ratio={16/9} className="w-full">
+                    <video
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    >
+                      <source 
+                        src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//site-web-1.mp4" 
+                        type="video/mp4" 
+                      />
+                      Votre navigateur ne prend pas en charge les vidéos HTML5.
+                    </video>
+                  </AspectRatio>
+                </div>
+                
+                {/* Second Video */}
+                <div className="flex-1 border-t border-gray-800">
+                  <AspectRatio ratio={16/9} className="w-full">
+                    <video
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    >
+                      <source 
+                        src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//site-web-1.mp4" 
+                        type="video/mp4" 
+                      />
+                      Votre navigateur ne prend pas en charge les vidéos HTML5.
+                    </video>
+                  </AspectRatio>
+                </div>
               </div>
               <div className="p-3 bg-podcast-dark">
                 <h3 className="text-podcast-accent font-medium text-sm">Format Vidéo</h3>
@@ -75,17 +97,31 @@ const ImpactSection = () => {
             </div>
           </div>
 
-          {/* Center Column - Image */}
+          {/* Center Column - Images (Stacked) */}
           <div className="overflow-hidden rounded-lg bg-black shadow-lg transform hover:scale-[1.02] transition-transform duration-300 animate-fade-in h-full" style={{animationDelay: '0.2s'}}>
             <div className="h-full flex flex-col">
-              <div className="flex-grow">
-                <AspectRatio ratio={16/9} className="w-full">
-                  <img
-                    src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//2ljj5___T8TdQ___k8MKt___1.jpg"
-                    alt="Studio Podcast"
-                    className="w-full h-full object-cover rounded-t-lg"
-                  />
-                </AspectRatio>
+              <div className="flex-grow flex flex-col">
+                {/* First Image */}
+                <div className="flex-1">
+                  <AspectRatio ratio={16/9} className="w-full">
+                    <img
+                      src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//2ljj5___T8TdQ___k8MKt___1.jpg"
+                      alt="Studio Podcast"
+                      className="w-full h-full object-cover"
+                    />
+                  </AspectRatio>
+                </div>
+                
+                {/* Second Image */}
+                <div className="flex-1 border-t border-gray-800">
+                  <AspectRatio ratio={16/9} className="w-full">
+                    <img
+                      src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//2ljj5___T8TdQ___k8MKt___1.jpg"
+                      alt="Studio Podcast"
+                      className="w-full h-full object-cover"
+                    />
+                  </AspectRatio>
+                </div>
               </div>
               <div className="p-3 bg-podcast-dark">
                 <h3 className="text-podcast-accent font-medium text-sm">Format Podcast</h3>
@@ -101,7 +137,7 @@ const ImpactSection = () => {
                 <div className="w-full max-w-[200px]">
                   <AspectRatio ratio={9/16} className="w-full">
                     <video
-                      className="w-full h-full object-contain rounded-t-lg"
+                      className="w-full h-full object-contain"
                       autoPlay
                       muted
                       loop
