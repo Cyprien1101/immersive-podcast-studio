@@ -12,28 +12,28 @@ const Footer = () => {
     <footer className="bg-black py-12 text-gray-300">
       <div className="container px-4 mx-auto">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {/* Logo et description */}
+          {/* Logo and description */}
           <div className="lg:col-span-2">
-            <h3 className="mb-4 text-2xl font-bold text-podcast-accent">Studio Premium</h3>
+            <h3 className="mb-4 text-2xl font-bold text-podcast-accent">Premium Studio</h3>
             <p className="mb-4 text-sm text-gray-400">
-              Des espaces professionnels pour enregistrer, produire et diffuser vos contenus audio et vidéo.
+              Professional spaces to record, produce, and broadcast your audio and video content.
             </p>
             <Button 
               variant="outline" 
               size="sm" 
               className="border-podcast-accent text-podcast-accent hover:bg-podcast-accent hover:text-white"
             >
-              Nous contacter
+              Contact Us
             </Button>
           </div>
 
-          {/* Liens */}
+          {/* Links */}
           <div>
-            <h4 className="mb-4 text-lg font-semibold text-white">Liens rapides</h4>
+            <h4 className="mb-4 text-lg font-semibold text-white">Quick Links</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-podcast-accent">Nos Studios</a></li>
+              <li><a href="#" className="hover:text-podcast-accent">Our Studios</a></li>
               <li><a href="#" className="hover:text-podcast-accent">Services</a></li>
-              <li><a href="#" className="hover:text-podcast-accent">Exemples</a></li>
+              <li><a href="#" className="hover:text-podcast-accent">Examples</a></li>
               <li><a href="#" className="hover:text-podcast-accent">FAQ</a></li>
             </ul>
           </div>
@@ -42,17 +42,17 @@ const Footer = () => {
           <div>
             <h4 className="mb-4 text-lg font-semibold text-white">Contact</h4>
             <address className="not-italic">
-              <p className="mb-2">123 Rue du Podcast</p>
-              <p className="mb-2">75001 Paris, France</p>
-              <p className="mb-2">contact@studio-premium.fr</p>
-              <p>+33 1 23 45 67 89</p>
+              <p className="mb-2">123 Podcast Street</p>
+              <p className="mb-2">New York, NY 10001</p>
+              <p className="mb-2">contact@premium-studio.com</p>
+              <p>+1 (555) 123-4567</p>
             </address>
           </div>
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between border-t border-gray-800 pt-8 md:flex-row">
           <p className="mb-4 text-sm text-gray-500 md:mb-0">
-            &copy; {new Date().getFullYear()} Studio Premium. Tous droits réservés.
+            &copy; {new Date().getFullYear()} Premium Studio. All rights reserved.
           </p>
           
           <div className="flex items-center">
@@ -79,7 +79,7 @@ const Footer = () => {
               size="icon" 
               className="rounded-full border-podcast-accent text-podcast-accent hover:bg-podcast-accent hover:text-white"
               onClick={scrollToTop}
-              aria-label="Retour en haut de page"
+              aria-label="Back to top"
             >
               <ArrowUp className="h-5 w-5" />
             </Button>

@@ -1,13 +1,11 @@
 
 import React, { useEffect } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
-import type { UseEmblaCarouselType } from 'embla-carousel-react';
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 
-// Données simulées pour les vidéos
+// Sample data for videos
 const videoData = Array(6).fill({
   videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//03252-1-1.mp4",
-  title: "Format vertical"
+  title: "Vertical Format"
 });
 
 const VerticalVideoGrid = () => {
@@ -32,7 +30,7 @@ const VerticalVideoGrid = () => {
     <section className="py-6 bg-black">
       <div className="container px-4 mx-auto">
         <h2 className="mb-4 text-center text-xl font-bold">
-          <span className="text-gradient-static">Exemples de Formats Verticaux Livrés</span>
+          <span className="text-gradient-static">Examples of Delivered Vertical Formats</span>
         </h2>
         
         <div className="relative max-w-4xl mx-auto">
@@ -50,12 +48,12 @@ const VerticalVideoGrid = () => {
                         playsInline
                       >
                         <source src={item.videoUrl} type="video/mp4" />
-                        Votre navigateur ne prend pas en charge les vidéos HTML5.
+                        Your browser does not support HTML5 videos.
                       </video>
                     </div>
                     <div className="bg-podcast-dark p-2">
-                      <h3 className="text-podcast-accent font-medium text-xs">Format Vertical #{index + 1}</h3>
-                      <p className="text-xs text-gray-400">Format optimisé pour les réseaux sociaux</p>
+                      <h3 className="text-podcast-accent font-medium text-xs">Vertical Format #{index + 1}</h3>
+                      <p className="text-xs text-gray-400">Format optimized for social media</p>
                     </div>
                   </div>
                 </div>

@@ -36,7 +36,7 @@ const ImpactSection = () => {
         {/* 1. Animated Text - Modified layout */}
         <div className="mb-8 text-center">
           <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white animate-fade-in flex flex-col items-center">
-            <span className="mb-2">Le lieu idéal pour vos</span>
+            <span className="mb-2">The ideal place for your</span>
             <span className={cn(
               "text-gradient-static text-6xl md:text-7xl lg:text-8xl transition-opacity duration-600",
               isAnimating ? "opacity-0" : "opacity-100"
@@ -64,13 +64,13 @@ const ImpactSection = () => {
                       src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//site-web-1.mp4" 
                       type="video/mp4" 
                     />
-                    Votre navigateur ne prend pas en charge les vidéos HTML5.
+                    Your browser does not support HTML5 videos.
                   </video>
                 </AspectRatio>
               </div>
-              <div className="p-3 bg-podcast-dark">
-                <h3 className="text-podcast-accent font-medium text-sm">Format Vidéo</h3>
-                <p className="text-xs text-gray-400">Enregistrement en studio professionnel</p>
+              <div className="p-3 bg-black">
+                <h3 className="text-podcast-accent font-medium text-sm">Video Format</h3>
+                <p className="text-xs text-gray-400">Professional studio recording</p>
               </div>
             </div>
           </div>
@@ -87,14 +87,14 @@ const ImpactSection = () => {
                   />
                 </AspectRatio>
               </div>
-              <div className="p-3 bg-podcast-dark">
-                <h3 className="text-podcast-accent font-medium text-sm">Format Podcast</h3>
-                <p className="text-xs text-gray-400">Création audio professionnelle</p>
+              <div className="p-3 bg-black">
+                <h3 className="text-podcast-accent font-medium text-sm">Podcast Format</h3>
+                <p className="text-xs text-gray-400">Professional audio creation</p>
               </div>
             </div>
           </div>
 
-          {/* Right Column - Video 16:9 (previously vertical) */}
+          {/* Right Column - Video 16:9 */}
           <div className="overflow-hidden rounded-lg bg-black shadow-lg transform hover:scale-[1.02] transition-transform duration-300 animate-fade-in h-full" style={{animationDelay: '0.4s'}}>
             <div className="h-full flex flex-col">
               <div className="flex-grow">
@@ -110,13 +110,13 @@ const ImpactSection = () => {
                       src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//site-web-1.mp4" 
                       type="video/mp4" 
                     />
-                    Votre navigateur ne prend pas en charge les vidéos HTML5.
+                    Your browser does not support HTML5 videos.
                   </video>
                 </AspectRatio>
               </div>
-              <div className="p-3 bg-podcast-dark">
-                <h3 className="text-podcast-accent font-medium text-sm">Format Réseaux Sociaux</h3>
-                <p className="text-xs text-gray-400">Optimisé pour les réseaux sociaux</p>
+              <div className="p-3 bg-black">
+                <h3 className="text-podcast-accent font-medium text-sm">Social Media Format</h3>
+                <p className="text-xs text-gray-400">Optimized for social networks</p>
               </div>
             </div>
           </div>

@@ -5,47 +5,47 @@ import { Mic, Video, Radio, Share2, Palette, BarChart } from 'lucide-react';
 
 const services = [
   {
-    title: "Enregistrement Audio",
-    description: "Capturez un son de qualité professionnelle avec notre équipement haut de gamme et nos ingénieurs expérimentés.",
+    title: "Audio Recording",
+    description: "Capture professional-quality sound with our high-end equipment and experienced engineers.",
     icon: Mic
   },
   {
-    title: "Production Vidéo",
-    description: "Transformez votre podcast en contenu vidéo engageant avec notre équipe de production vidéo dédiée.",
+    title: "Video Production",
+    description: "Transform your podcast into engaging video content with our dedicated video production team.",
     icon: Video
   },
   {
     title: "Post-production",
-    description: "Montage, mixage et mastering par des professionnels pour un résultat final impeccable.",
+    description: "Editing, mixing, and mastering by professionals for an impeccable final result.",
     icon: Radio
   },
   {
     title: "Distribution",
-    description: "Diffusez votre podcast sur toutes les plateformes majeures avec notre service de distribution intégré.",
+    description: "Broadcast your podcast on all major platforms with our integrated distribution service.",
     icon: Share2
   },
   {
     title: "Branding",
-    description: "Créez une identité visuelle forte pour votre podcast avec notre équipe de designers créatifs.",
+    description: "Create a strong visual identity for your podcast with our team of creative designers.",
     icon: Palette
   },
   {
-    title: "Analyses & Insights",
-    description: "Suivez les performances de votre podcast et obtenez des insights précieux sur votre audience.",
+    title: "Analytics & Insights",
+    description: "Track your podcast's performance and get valuable insights about your audience.",
     icon: BarChart
   }
 ];
 
 const ServiceSection = () => {
   return (
-    <section className="py-20 bg-podcast-dark">
+    <section className="py-20 bg-black">
       <div className="container px-4 mx-auto">
         <h2 className="mb-4 text-center text-4xl font-bold">
-          <span className="text-gradient">Nos Services</span>
+          <span className="text-gradient">Our Services</span>
         </h2>
         
         <p className="mx-auto mb-12 max-w-2xl text-center text-gray-300">
-          Une gamme complète de services pour transformer votre vision en un podcast professionnel de haute qualité
+          A complete range of services to transform your vision into a high-quality professional podcast
         </p>
         
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
