@@ -44,7 +44,7 @@ const StudioCarousel = () => {
   };
 
   return (
-    <section className="py-20 bg-black clip-polygon">
+    <section className="py-20 bg-black">
       <div className="container px-4 mx-auto">
         <h2 className="mb-12 text-center text-4xl font-bold">
           <span className="text-gradient">Our Studios</span>

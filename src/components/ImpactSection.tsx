@@ -33,12 +33,12 @@ const ImpactSection = () => {
   return (
     <section className="bg-black py-12 px-4">
       <div className="container mx-auto">
-        {/* 1. Animated Text - Modified layout */}
+        {/* 1. Animated Text - Modified layout with REDUCED FONT SIZE */}
         <div className="mb-8 text-center">
-          <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white animate-fade-in flex flex-col items-center">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white animate-fade-in flex flex-col items-center">
             <span className="mb-2">The ideal place for your</span>
             <span className={cn(
-              "text-gradient-static text-6xl md:text-7xl lg:text-8xl transition-opacity duration-600",
+              "text-gradient-static text-5xl md:text-6xl lg:text-7xl transition-opacity duration-600",
               isAnimating ? "opacity-0" : "opacity-100"
             )}>
               {contentTypes[activeIndex]}

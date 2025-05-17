@@ -92,10 +92,6 @@
 }
 
 @layer utilities {
-  .clip-polygon {
-    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-  }
-
   .text-gradient {
     @apply bg-gradient-to-r from-podcast-accent to-purple-400 bg-clip-text text-transparent;
   }
