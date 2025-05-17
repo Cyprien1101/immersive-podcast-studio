@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 
 // Sample data for studios
 const studioData = [
@@ -46,9 +47,11 @@ const StudioCarousel = () => {
   return (
     <section className="py-20 bg-black">
       <div className="container px-4 mx-auto">
-        <h2 className="mb-12 text-center text-4xl font-bold">
-          <span className="text-gradient">Our Studios</span>
-        </h2>
+        <ScrollAnimationWrapper animation="fade-down">
+          <h2 className="mb-12 text-center text-4xl font-bold">
+            <span className="text-gradient">Our Studios</span>
+          </h2>
+        </ScrollAnimationWrapper>
         
         <div className="relative">
           {/* Navigation buttons */}
@@ -82,21 +85,25 @@ const StudioCarousel = () => {
                 <div key={studio.id} className="min-w-full px-4">
                   <div className="flex flex-col md:flex-row gap-8 items-center">
                     <div className="md:w-1/2">
-                      <div className="overflow-hidden rounded-lg shadow-2xl">
-                        <img
-                          src={studio.imageUrl}
-                          alt={`Studio ${studio.name}`}
-                          className="h-auto w-full object-cover transition-transform duration-500 hover:scale-110"
-                        />
-                      </div>
+                      <ScrollAnimationWrapper animation="fade-right">
+                        <div className="overflow-hidden rounded-lg shadow-2xl">
+                          <img
+                            src={studio.imageUrl}
+                            alt={`Studio ${studio.name}`}
+                            className="h-auto w-full object-cover transition-transform duration-500 hover:scale-110"
+                          />
+                        </div>
+                      </ScrollAnimationWrapper>
                     </div>
                     
                     <div className="md:w-1/2">
-                      <h3 className="mb-4 text-3xl font-bold text-podcast-accent">{studio.name}</h3>
-                      <p className="mb-6 text-lg text-gray-300">{studio.description}</p>
-                      <Button className="bg-podcast-accent hover:bg-podcast-accent-hover text-white">
-                        Discover this studio
-                      </Button>
+                      <ScrollAnimationWrapper animation="fade-left" delay={200}>
+                        <h3 className="mb-4 text-3xl font-bold text-podcast-accent">{studio.name}</h3>
+                        <p className="mb-6 text-lg text-gray-300">{studio.description}</p>
+                        <Button className="bg-podcast-accent hover:bg-podcast-accent-hover text-white">
+                          Discover this studio
+                        </Button>
+                      </ScrollAnimationWrapper>
                     </div>
                   </div>
                 </div>
@@ -105,21 +112,23 @@ const StudioCarousel = () => {
           </div>
           
           {/* Slide indicators */}
-          <div className="mt-8 flex justify-center gap-2">
-            {studioData.map((_, index) => (
-              <button
-                key={index}
-                className={cn(
-                  "h-3 w-3 rounded-full transition-all",
-                  activeSlide === index 
-                    ? "bg-podcast-accent w-8" 
-                    : "bg-gray-600 hover:bg-gray-500"
-                )}
-                onClick={() => setActiveSlide(index)}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
+          <ScrollAnimationWrapper animation="fade-up" delay={300}>
+            <div className="mt-8 flex justify-center gap-2">
+              {studioData.map((_, index) => (
+                <button
+                  key={index}
+                  className={cn(
+                    "h-3 w-3 rounded-full transition-all",
+                    activeSlide === index 
+                      ? "bg-podcast-accent w-8" 
+                      : "bg-gray-600 hover:bg-gray-500"
+                  )}
+                  onClick={() => setActiveSlide(index)}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          </ScrollAnimationWrapper>
         </div>
       </div>
     </section>

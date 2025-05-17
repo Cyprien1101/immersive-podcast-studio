@@ -1,8 +1,53 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 
 const HeroSection = () => {
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const descRef = useRef<HTMLParagraphElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Initial setup - hide elements
+    if (titleRef.current) {
+      titleRef.current.style.opacity = '0';
+      titleRef.current.style.transform = 'translateY(30px)';
+      titleRef.current.style.transition = 'opacity 1s ease-out, transform 1s ease-out';
+    }
+    
+    if (descRef.current) {
+      descRef.current.style.opacity = '0';
+      descRef.current.style.transform = 'translateY(30px)';
+      descRef.current.style.transition = 'opacity 1s ease-out 0.3s, transform 1s ease-out 0.3s';
+    }
+    
+    if (buttonRef.current) {
+      buttonRef.current.style.opacity = '0';
+      buttonRef.current.style.transform = 'translateY(30px)';
+      buttonRef.current.style.transition = 'opacity 1s ease-out 0.6s, transform 1s ease-out 0.6s';
+    }
+    
+    // Animate elements after a short delay
+    const timer = setTimeout(() => {
+      if (titleRef.current) {
+        titleRef.current.style.opacity = '1';
+        titleRef.current.style.transform = 'translateY(0)';
+      }
+      
+      if (descRef.current) {
+        descRef.current.style.opacity = '1';
+        descRef.current.style.transform = 'translateY(0)';
+      }
+      
+      if (buttonRef.current) {
+        buttonRef.current.style.opacity = '1';
+        buttonRef.current.style.transform = 'translateY(0)';
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
       <section className="relative h-screen w-full overflow-hidden">
@@ -24,23 +69,25 @@ const HeroSection = () => {
         {/* Dark overlay for better readability */}
         <div className="absolute inset-0 hero-overlay"></div>
         
-        {/* Centered content */}
+        {/* Centered content with animation */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-          <h1 className="mb-6 max-w-3xl text-3xl font-bold leading-tight animate-fade-in md:text-5xl lg:text-7xl">
+          <h1 ref={titleRef} className="mb-6 max-w-3xl text-3xl font-bold leading-tight md:text-5xl lg:text-7xl">
             <span className="text-gradient-static">Premium Studio</span> for your 
             <span className="text-gradient-static"> podcasts</span>
           </h1>
           
-          <p className="mb-8 max-w-xl text-lg text-gray-200 animate-fade-in md:text-xl">
+          <p ref={descRef} className="mb-8 max-w-xl text-lg text-gray-200 md:text-xl">
             Professional spaces to record, produce, and broadcast your audio and video content
           </p>
           
-          <Button 
-            size="lg" 
-            className="animate-scale-in bg-podcast-accent hover:bg-podcast-accent-hover text-white"
-          >
-            Book Now
-          </Button>
+          <div ref={buttonRef}>
+            <Button 
+              size="lg" 
+              className="bg-podcast-accent hover:bg-podcast-accent-hover text-white"
+            >
+              Book Now
+            </Button>
+          </div>
         </div>
       </section>
     </>

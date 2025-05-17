@@ -134,4 +134,51 @@
   .duration-600 {
     transition-duration: 600ms;
   }
+
+  /* New scroll animations */
+  .scroll-fade-in {
+    opacity: 0;
+    transition: opacity 1s ease-out, transform 1s ease-out;
+  }
+  
+  .scroll-fade-up {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+  }
+  
+  .scroll-fade-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+  }
+  
+  .scroll-fade-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+  }
+  
+  .scroll-scale-in {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+  }
+
+  .scroll-visible {
+    opacity: 1;
+    transform: translate(0) scale(1);
+  }
+
+  .staggered-item {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .stagger-animation-delay-1 { animation-delay: 0.1s; }
+  .stagger-animation-delay-2 { animation-delay: 0.2s; }
+  .stagger-animation-delay-3 { animation-delay: 0.3s; }
+  .stagger-animation-delay-4 { animation-delay: 0.4s; }
+  .stagger-animation-delay-5 { animation-delay: 0.5s; }
+  .stagger-animation-delay-6 { animation-delay: 0.6s; }
 }

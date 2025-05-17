@@ -2,6 +2,7 @@
 import React from 'react';
 import ServiceCard from './ServiceCard';
 import { Mic, Video, Radio, Share2, Palette, BarChart } from 'lucide-react';
+import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 
 const services = [
   {
@@ -40,27 +41,29 @@ const ServiceSection = () => {
   return (
     <section className="py-20 bg-black">
       <div className="container px-4 mx-auto">
-        <h2 className="mb-4 text-center text-4xl font-bold">
-          <span className="text-gradient">Our Services</span>
-        </h2>
-        
-        <p className="mx-auto mb-12 max-w-2xl text-center text-gray-300">
-          A complete range of services to transform your vision into a high-quality professional podcast
-        </p>
+        <ScrollAnimationWrapper animation="zoom-in">
+          <h2 className="mb-4 text-center text-4xl font-bold">
+            <span className="text-gradient">Our Services</span>
+          </h2>
+          
+          <p className="mx-auto mb-12 max-w-2xl text-center text-gray-300">
+            A complete range of services to transform your vision into a high-quality professional podcast
+          </p>
+        </ScrollAnimationWrapper>
         
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {services.map((service, index) => (
-            <div 
+            <ScrollAnimationWrapper 
               key={index} 
-              className="animate-fade-in" 
-              style={{ animationDelay: `${index * 0.1}s` }}
+              animation="fade-up" 
+              delay={index * 150}
             >
               <ServiceCard
                 title={service.title}
                 description={service.description}
                 Icon={service.icon}
               />
-            </div>
+            </ScrollAnimationWrapper>
           ))}
         </div>
       </div>

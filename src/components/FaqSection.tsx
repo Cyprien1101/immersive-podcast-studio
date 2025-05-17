@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 
 const faqItems = [
   {
@@ -38,21 +39,29 @@ const FaqSection = () => {
   return (
     <section className="py-20 bg-black">
       <div className="container px-4 mx-auto">
-        <h2 className="mb-12 text-center text-4xl font-bold">
-          <span className="text-gradient">Frequently Asked Questions</span>
-        </h2>
+        <ScrollAnimationWrapper animation="fade-down">
+          <h2 className="mb-12 text-center text-4xl font-bold">
+            <span className="text-gradient">Frequently Asked Questions</span>
+          </h2>
+        </ScrollAnimationWrapper>
         
         <div className="mx-auto max-w-3xl">
           <Accordion type="single" collapsible className="w-full">
             {faqItems.map((item, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-left text-lg font-medium text-podcast-light">
-                  {item.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-gray-300">
-                  {item.answer}
-                </AccordionContent>
-              </AccordionItem>
+              <ScrollAnimationWrapper 
+                key={index} 
+                animation="fade-up" 
+                delay={index * 100}
+              >
+                <AccordionItem value={`item-${index}`}>
+                  <AccordionTrigger className="text-left text-lg font-medium text-podcast-light">
+                    {item.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-gray-300">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              </ScrollAnimationWrapper>
             ))}
           </Accordion>
         </div>
