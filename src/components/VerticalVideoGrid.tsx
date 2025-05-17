@@ -29,7 +29,7 @@ const VerticalVideoGrid = () => {
   }, [emblaApi]);
 
   return (
-    <section className="py-6 bg-podcast-muted">
+    <section className="py-6 bg-black">
       <div className="container px-4 mx-auto">
         <h2 className="mb-4 text-center text-xl font-bold">
           <span className="text-gradient-static">Exemples de Formats Verticaux Livrés</span>
