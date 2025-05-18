@@ -54,9 +54,9 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
         
         if (error) throw error;
         
-        // Generate time slots for the day (9 AM to 9 PM, in 30-minute increments)
+        // Generate time slots for the day (00:00 to 23:30, in 30-minute increments)
         const generatedTimeSlots: TimeSlot[] = [];
-        for (let hour = 9; hour < 21; hour++) {
+        for (let hour = 0; hour < 24; hour++) {
           for (let minute of [0, 30]) {
             const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
             
@@ -155,7 +155,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
         {/* Left Column - Calendar */}
         <Card className="bg-black border-gray-800 text-white h-fit">
           <CardContent className="pt-6">
-            <h3 className="text-xl font-semibold mb-4 text-podcast-accent">Select Date</h3>
+            <h3 className="text-xl font-semibold mb-4 text-white">Select Date</h3>
             
             <div className="grid gap-2">
               <Popover>
@@ -176,8 +176,11 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
                     disabled={disabledDays}
                     className="pointer-events-auto"
                     classNames={{
-                      day_selected: "bg-podcast-accent text-white hover:bg-podcast-accent-hover",
-                      day_today: "bg-gray-700 text-white"
+                      day_selected: "bg-white text-black hover:bg-gray-200",
+                      day_today: "bg-gray-700 text-white",
+                      day: "text-white hover:bg-gray-800 focus:bg-gray-800",
+                      caption_label: "text-white",
+                      head_cell: "text-gray-400"
                     }}
                   />
                 </PopoverContent>
@@ -189,7 +192,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
         {/* Right Column - Session Details */}
         <Card className="bg-black border-gray-800 text-white h-fit">
           <CardContent className="pt-6">
-            <h3 className="text-xl font-semibold mb-4 text-podcast-accent">Session Details</h3>
+            <h3 className="text-xl font-semibold mb-4 text-white">Session Details</h3>
             
             {/* Duration Selector */}
             <div className="mb-6">
@@ -257,10 +260,10 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
       {/* Time Slots Section */}
       <Card className="mt-8 bg-black border-gray-800 text-white">
         <CardContent className="pt-6">
-          <h3 className="text-xl font-semibold mb-4 text-podcast-accent">Available Time Slots</h3>
+          <h3 className="text-xl font-semibold mb-4 text-white">Available Time Slots</h3>
           {loading ? (
             <div className="flex justify-center items-center h-32">
-              <Loader2 className="h-8 w-8 animate-spin text-podcast-accent" />
+              <Loader2 className="h-8 w-8 animate-spin text-white" />
             </div>
           ) : (
             <>
@@ -275,12 +278,12 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
                       className={cn(
                         "transition-all",
                         isSelected 
-                          ? "bg-podcast-accent hover:bg-podcast-accent-hover" 
-                          : canSelect 
+                          ? "bg-white text-black hover:bg-gray-200" 
+                          : canSelect && slot.isAvailable
                             ? "bg-gray-800 hover:bg-gray-700" 
                             : "bg-gray-900 opacity-50 cursor-not-allowed"
                       )}
-                      disabled={!canSelect}
+                      disabled={!canSelect || !slot.isAvailable}
                       onClick={() => handleSelectTimeSlot(slot.time, index)}
                     >
                       {formatTimeSlot(slot.time)}
@@ -295,7 +298,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
               
               <div className="mt-8 flex justify-center">
                 <Button 
-                  className="px-8 bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600"
+                  className="px-8 bg-white text-black hover:bg-gray-200"
                   disabled={!selectedStartTime}
                   onClick={handleProceed}
                 >
