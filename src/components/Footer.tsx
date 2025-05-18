@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const scrollToTop = () => {
@@ -18,13 +19,15 @@ const Footer = () => {
             <p className="mb-4 text-sm text-gray-400">
               Professional spaces to record, produce, and broadcast your audio and video content.
             </p>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="border-podcast-accent text-podcast-accent hover:bg-podcast-accent hover:text-white"
-            >
-              Contact Us
-            </Button>
+            <Link to="/contact">
+              <Button 
+                variant="default" 
+                size="sm" 
+                className="hover:scale-105 transition-transform"
+              >
+                Contact Us
+              </Button>
+            </Link>
           </div>
 
           {/* Links */}
