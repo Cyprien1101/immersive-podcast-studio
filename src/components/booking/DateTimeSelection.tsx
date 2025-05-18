@@ -267,7 +267,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
                 {availableTimeSlots.map((slot, index) => {
                   const canSelect = canSelectTimeSlot(index);
                   const isSelected = selectedStartTime === slot.time;
@@ -281,7 +281,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
                         isSelected 
                           ? "bg-white text-black hover:bg-gray-200" 
                           : canSelect && slot.isAvailable
-                            ? "bg-black hover:bg-gray-900 text-white border border-gray-700" 
+                            ? "bg-black text-white border border-gray-700 hover:bg-gray-900" 
                             : "bg-gray-900 text-gray-500 opacity-50 cursor-not-allowed"
                       )}
                       disabled={!canSelect || !slot.isAvailable}
@@ -299,7 +299,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
               
               <div className="mt-8 flex justify-center">
                 <Button 
-                  className="px-8 bg-white text-black hover:bg-gray-200"
+                  className="px-8 bg-black text-white border border-white hover:bg-gray-900"
                   disabled={!selectedStartTime}
                   onClick={handleProceed}
                 >
