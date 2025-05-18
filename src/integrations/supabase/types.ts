@@ -355,6 +355,7 @@ export type Database = {
           description: string
           id: string
           location: string
+          max_booking_duration: number
           max_guests: number
           name: string
           price_per_hour: number
@@ -367,6 +368,7 @@ export type Database = {
           description: string
           id?: string
           location: string
+          max_booking_duration?: number
           max_guests: number
           name: string
           price_per_hour: number
@@ -379,6 +381,7 @@ export type Database = {
           description?: string
           id?: string
           location?: string
+          max_booking_duration?: number
           max_guests?: number
           name?: string
           price_per_hour?: number
