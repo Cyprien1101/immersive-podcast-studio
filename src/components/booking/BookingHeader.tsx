@@ -6,7 +6,18 @@ import { Home } from 'lucide-react';
 
 const BookingHeader = () => {
   return (
-    <div className="fixed top-0 right-0 p-4 flex items-center gap-3 z-50">
+    <div className="fixed top-0 left-0 p-4 flex items-center gap-3 z-50">
+      {/* Logo */}
+      <Link to="/">
+        <div className="h-12 w-auto overflow-hidden rounded-lg border-2 border-white hover:scale-105 transition-transform duration-300">
+          <img 
+            src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//logo.png" 
+            alt="Studio Logo" 
+            className="h-full object-cover"
+          />
+        </div>
+      </Link>
+      
       {/* Home button with house icon */}
       <Link to="/">
         <Button 
@@ -24,17 +35,6 @@ const BookingHeader = () => {
       >
         Sign in
       </Button>
-      
-      {/* Logo */}
-      <Link to="/">
-        <div className="h-12 w-12 overflow-hidden rounded-full border-2 border-white hover:scale-105 transition-transform duration-300">
-          <img 
-            src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//logo.png" 
-            alt="Studio Logo" 
-            className="h-full w-full object-cover"
-          />
-        </div>
-      </Link>
     </div>
   );
 };
