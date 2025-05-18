@@ -1,0 +1,313 @@
+
+import React, { useState, useEffect } from 'react';
+import { format, addDays, isAfter, startOfDay } from 'date-fns';
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Card, CardContent } from "@/components/ui/card";
+import { CalendarIcon, Minus, Plus, Clock, Users } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
+import ScrollAnimationWrapper from '@/components/ScrollAnimationWrapper';
+
+interface DateTimeSelectionProps {
+  studio: any;
+  onProceed: (bookingDetails: {
+    date: Date;
+    startTime: string;
+    duration: number;
+    guests: number;
+  }) => void;
+}
+
+interface TimeSlot {
+  time: string;
+  isAvailable: boolean;
+}
+
+const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed }) => {
+  const [date, setDate] = useState<Date>(new Date());
+  const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([]);
+  const [selectedStartTime, setSelectedStartTime] = useState<string | null>(null);
+  const [duration, setDuration] = useState<number>(1); // Default 1 hour
+  const [guests, setGuests] = useState<number>(1); // Default 1 guest
+  const [loading, setLoading] = useState<boolean>(false);
+  
+  // Fetch availability for the selected date and studio
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      if (!studio?.id || !date) return;
+      
+      setLoading(true);
+      setSelectedStartTime(null); // Reset selection when date changes
+      
+      try {
+        // Convert the date to the format used in the database
+        const formattedDate = format(date, 'yyyy-MM-dd');
+        
+        const { data, error } = await supabase
+          .from('studio_availability')
+          .select('*')
+          .eq('studio_id', studio.id)
+          .eq('date', formattedDate);
+        
+        if (error) throw error;
+        
+        // Generate time slots for the day (9 AM to 9 PM, in 30-minute increments)
+        const generatedTimeSlots: TimeSlot[] = [];
+        for (let hour = 9; hour < 21; hour++) {
+          for (let minute of [0, 30]) {
+            const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+            
+            // Check if this time slot exists in the data and is available
+            const timeSlot = data?.find(slot => slot.start_time === time);
+            // If the slot exists in the database and is marked unavailable, set it as unavailable
+            // If it doesn't exist or is marked available in the database, it's available
+            const isAvailable = !timeSlot || timeSlot.is_available;
+            
+            generatedTimeSlots.push({ time, isAvailable });
+          }
+        }
+        
+        setAvailableTimeSlots(generatedTimeSlots);
+      } catch (error) {
+        console.error('Error fetching availability:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAvailability();
+  }, [date, studio]);
+  
+  // Check if a time slot can accommodate the selected duration
+  const canSelectTimeSlot = (startIndex: number): boolean => {
+    // We need 2 consecutive 30-min slots for 1 hour, 4 for 2 hours, etc.
+    const slotsNeeded = duration * 2; 
+    
+    // Check if we have enough consecutive available slots
+    for (let i = startIndex; i < startIndex + slotsNeeded; i++) {
+      if (!availableTimeSlots[i] || !availableTimeSlots[i].isAvailable) {
+        return false;
+      }
+    }
+    
+    return true;
+  };
+  
+  // Format the time slot for display
+  const formatTimeSlot = (time: string): string => {
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours, 10);
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${period}`;
+  };
+  
+  // Handle duration changes
+  const handleDurationChange = (increment: boolean) => {
+    setDuration(prev => {
+      const newValue = increment ? prev + 1 : prev - 1;
+      // Constraint between 1 and max_booking_duration (or default to 3)
+      return Math.min(Math.max(newValue, 1), studio?.max_booking_duration || 3);
+    });
+    // Reset selected time when duration changes
+    setSelectedStartTime(null);
+  };
+  
+  // Handle guests changes
+  const handleGuestsChange = (increment: boolean) => {
+    setGuests(prev => {
+      const newValue = increment ? prev + 1 : prev - 1;
+      // Constraint between 1 and max_guests
+      return Math.min(Math.max(newValue, 1), studio?.max_guests || 10);
+    });
+  };
+  
+  // Handle selecting a time slot
+  const handleSelectTimeSlot = (time: string, index: number) => {
+    if (canSelectTimeSlot(index)) {
+      setSelectedStartTime(time);
+    }
+  };
+  
+  // Handle proceeding to next step
+  const handleProceed = () => {
+    if (date && selectedStartTime) {
+      onProceed({
+        date,
+        startTime: selectedStartTime,
+        duration,
+        guests
+      });
+    }
+  };
+
+  // Disable past dates
+  const disabledDays = (date: Date) => {
+    return isAfter(startOfDay(new Date()), startOfDay(date));
+  };
+  
+  return (
+    <ScrollAnimationWrapper animation="fade-up">
+      <div className="grid gap-8 md:grid-cols-2">
+        {/* Left Column - Calendar */}
+        <Card className="bg-black border-gray-800 text-white h-fit">
+          <CardContent className="pt-6">
+            <h3 className="text-xl font-semibold mb-4 text-podcast-accent">Select Date</h3>
+            
+            <div className="grid gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, 'PPP') : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-gray-900 border-gray-700">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(newDate) => newDate && setDate(newDate)}
+                    disabled={disabledDays}
+                    className="pointer-events-auto"
+                    classNames={{
+                      day_selected: "bg-podcast-accent text-white hover:bg-podcast-accent-hover",
+                      day_today: "bg-gray-700 text-white"
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Right Column - Session Details */}
+        <Card className="bg-black border-gray-800 text-white h-fit">
+          <CardContent className="pt-6">
+            <h3 className="text-xl font-semibold mb-4 text-podcast-accent">Session Details</h3>
+            
+            {/* Duration Selector */}
+            <div className="mb-6">
+              <label className="block text-gray-300 mb-2 flex items-center">
+                <Clock className="w-4 h-4 mr-2" /> Duration
+              </label>
+              <div className="flex items-center">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  onClick={() => handleDurationChange(false)}
+                  disabled={duration <= 1}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="px-4 py-2 mx-2 bg-gray-900 rounded-md min-w-[60px] text-center">
+                  {duration} {duration === 1 ? 'hour' : 'hours'}
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  onClick={() => handleDurationChange(true)}
+                  disabled={duration >= (studio?.max_booking_duration || 3)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            {/* Guests Selector */}
+            <div className="mb-6">
+              <label className="block text-gray-300 mb-2 flex items-center">
+                <Users className="w-4 h-4 mr-2" /> How many people will be recording?
+              </label>
+              <div className="flex items-center">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  onClick={() => handleGuestsChange(false)}
+                  disabled={guests <= 1}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="px-4 py-2 mx-2 bg-gray-900 rounded-md min-w-[60px] text-center">
+                  {guests} {guests === 1 ? 'guest' : 'guests'}
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  onClick={() => handleGuestsChange(true)}
+                  disabled={guests >= (studio?.max_guests || 10)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Time Slots Section */}
+      <Card className="mt-8 bg-black border-gray-800 text-white">
+        <CardContent className="pt-6">
+          <h3 className="text-xl font-semibold mb-4 text-podcast-accent">Available Time Slots</h3>
+          {loading ? (
+            <div className="flex justify-center items-center h-32">
+              <Loader2 className="h-8 w-8 animate-spin text-podcast-accent" />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                {availableTimeSlots.map((slot, index) => {
+                  const canSelect = canSelectTimeSlot(index);
+                  const isSelected = selectedStartTime === slot.time;
+                  
+                  return (
+                    <Button
+                      key={slot.time}
+                      className={cn(
+                        "transition-all",
+                        isSelected 
+                          ? "bg-podcast-accent hover:bg-podcast-accent-hover" 
+                          : canSelect 
+                            ? "bg-gray-800 hover:bg-gray-700" 
+                            : "bg-gray-900 opacity-50 cursor-not-allowed"
+                      )}
+                      disabled={!canSelect}
+                      onClick={() => handleSelectTimeSlot(slot.time, index)}
+                    >
+                      {formatTimeSlot(slot.time)}
+                    </Button>
+                  );
+                })}
+              </div>
+              
+              {availableTimeSlots.length === 0 && !loading && (
+                <p className="text-center text-gray-400 my-6">No available time slots for this date.</p>
+              )}
+              
+              <div className="mt-8 flex justify-center">
+                <Button 
+                  className="px-8 bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600"
+                  disabled={!selectedStartTime}
+                  onClick={handleProceed}
+                >
+                  Continue
+                </Button>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </ScrollAnimationWrapper>
+  );
+};
+
+export default DateTimeSelection;
