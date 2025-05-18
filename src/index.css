@@ -104,6 +104,10 @@
     @apply bg-gradient-to-r from-podcast-accent via-purple-400 to-pink-500 bg-clip-text text-transparent animate-pulse-slow;
   }
   
+  .button-gradient {
+    @apply bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600;
+  }
+  
   .video-container {
     aspect-ratio: 9/16;
     max-height: 350px;

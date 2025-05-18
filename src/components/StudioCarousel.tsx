@@ -11,6 +11,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { BookOpen } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
 
 // Enhanced studio data with proper names and addresses
 const studioData = [
@@ -18,28 +19,28 @@ const studioData = [
     id: 1,
     name: "Studio Eden",
     description: "Spacious environment ideal for podcasts with multiple guests, equipped with Neumann microphones and SSL preamps.",
-    imageUrl: "https://images.unsplash.com/photo-1483058712412-4245e9b90334?q=80&w=2070&auto=format&fit=crop",
+    imageUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//2ljj5___T8TdQ___k8MKt___1.jpg",
     address: "12 Rue du Son, Paris 10e"
   },
   {
     id: 2,
     name: "Studio Alpha",
     description: "Intimate studio for one-on-one interviews, with premium acoustic treatment and adjustable lighting.",
-    imageUrl: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?q=80&w=2070&auto=format&fit=crop",
+    imageUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//2ljj5___T8TdQ___k8MKt___1.jpg",
     address: "34 Avenue des Fréquences, Lyon"
   },
   {
     id: 3,
     name: "Studio Nova",
     description: "Configured for video podcasts with green screen, LED lighting, and 4K cameras for professional results.",
-    imageUrl: "https://images.unsplash.com/photo-1496307653780-42ee777d4833?q=80&w=2070&auto=format&fit=crop",
+    imageUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//2ljj5___T8TdQ___k8MKt___1.jpg",
     address: "8 Boulevard du Mix, Marseille"
   },
   {
     id: 4,
     name: "Studio Céleste",
     description: "Our largest space for live events, capable of hosting an audience and equipped for live streaming.",
-    imageUrl: "https://images.unsplash.com/photo-1449157291145-7efd050a4d0e?q=80&w=2070&auto=format&fit=crop",
+    imageUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//2ljj5___T8TdQ___k8MKt___1.jpg",
     address: "21 Rue des Voix, Bordeaux"
   }
 ];
@@ -49,7 +50,7 @@ const StudioCarousel = () => {
     <section className="py-20 bg-black">
       <div className="container mx-auto">
         <ScrollAnimationWrapper animation="fade-down">
-          <h2 className="mb-12 text-center text-4xl font-bold">
+          <h2 className="mb-12 text-center text-5xl md:text-6xl font-bold">
             <span className="text-gradient">Our Studios</span>
           </h2>
         </ScrollAnimationWrapper>
@@ -71,7 +72,7 @@ const StudioCarousel = () => {
                         <img
                           src={studio.imageUrl}
                           alt={`Studio ${studio.name}`}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110 rounded-xl"
                         />
                       </div>
                       
@@ -80,7 +81,7 @@ const StudioCarousel = () => {
                       
                       {/* Studio info overlay - bottom left */}
                       <div className="absolute bottom-10 left-10 max-w-md text-white">
-                        <h3 className="mb-2 text-5xl md:text-6xl font-bold tracking-tight text-white drop-shadow-lg">
+                        <h3 className="mb-2 text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">
                           {studio.name}
                         </h3>
                         <p className="text-xl md:text-2xl text-white/90 drop-shadow-md">
@@ -91,7 +92,7 @@ const StudioCarousel = () => {
                       {/* Book now button - bottom right */}
                       <div className="absolute bottom-10 right-10">
                         <Button 
-                          className="bg-podcast-accent hover:bg-podcast-accent-hover text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300"
+                          className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600 text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300"
                         >
                           <BookOpen className="h-5 w-5" />
                           Book Now
