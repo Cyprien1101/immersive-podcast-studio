@@ -58,14 +58,12 @@ const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep })
                 </span>
               </div>
               
-              {/* Add separator between steps - centered vertically */}
+              {/* Ligne fine entre les étapes - revenir à la version antérieure */}
               {!isLast && (
-                <div className="flex items-center h-10">
-                  <Separator 
-                    orientation="horizontal" 
-                    className="h-0.5 flex-1 mx-2 bg-gray-700"
-                  />
-                </div>
+                <Separator 
+                  orientation="horizontal" 
+                  className="h-0.5 flex-1 mx-2 bg-gray-700"
+                />
               )}
             </React.Fragment>
           );

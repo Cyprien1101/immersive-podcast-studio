@@ -1,6 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -81,12 +82,14 @@ const HeroSection = () => {
           </p>
           
           <div ref={buttonRef}>
-            <Button 
-              size="lg" 
-              className="bg-podcast-accent hover:bg-podcast-accent-hover text-white"
-            >
-              Book Now
-            </Button>
+            <Link to="/booking">
+              <Button 
+                size="lg" 
+                className="bg-podcast-accent hover:bg-podcast-accent-hover text-white"
+              >
+                Book Now
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
