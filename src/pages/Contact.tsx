@@ -1,11 +1,16 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Map, Phone, Mail } from 'lucide-react';
 import Footer from '@/components/Footer';
 import FaqSection from '@/components/FaqSection';
 import ScrollAnimationWrapper from '@/components/ScrollAnimationWrapper';
 
 const Contact = () => {
+  // Add useEffect to scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   return (
     <div className="min-h-screen bg-podcast-dark">
       <div className="container px-4 mx-auto py-20">
