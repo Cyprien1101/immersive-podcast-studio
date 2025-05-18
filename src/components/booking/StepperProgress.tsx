@@ -3,6 +3,7 @@ import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Step {
   id: string;
@@ -18,6 +19,7 @@ const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep })
   // Calculate progress percentage
   const currentIndex = steps.findIndex(step => step.id === currentStep);
   const progressPercentage = ((currentIndex + 1) / steps.length) * 100;
+  const isMobile = useIsMobile();
   
   return (
     <div className="mb-12">
@@ -47,7 +49,7 @@ const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep })
                   )}
                 </div>
                 <span 
-                  className={`text-sm font-medium
+                  className={`text-sm ${isMobile ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[70px] text-center
                     ${isActive ? 'text-podcast-accent' : 
                       isCompleted ? 'text-green-600' : 
                       'text-gray-400'}`}
@@ -56,12 +58,14 @@ const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep })
                 </span>
               </div>
               
-              {/* Add separator between steps */}
+              {/* Add separator between steps - centered vertically */}
               {!isLast && (
-                <Separator 
-                  orientation="vertical" 
-                  className="h-0.5 flex-1 mx-2 bg-gray-700"
-                />
+                <div className="flex items-center h-10">
+                  <Separator 
+                    orientation="horizontal" 
+                    className="h-0.5 flex-1 mx-2 bg-gray-700"
+                  />
+                </div>
               )}
             </React.Fragment>
           );
