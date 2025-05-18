@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { format, addDays, isAfter, startOfDay } from 'date-fns';
 import { Calendar } from "@/components/ui/calendar";
@@ -280,8 +281,8 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
                         isSelected 
                           ? "bg-white text-black hover:bg-gray-200" 
                           : canSelect && slot.isAvailable
-                            ? "bg-gray-800 hover:bg-gray-700" 
-                            : "bg-gray-900 opacity-50 cursor-not-allowed"
+                            ? "bg-black hover:bg-gray-900 text-white border border-gray-700" 
+                            : "bg-gray-900 text-gray-500 opacity-50 cursor-not-allowed"
                       )}
                       disabled={!canSelect || !slot.isAvailable}
                       onClick={() => handleSelectTimeSlot(slot.time, index)}
