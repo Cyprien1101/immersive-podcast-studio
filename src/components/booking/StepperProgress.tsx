@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Progress } from '@/components/ui/progress';
 import { CheckCircle } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -18,14 +17,10 @@ interface StepperProgressProps {
 const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep }) => {
   // Calculate progress percentage
   const currentIndex = steps.findIndex(step => step.id === currentStep);
-  const progressPercentage = ((currentIndex + 1) / steps.length) * 100;
   const isMobile = useIsMobile();
   
   return (
-    <div className="mb-12">
-      {/* Progress bar */}
-      <Progress value={progressPercentage} className="h-2 mb-6" />
-      
+    <div className="mb-6">
       {/* Step labels */}
       <div className="flex justify-between items-center">
         {steps.map((step, index) => {
@@ -58,7 +53,7 @@ const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep })
                 </span>
               </div>
               
-              {/* Ligne fine entre les étapes - revenir à la version antérieure */}
+              {/* Ligne fine entre les étapes */}
               {!isLast && (
                 <Separator 
                   orientation="horizontal" 

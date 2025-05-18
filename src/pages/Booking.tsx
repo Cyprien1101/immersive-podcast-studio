@@ -72,11 +72,11 @@ const BookingPage = () => {
       {/* Added BookingHeader component */}
       <BookingHeader />
       
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-8">
         {/* Step Progress Indicator */}
         <StepperProgress steps={STEPS} currentStep={currentStep} />
         
-        <h1 className="text-4xl md:text-5xl font-bold text-center my-8">
+        <h1 className="text-4xl md:text-5xl font-bold text-center my-6">
           <span className="text-gradient">Book Your Studio</span>
         </h1>
         
