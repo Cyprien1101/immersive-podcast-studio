@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import StudioSelection from '@/components/booking/StudioSelection';
 import StepperProgress from '@/components/booking/StepperProgress';
+import BookingHeader from '@/components/booking/BookingHeader';
 import Footer from '@/components/Footer';
 import { Loader2 } from 'lucide-react';
 
@@ -67,7 +68,10 @@ const BookingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-podcast-dark">
+    <div className="min-h-screen bg-podcast-dark pt-20">
+      {/* Added BookingHeader component */}
+      <BookingHeader />
+      
       <div className="container mx-auto px-4 py-12">
         {/* Step Progress Indicator */}
         <StepperProgress steps={STEPS} currentStep={currentStep} />
