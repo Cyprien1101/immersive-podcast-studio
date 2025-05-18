@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/carousel";
 import { BookOpen } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from 'react-router-dom';
 
 // Enhanced studio data with proper names and addresses
 const studioData = [
@@ -91,12 +92,14 @@ const StudioCarousel = () => {
                       
                       {/* Book now button - bottom right */}
                       <div className="absolute bottom-10 right-10">
-                        <Button 
-                          className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600 text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300"
-                        >
-                          <BookOpen className="h-5 w-5" />
-                          Book Now
-                        </Button>
+                        <Link to="/booking">
+                          <Button 
+                            className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600 text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300"
+                          >
+                            <BookOpen className="h-5 w-5" />
+                            Book Now
+                          </Button>
+                        </Link>
                       </div>
                     </div>
                   </CarouselItem>
