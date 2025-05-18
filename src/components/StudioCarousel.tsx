@@ -1,133 +1,108 @@
 
-import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React from 'react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import ScrollAnimationWrapper from './ScrollAnimationWrapper';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { BookOpen } from 'lucide-react';
 
-// Sample data for studios
+// Enhanced studio data with proper names and addresses
 const studioData = [
   {
     id: 1,
-    name: "Studio A",
+    name: "Studio Eden",
     description: "Spacious environment ideal for podcasts with multiple guests, equipped with Neumann microphones and SSL preamps.",
-    imageUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//2ljj5___T8TdQ___k8MKt___1.jpg"
+    imageUrl: "https://images.unsplash.com/photo-1483058712412-4245e9b90334?q=80&w=2070&auto=format&fit=crop",
+    address: "12 Rue du Son, Paris 10e"
   },
   {
     id: 2,
-    name: "Studio B",
+    name: "Studio Alpha",
     description: "Intimate studio for one-on-one interviews, with premium acoustic treatment and adjustable lighting.",
-    imageUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//2ljj5___T8TdQ___k8MKt___1.jpg"
+    imageUrl: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?q=80&w=2070&auto=format&fit=crop",
+    address: "34 Avenue des Fréquences, Lyon"
   },
   {
     id: 3,
-    name: "Studio C",
+    name: "Studio Nova",
     description: "Configured for video podcasts with green screen, LED lighting, and 4K cameras for professional results.",
-    imageUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//2ljj5___T8TdQ___k8MKt___1.jpg"
+    imageUrl: "https://images.unsplash.com/photo-1496307653780-42ee777d4833?q=80&w=2070&auto=format&fit=crop",
+    address: "8 Boulevard du Mix, Marseille"
   },
   {
     id: 4,
-    name: "Studio D",
+    name: "Studio Céleste",
     description: "Our largest space for live events, capable of hosting an audience and equipped for live streaming.",
-    imageUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//2ljj5___T8TdQ___k8MKt___1.jpg"
+    imageUrl: "https://images.unsplash.com/photo-1449157291145-7efd050a4d0e?q=80&w=2070&auto=format&fit=crop",
+    address: "21 Rue des Voix, Bordeaux"
   }
 ];
 
 const StudioCarousel = () => {
-  const [activeSlide, setActiveSlide] = useState(0);
-
-  const nextSlide = () => {
-    setActiveSlide((prev) => (prev === studioData.length - 1 ? 0 : prev + 1));
-  };
-
-  const prevSlide = () => {
-    setActiveSlide((prev) => (prev === 0 ? studioData.length - 1 : prev - 1));
-  };
-
   return (
     <section className="py-20 bg-black">
-      <div className="container px-4 mx-auto">
+      <div className="container mx-auto">
         <ScrollAnimationWrapper animation="fade-down">
           <h2 className="mb-12 text-center text-4xl font-bold">
             <span className="text-gradient">Our Studios</span>
           </h2>
         </ScrollAnimationWrapper>
         
-        <div className="relative">
-          {/* Navigation buttons */}
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full border-podcast-accent bg-black/40 text-podcast-accent hover:bg-black/60 md:-left-16"
-            onClick={prevSlide}
-            aria-label="Previous slide"
-          >
-            <ArrowLeft className="h-6 w-6" />
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full border-podcast-accent bg-black/40 text-podcast-accent hover:bg-black/60 md:-right-16"
-            onClick={nextSlide}
-            aria-label="Next slide"
-          >
-            <ArrowRight className="h-6 w-6" />
-          </Button>
-          
-          {/* Carousel */}
-          <div className="overflow-hidden">
-            <div
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+        <div className="relative w-full overflow-hidden">
+          <ScrollAnimationWrapper animation="fade-up" delay={200}>
+            <Carousel 
+              opts={{
+                align: "center",
+                loop: true,
+              }}
+              className="w-full"
             >
-              {studioData.map((studio) => (
-                <div key={studio.id} className="min-w-full px-4">
-                  <div className="flex flex-col md:flex-row gap-8 items-center">
-                    <div className="md:w-1/2">
-                      <ScrollAnimationWrapper animation="fade-right">
-                        <div className="overflow-hidden rounded-lg shadow-2xl">
-                          <img
-                            src={studio.imageUrl}
-                            alt={`Studio ${studio.name}`}
-                            className="h-auto w-full object-cover transition-transform duration-500 hover:scale-110"
-                          />
-                        </div>
-                      </ScrollAnimationWrapper>
-                    </div>
-                    
-                    <div className="md:w-1/2">
-                      <ScrollAnimationWrapper animation="fade-left" delay={200}>
-                        <h3 className="mb-4 text-3xl font-bold text-podcast-accent">{studio.name}</h3>
-                        <p className="mb-6 text-lg text-gray-300">{studio.description}</p>
-                        <Button className="bg-podcast-accent hover:bg-podcast-accent-hover text-white">
-                          Discover this studio
+              <CarouselContent className="-ml-4">
+                {studioData.map((studio) => (
+                  <CarouselItem key={studio.id} className="pl-4 md:basis-4/5 lg:basis-3/4">
+                    <div className="relative h-[70vh] w-full overflow-hidden rounded-lg">
+                      <img
+                        src={studio.imageUrl}
+                        alt={`Studio ${studio.name}`}
+                        className="h-full w-full object-cover"
+                      />
+                      
+                      {/* Studio info overlay - bottom left */}
+                      <div className="absolute bottom-8 left-8 max-w-md text-white">
+                        <h3 className="mb-1 text-4xl font-bold tracking-tight">{studio.name}</h3>
+                        <p className="text-xl text-white/90">{studio.address}</p>
+                      </div>
+                      
+                      {/* Book now button - bottom right */}
+                      <div className="absolute bottom-8 right-8">
+                        <Button 
+                          className="bg-podcast-accent hover:bg-podcast-accent-hover text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg"
+                        >
+                          <BookOpen className="h-5 w-5" />
+                          Book Now
                         </Button>
-                      </ScrollAnimationWrapper>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          {/* Slide indicators */}
-          <ScrollAnimationWrapper animation="fade-up" delay={300}>
-            <div className="mt-8 flex justify-center gap-2">
-              {studioData.map((_, index) => (
-                <button
-                  key={index}
-                  className={cn(
-                    "h-3 w-3 rounded-full transition-all",
-                    activeSlide === index 
-                      ? "bg-podcast-accent w-8" 
-                      : "bg-gray-600 hover:bg-gray-500"
-                  )}
-                  onClick={() => setActiveSlide(index)}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              
+              <CarouselPrevious 
+                className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full border-podcast-accent bg-black/40 text-podcast-accent hover:bg-black/60"
+                aria-label="Previous slide"
+              />
+              
+              <CarouselNext 
+                className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full border-podcast-accent bg-black/40 text-podcast-accent hover:bg-black/60"
+                aria-label="Next slide"
+              />
+            </Carousel>
           </ScrollAnimationWrapper>
         </div>
       </div>
