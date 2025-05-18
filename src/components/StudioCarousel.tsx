@@ -66,23 +66,32 @@ const StudioCarousel = () => {
               <CarouselContent className="-ml-4">
                 {studioData.map((studio) => (
                   <CarouselItem key={studio.id} className="pl-4 md:basis-4/5 lg:basis-3/4">
-                    <div className="relative h-[70vh] w-full overflow-hidden rounded-lg">
-                      <img
-                        src={studio.imageUrl}
-                        alt={`Studio ${studio.name}`}
-                        className="h-full w-full object-cover"
-                      />
+                    <div className="relative h-[70vh] w-full overflow-hidden rounded-xl group">
+                      <div className="w-full h-full overflow-hidden">
+                        <img
+                          src={studio.imageUrl}
+                          alt={`Studio ${studio.name}`}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                      </div>
+                      
+                      {/* Semi-transparent overlay for better text readability */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                       
                       {/* Studio info overlay - bottom left */}
-                      <div className="absolute bottom-8 left-8 max-w-md text-white">
-                        <h3 className="mb-1 text-4xl font-bold tracking-tight">{studio.name}</h3>
-                        <p className="text-xl text-white/90">{studio.address}</p>
+                      <div className="absolute bottom-10 left-10 max-w-md text-white">
+                        <h3 className="mb-2 text-5xl md:text-6xl font-bold tracking-tight text-white drop-shadow-lg">
+                          {studio.name}
+                        </h3>
+                        <p className="text-xl md:text-2xl text-white/90 drop-shadow-md">
+                          {studio.address}
+                        </p>
                       </div>
                       
                       {/* Book now button - bottom right */}
-                      <div className="absolute bottom-8 right-8">
+                      <div className="absolute bottom-10 right-10">
                         <Button 
-                          className="bg-podcast-accent hover:bg-podcast-accent-hover text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg"
+                          className="bg-podcast-accent hover:bg-podcast-accent-hover text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300"
                         >
                           <BookOpen className="h-5 w-5" />
                           Book Now
@@ -94,12 +103,12 @@ const StudioCarousel = () => {
               </CarouselContent>
               
               <CarouselPrevious 
-                className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full border-podcast-accent bg-black/40 text-podcast-accent hover:bg-black/60"
+                className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full border-podcast-accent bg-black/40 text-podcast-accent hover:bg-black/60 hover:scale-110 transition-transform"
                 aria-label="Previous slide"
               />
               
               <CarouselNext 
-                className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full border-podcast-accent bg-black/40 text-podcast-accent hover:bg-black/60"
+                className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full border-podcast-accent bg-black/40 text-podcast-accent hover:bg-black/60 hover:scale-110 transition-transform"
                 aria-label="Next slide"
               />
             </Carousel>
