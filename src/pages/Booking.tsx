@@ -6,7 +6,10 @@ import StudioSelection from '@/components/booking/StudioSelection';
 import StepperProgress from '@/components/booking/StepperProgress';
 import BookingHeader from '@/components/booking/BookingHeader';
 import Footer from '@/components/Footer';
+import DateTimeSelection from '@/components/booking/DateTimeSelection';
+import BookingDuration from '@/components/booking/BookingDuration';
 import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 // Define booking steps
 const STEPS = [
@@ -22,6 +25,11 @@ const BookingPage = () => {
   const [studioImages, setStudioImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStudio, setSelectedStudio] = useState(null);
+  const [duration, setDuration] = useState(1); // Default duration: 1 hour
+  const [guestCount, setGuestCount] = useState(1); // Default guests: 1 person
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedStartTime, setSelectedStartTime] = useState(null);
+  const [selectedEndTime, setSelectedEndTime] = useState(null);
   const navigate = useNavigate();
 
   // Fetch studios and their images from Supabase
@@ -61,11 +69,38 @@ const BookingPage = () => {
 
   const handleStudioSelect = (studio) => {
     setSelectedStudio(studio);
-    // In a real application, we would move to the next step here
-    // setCurrentStep('datetime');
-    // For now, we'll just log the selection as the next steps aren't implemented yet
-    console.log('Selected studio:', studio);
+    setCurrentStep('datetime');
+    // Reset other selections when a new studio is selected
+    setSelectedDate(null);
+    setSelectedStartTime(null);
+    setSelectedEndTime(null);
+    setDuration(1);
+    setGuestCount(1);
+    
+    // Scroll to top to see the next step
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const handleDateTimeSelect = (date, startTime, endTime) => {
+    setSelectedDate(date);
+    setSelectedStartTime(startTime);
+    setSelectedEndTime(endTime);
+  };
+
+  const handleNextStep = () => {
+    // Move to the service step (this would be implemented in the next phase)
+    setCurrentStep('service');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBackStep = () => {
+    if (currentStep === 'datetime') {
+      setCurrentStep('studio');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const isDateTimeStepComplete = !!selectedDate && !!selectedStartTime && !!selectedEndTime;
 
   return (
     <div className="min-h-screen bg-podcast-dark pt-20">
@@ -92,6 +127,49 @@ const BookingPage = () => {
                 studioImages={studioImages} 
                 onSelectStudio={handleStudioSelect} 
               />
+            )}
+
+            {currentStep === 'datetime' && selectedStudio && (
+              <div className="space-y-8">
+                <div className="flex justify-between items-center mb-6">
+                  <Button 
+                    onClick={handleBackStep} 
+                    variant="outline"
+                    className="bg-podcast-muted text-white border-gray-600 hover:bg-podcast-dark"
+                  >
+                    Back
+                  </Button>
+                  <h2 className="text-2xl font-semibold text-white">
+                    {selectedStudio.name} - Select Date & Time
+                  </h2>
+                </div>
+                
+                <BookingDuration 
+                  duration={duration}
+                  setDuration={setDuration}
+                  guestCount={guestCount}
+                  setGuestCount={setGuestCount}
+                  maxGuests={selectedStudio.max_guests}
+                />
+                
+                <DateTimeSelection 
+                  studioId={selectedStudio.id}
+                  onSelectDateTime={handleDateTimeSelect}
+                  selectedDuration={duration}
+                  selectedGuests={guestCount}
+                />
+                
+                {isDateTimeStepComplete && (
+                  <div className="flex justify-center mt-8">
+                    <Button 
+                      onClick={handleNextStep}
+                      className="px-8 py-2"
+                    >
+                      Continue
+                    </Button>
+                  </div>
+                )}
+              </div>
             )}
           </>
         )}
