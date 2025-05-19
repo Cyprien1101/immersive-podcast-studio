@@ -51,6 +51,14 @@ const BookingPage = () => {
         
         if (imageError) throw imageError;
         
+        // Set the losangeles studio as selected by default
+        const losAngelesStudio = studioData?.find(studio => studio.name === 'losangeles');
+        if (losAngelesStudio) {
+          setSelectedStudio(losAngelesStudio);
+          // Skip the studio selection step
+          setCurrentStep('datetime');
+        }
+        
         setStudios(studioData || []);
         setStudioImages(imageData || []);
       } catch (error) {
@@ -127,13 +135,13 @@ const BookingPage = () => {
         {/* Step Progress Indicator */}
         <StepperProgress steps={STEPS} currentStep={currentStep} />
         
-        <h1 className="text-4xl md:text-5xl font-bold text-center my-6">
-          <span className="text-gradient">Book Your Studio</span>
+        <h1 className="text-4xl md:text-5xl font-bold text-center my-6 text-white">
+          Book Your Studio
         </h1>
         
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <Loader2 className="h-12 w-12 animate-spin text-podcast-accent" />
+            <Loader2 className="h-12 w-12 animate-spin text-white" />
           </div>
         ) : (
           <>

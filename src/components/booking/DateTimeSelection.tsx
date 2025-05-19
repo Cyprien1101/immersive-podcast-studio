@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { format, addDays, isAfter, startOfDay } from 'date-fns';
 import { Calendar } from "@/components/ui/calendar";
@@ -43,11 +42,9 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
   const [loading, setLoading] = useState<boolean>(false);
   const [timeCategories, setTimeCategories] = useState<TimeCategory[]>([]);
   
-  // Fetch availability for the selected date and studio
+  // Fetch availability for the selected date and for the 'losangeles' studio
   useEffect(() => {
     const fetchAvailability = async () => {
-      if (!studio?.id || !date) return;
-      
       setLoading(true);
       setSelectedStartTime(null); // Reset selection when date changes
       
@@ -55,25 +52,46 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
         // Convert the date to the format used in the database
         const formattedDate = format(date, 'yyyy-MM-dd');
         
+        // First, get the losangeles studio id
+        const { data: studioData, error: studioError } = await supabase
+          .from('studios')
+          .select('id')
+          .eq('name', 'losangeles')
+          .single();
+        
+        if (studioError) {
+          console.error('Error fetching studio:', studioError);
+          throw studioError;
+        }
+        
+        const losAngelesStudioId = studioData?.id;
+        
+        if (!losAngelesStudioId) {
+          console.error('Los Angeles studio not found');
+          setLoading(false);
+          return;
+        }
+        
+        // Get availability data for the Los Angeles studio
         const { data, error } = await supabase
           .from('studio_availability')
           .select('*')
-          .eq('studio_id', studio.id)
+          .eq('studio_id', losAngelesStudioId)
           .eq('date', formattedDate);
         
         if (error) throw error;
         
-        // Generate time slots for the day (00:00 to 23:30, in 30-minute increments)
+        // Generate ALL time slots for the day (00:00 to 23:30, in 30-minute increments)
         const generatedTimeSlots: TimeSlot[] = [];
         for (let hour = 0; hour < 24; hour++) {
           for (let minute of [0, 30]) {
             const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
             
-            // Check if this time slot exists in the data and is available
+            // Check if this time slot exists in the data and check its availability status
             const timeSlot = data?.find(slot => slot.start_time === time);
-            // If the slot exists in the database and is marked unavailable, set it as unavailable
-            // If it doesn't exist or is marked available in the database, it's available
-            const isAvailable = !timeSlot || timeSlot.is_available;
+            // If the slot exists in the database and is marked as unavailable, set it as unavailable
+            // Otherwise, default to available
+            const isAvailable = !timeSlot ? true : timeSlot.is_available;
             
             generatedTimeSlots.push({ time, isAvailable });
           }
@@ -118,7 +136,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
     };
     
     fetchAvailability();
-  }, [date, studio]);
+  }, [date]);
   
   // Check if a time slot can accommodate the selected duration
   const canSelectTimeSlot = (startIndex: number): boolean => {
@@ -310,43 +328,41 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
           ) : (
             <>
               {timeCategories.map((category, categoryIndex) => (
-                category.slots.length > 0 && (
-                  <div key={categoryIndex} className="mb-6">
-                    <h4 className="text-lg font-medium mb-2 text-gray-300">{category.label}</h4>
-                    <div className="bg-podcast-dark bg-opacity-60 p-4 rounded-md border border-gray-800">
-                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-                        {category.slots.map((slot) => {
-                          // Find the slot index in the overall availableTimeSlots array for checking consecutive availability
-                          const slotIndex = availableTimeSlots.findIndex(s => s.time === slot.time);
-                          const canSelect = canSelectTimeSlot(slotIndex);
-                          const isSelected = selectedStartTime === slot.time;
-                          
-                          return (
-                            <Button
-                              key={slot.time}
-                              className={cn(
-                                "transition-all border border-gray-600 text-sm py-1 px-2 h-8",
-                                isSelected 
-                                  ? "bg-white text-black hover:bg-gray-200" 
-                                  : canSelect && slot.isAvailable
-                                    ? "bg-podcast-dark text-white hover:bg-gray-800" 
-                                    : "bg-gray-900 opacity-50 cursor-not-allowed"
-                              )}
-                              disabled={!canSelect || !slot.isAvailable}
-                              onClick={() => handleSelectTimeSlot(slot.time)}
-                            >
-                              {formatTimeSlot(slot.time)}
-                            </Button>
-                          );
-                        })}
-                      </div>
+                <div key={categoryIndex} className="mb-6">
+                  <h4 className="text-lg font-medium mb-2 text-gray-300">{category.label}</h4>
+                  <div className="bg-podcast-dark bg-opacity-60 p-4 rounded-md border border-gray-800">
+                    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-1">
+                      {category.slots.map((slot, index) => {
+                        // Find the slot index in the overall availableTimeSlots array for checking consecutive availability
+                        const slotIndex = availableTimeSlots.findIndex(s => s.time === slot.time);
+                        const canSelect = slot.isAvailable && canSelectTimeSlot(slotIndex);
+                        const isSelected = selectedStartTime === slot.time;
+                        
+                        return (
+                          <Button
+                            key={`${category.label}-${index}`}
+                            className={cn(
+                              "transition-all border text-xs py-1 px-1 h-7",
+                              isSelected 
+                                ? "bg-black text-white border-white hover:bg-gray-800" 
+                                : canSelect
+                                  ? "bg-black text-white border-gray-600 hover:bg-gray-800" 
+                                  : "bg-gray-700 text-gray-400 border-gray-700 opacity-60 cursor-not-allowed"
+                            )}
+                            disabled={!canSelect}
+                            onClick={() => handleSelectTimeSlot(slot.time)}
+                          >
+                            {formatTimeSlot(slot.time)}
+                          </Button>
+                        );
+                      })}
                     </div>
                   </div>
-                )
+                </div>
               ))}
               
               {availableTimeSlots.length === 0 && !loading && (
-                <p className="text-center text-gray-400 my-6">No available time slots for this date.</p>
+                <p className="text-center text-gray-400 my-6">No time slots found for this date.</p>
               )}
               
               <div className="mt-8 flex justify-center">
