@@ -26,6 +26,13 @@ const TimeCategory: React.FC<TimeCategoryProps> = ({
   canSelectTimeSlot,
   formatTimeSlot,
 }) => {
+  if (slots.length === 0) {
+    console.log(`No slots for category: ${label}`);
+    return null;
+  }
+
+  console.log(`${label} category has ${slots.length} slots`);
+
   return (
     <div className="mb-6">
       <h4 className="text-lg font-medium mb-2 text-gray-300">{label}</h4>
@@ -39,7 +46,7 @@ const TimeCategory: React.FC<TimeCategoryProps> = ({
             
             return (
               <TimeSlot
-                key={`${label}-${index}`}
+                key={`${label}-${slot.time}`}
                 time={slot.time}
                 isAvailable={slot.isAvailable}
                 isSelected={isSelected}

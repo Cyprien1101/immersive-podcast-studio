@@ -26,11 +26,11 @@ const TimeSlot: React.FC<TimeSlotProps> = ({
         "transition-all border text-xs py-1 px-1 h-7",
         isSelected 
           ? "bg-black text-white border-white hover:bg-gray-800" 
-          : canSelect
+          : isAvailable
             ? "bg-black text-white border-gray-600 hover:bg-gray-800" 
             : "bg-gray-700 text-gray-400 border-gray-700 opacity-60 cursor-not-allowed"
       )}
-      disabled={!canSelect}
+      disabled={!isAvailable}
       onClick={onSelect}
     >
       {formatTimeSlot(time)}

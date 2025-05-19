@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { format, isAfter, startOfDay } from 'date-fns';
 import { supabase } from "@/integrations/supabase/client";
@@ -74,6 +75,8 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
         
         if (error) throw error;
         
+        console.log("Availability data from database:", data);
+        
         // Generate ALL time slots for the day (00:00 to 23:30, in 30-minute increments)
         const generatedTimeSlots: TimeSlot[] = [];
         for (let hour = 0; hour < 24; hour++) {
@@ -82,13 +85,15 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
             
             // Check if this time slot exists in the data and check its availability status
             const timeSlot = data?.find(slot => slot.start_time === time);
-            // If the slot exists in the database and is marked as unavailable, set it as unavailable
-            // Otherwise, default to available
-            const isAvailable = !timeSlot ? true : timeSlot.is_available;
+            // If the slot exists in the database, use its availability status
+            // If it doesn't exist, assume it's available
+            const isAvailable = timeSlot ? timeSlot.is_available : true;
             
             generatedTimeSlots.push({ time, isAvailable });
           }
         }
+        
+        console.log("Generated time slots:", generatedTimeSlots.length);
         
         setAvailableTimeSlots(generatedTimeSlots);
         
@@ -119,6 +124,8 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
           categories[2], // Evening
           categories[3]  // Night
         ];
+        
+        console.log("Time categories:", orderedCategories.map(c => ({ label: c.label, slotCount: c.slots.length })));
         
         setTimeCategories(orderedCategories);
       } catch (error) {
