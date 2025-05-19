@@ -26,6 +26,14 @@ interface TimeSlot {
   isAvailable: boolean;
 }
 
+// Création des catégories de temps
+interface TimeCategory {
+  label: string;
+  startHour: number;
+  endHour: number;
+  slots: TimeSlot[];
+}
+
 const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed }) => {
   const [date, setDate] = useState<Date>(new Date());
   const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([]);
@@ -33,6 +41,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
   const [duration, setDuration] = useState<number>(1); // Default 1 hour
   const [guests, setGuests] = useState<number>(1); // Default 1 guest
   const [loading, setLoading] = useState<boolean>(false);
+  const [timeCategories, setTimeCategories] = useState<TimeCategory[]>([]);
   
   // Fetch availability for the selected date and studio
   useEffect(() => {
@@ -71,6 +80,36 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
         }
         
         setAvailableTimeSlots(generatedTimeSlots);
+        
+        // Organize slots into categories
+        const categories: TimeCategory[] = [
+          { label: 'Matin', startHour: 6, endHour: 12, slots: [] },
+          { label: 'Après-midi', startHour: 12, endHour: 18, slots: [] },
+          { label: 'Soir', startHour: 18, endHour: 23, slots: [] },
+          { label: 'Nuit', startHour: 0, endHour: 6, slots: [] },
+        ];
+        
+        // Fill categories with time slots
+        generatedTimeSlots.forEach(slot => {
+          const hour = parseInt(slot.time.split(':')[0], 10);
+          
+          for (const category of categories) {
+            if (hour >= category.startHour && hour < category.endHour) {
+              category.slots.push(slot);
+              break;
+            }
+          }
+        });
+        
+        // Order categories for display (morning first, night last)
+        const orderedCategories = [
+          categories[0], // Matin
+          categories[1], // Après-midi
+          categories[2], // Soir
+          categories[3]  // Nuit
+        ];
+        
+        setTimeCategories(orderedCategories);
       } catch (error) {
         console.error('Error fetching availability:', error);
       } finally {
@@ -126,8 +165,11 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
   };
   
   // Handle selecting a time slot
-  const handleSelectTimeSlot = (time: string, index: number) => {
-    if (canSelectTimeSlot(index)) {
+  const handleSelectTimeSlot = (time: string) => {
+    // Find the slot in availableTimeSlots array
+    const slotIndex = availableTimeSlots.findIndex(slot => slot.time === time);
+    
+    if (slotIndex !== -1 && canSelectTimeSlot(slotIndex)) {
       setSelectedStartTime(time);
     }
   };
@@ -267,30 +309,41 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                {availableTimeSlots.map((slot, index) => {
-                  const canSelect = canSelectTimeSlot(index);
-                  const isSelected = selectedStartTime === slot.time;
-                  
-                  return (
-                    <Button
-                      key={slot.time}
-                      className={cn(
-                        "transition-all border border-white",
-                        isSelected 
-                          ? "bg-white text-black hover:bg-gray-200" 
-                          : canSelect && slot.isAvailable
-                            ? "bg-black text-white hover:bg-gray-800" 
-                            : "bg-gray-900 opacity-50 cursor-not-allowed"
-                      )}
-                      disabled={!canSelect || !slot.isAvailable}
-                      onClick={() => handleSelectTimeSlot(slot.time, index)}
-                    >
-                      {formatTimeSlot(slot.time)}
-                    </Button>
-                  );
-                })}
-              </div>
+              {timeCategories.map((category, categoryIndex) => (
+                category.slots.length > 0 && (
+                  <div key={categoryIndex} className="mb-6">
+                    <h4 className="text-lg font-medium mb-2 text-gray-300">{category.label}</h4>
+                    <div className="bg-podcast-dark bg-opacity-60 p-4 rounded-md border border-gray-800">
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                        {category.slots.map((slot) => {
+                          // Find the slot index in the overall availableTimeSlots array for checking consecutive availability
+                          const slotIndex = availableTimeSlots.findIndex(s => s.time === slot.time);
+                          const canSelect = canSelectTimeSlot(slotIndex);
+                          const isSelected = selectedStartTime === slot.time;
+                          
+                          return (
+                            <Button
+                              key={slot.time}
+                              className={cn(
+                                "transition-all border border-gray-600 text-sm py-1 px-2 h-8",
+                                isSelected 
+                                  ? "bg-white text-black hover:bg-gray-200" 
+                                  : canSelect && slot.isAvailable
+                                    ? "bg-podcast-dark text-white hover:bg-gray-800" 
+                                    : "bg-gray-900 opacity-50 cursor-not-allowed"
+                              )}
+                              disabled={!canSelect || !slot.isAvailable}
+                              onClick={() => handleSelectTimeSlot(slot.time)}
+                            >
+                              {formatTimeSlot(slot.time)}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )
+              ))}
               
               {availableTimeSlots.length === 0 && !loading && (
                 <p className="text-center text-gray-400 my-6">No available time slots for this date.</p>
