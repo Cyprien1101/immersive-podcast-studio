@@ -1,233 +1,312 @@
 
 import React, { useState, useEffect } from 'react';
-import { Calendar } from '@/components/ui/calendar';
-import { supabase } from '@/integrations/supabase/client';
-import { format } from 'date-fns';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-
-interface TimeSlot {
-  id: string;
-  time: string;
-  available: boolean;
-  studio_id: string;
-  date: string;
-}
+import { format, addDays, isAfter, startOfDay } from 'date-fns';
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Card, CardContent } from "@/components/ui/card";
+import { CalendarIcon, Minus, Plus, Clock, Users } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
+import ScrollAnimationWrapper from '@/components/ScrollAnimationWrapper';
 
 interface DateTimeSelectionProps {
-  studioId: string;
-  onSelectDateTime: (date: Date, startTime: string, endTime: string) => void;
-  selectedDuration: number;
-  selectedGuests: number;
+  studio: any;
+  onProceed: (bookingDetails: {
+    date: Date;
+    startTime: string;
+    duration: number;
+    guests: number;
+  }) => void;
 }
 
-const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({
-  studioId,
-  onSelectDateTime,
-  selectedDuration,
-  selectedGuests,
-}) => {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+interface TimeSlot {
+  time: string;
+  isAvailable: boolean;
+}
 
+const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed }) => {
+  const [date, setDate] = useState<Date>(new Date());
+  const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([]);
+  const [selectedStartTime, setSelectedStartTime] = useState<string | null>(null);
+  const [duration, setDuration] = useState<number>(1); // Default 1 hour
+  const [guests, setGuests] = useState<number>(1); // Default 1 guest
+  const [loading, setLoading] = useState<boolean>(false);
+  
+  // Fetch availability for the selected date and studio
   useEffect(() => {
-    if (date && studioId) {
-      fetchAvailability();
-    }
-  }, [date, studioId, selectedDuration]);
-
-  const fetchAvailability = async () => {
-    if (!date) return;
-    
-    setLoading(true);
-    const formattedDate = format(date, 'yyyy-MM-dd');
-    
-    try {
-      // Fetch availability from Supabase
-      const { data, error } = await supabase
-        .from('studio_availability')
-        .select('*')
-        .eq('studio_id', studioId)
-        .eq('date', formattedDate);
+    const fetchAvailability = async () => {
+      if (!studio?.id || !date) return;
       
-      if (error) throw error;
+      setLoading(true);
+      setSelectedStartTime(null); // Reset selection when date changes
       
-      // If no data for this date, generate time slots (all available by default)
-      if (!data || data.length === 0) {
-        generateDefaultTimeSlots(formattedDate);
-      } else {
-        // Process the available time slots
-        processTimeSlots(data, formattedDate);
-      }
-    } catch (error) {
-      console.error('Error fetching availability:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const generateDefaultTimeSlots = (formattedDate: string) => {
-    // Generate time slots from 9 AM to 10 PM
-    const slots: TimeSlot[] = [];
-    for (let hour = 9; hour < 22; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const hourFormatted = hour.toString().padStart(2, '0');
-        const minuteFormatted = minute.toString().padStart(2, '0');
-        const time = `${hourFormatted}:${minuteFormatted}`;
+      try {
+        // Convert the date to the format used in the database
+        const formattedDate = format(date, 'yyyy-MM-dd');
         
-        slots.push({
-          id: `${formattedDate}-${time}`,
-          time,
-          available: true,
-          studio_id: studioId,
-          date: formattedDate
-        });
-      }
-    }
-    setTimeSlots(slots);
-  };
-
-  const processTimeSlots = (data: any[], formattedDate: string) => {
-    // Create a map of start times to availability status
-    const availabilityMap = new Map();
-    
-    data.forEach(slot => {
-      availabilityMap.set(slot.start_time, slot.is_available);
-    });
-    
-    // Generate all possible time slots
-    const slots: TimeSlot[] = [];
-    for (let hour = 9; hour < 22; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const hourFormatted = hour.toString().padStart(2, '0');
-        const minuteFormatted = minute.toString().padStart(2, '0');
-        const time = `${hourFormatted}:${minuteFormatted}`;
+        const { data, error } = await supabase
+          .from('studio_availability')
+          .select('*')
+          .eq('studio_id', studio.id)
+          .eq('date', formattedDate);
         
-        // Check if this time exists in the availability data
-        const available = availabilityMap.has(time) ? availabilityMap.get(time) : true;
+        if (error) throw error;
         
-        slots.push({
-          id: `${formattedDate}-${time}`,
-          time,
-          available,
-          studio_id: studioId,
-          date: formattedDate
-        });
+        // Generate time slots for the day (9 AM to 9 PM, in 30-minute increments)
+        const generatedTimeSlots: TimeSlot[] = [];
+        for (let hour = 9; hour < 21; hour++) {
+          for (let minute of [0, 30]) {
+            const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+            
+            // Check if this time slot exists in the data and is available
+            const timeSlot = data?.find(slot => slot.start_time === time);
+            // If the slot exists in the database and is marked unavailable, set it as unavailable
+            // If it doesn't exist or is marked available in the database, it's available
+            const isAvailable = !timeSlot || timeSlot.is_available;
+            
+            generatedTimeSlots.push({ time, isAvailable });
+          }
+        }
+        
+        setAvailableTimeSlots(generatedTimeSlots);
+      } catch (error) {
+        console.error('Error fetching availability:', error);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
     
-    setTimeSlots(slots);
-  };
-
-  const handleTimeSelect = (time: string) => {
-    setSelectedTime(time);
+    fetchAvailability();
+  }, [date, studio]);
+  
+  // Check if a time slot can accommodate the selected duration
+  const canSelectTimeSlot = (startIndex: number): boolean => {
+    // We need 2 consecutive 30-min slots for 1 hour, 4 for 2 hours, etc.
+    const slotsNeeded = duration * 2; 
     
-    if (date) {
-      // Calculate end time based on selected duration (in hours)
-      const [hours, minutes] = time.split(':').map(Number);
-      const startTime = time;
-      
-      const endHour = hours + selectedDuration;
-      const endTime = `${endHour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-      
-      onSelectDateTime(date, startTime, endTime);
-    }
-  };
-
-  // Check if a time slot can be selected based on duration
-  const isSlotSelectable = (index: number) => {
-    // For the selected duration, check if the required consecutive slots are available
-    const requiredSlots = selectedDuration * 2; // 2 slots per hour (30 min each)
-    
-    if (index + requiredSlots > timeSlots.length) return false;
-    
-    for (let i = 0; i < requiredSlots; i++) {
-      if (!timeSlots[index + i].available) return false;
+    // Check if we have enough consecutive available slots
+    for (let i = startIndex; i < startIndex + slotsNeeded; i++) {
+      if (!availableTimeSlots[i] || !availableTimeSlots[i].isAvailable) {
+        return false;
+      }
     }
     
     return true;
   };
+  
+  // Format the time slot for display
+  const formatTimeSlot = (time: string): string => {
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours, 10);
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${period}`;
+  };
+  
+  // Handle duration changes
+  const handleDurationChange = (increment: boolean) => {
+    setDuration(prev => {
+      const newValue = increment ? prev + 1 : prev - 1;
+      // Constraint between 1 and max_booking_duration (or default to 3)
+      return Math.min(Math.max(newValue, 1), studio?.max_booking_duration || 3);
+    });
+    // Reset selected time when duration changes
+    setSelectedStartTime(null);
+  };
+  
+  // Handle guests changes
+  const handleGuestsChange = (increment: boolean) => {
+    setGuests(prev => {
+      const newValue = increment ? prev + 1 : prev - 1;
+      // Constraint between 1 and max_guests
+      return Math.min(Math.max(newValue, 1), studio?.max_guests || 10);
+    });
+  };
+  
+  // Handle selecting a time slot
+  const handleSelectTimeSlot = (time: string, index: number) => {
+    if (canSelectTimeSlot(index)) {
+      setSelectedStartTime(time);
+    }
+  };
+  
+  // Handle proceeding to next step
+  const handleProceed = () => {
+    if (date && selectedStartTime) {
+      onProceed({
+        date,
+        startTime: selectedStartTime,
+        duration,
+        guests
+      });
+    }
+  };
 
+  // Disable past dates
+  const disabledDays = (date: Date) => {
+    return isAfter(startOfDay(new Date()), startOfDay(date));
+  };
+  
   return (
-    <div className="space-y-6">
-      <div className="flex justify-center">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-          disabled={{ before: new Date() }}
-          className="rounded-md border"
-          classNames={{
-            months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-            month: "space-y-4",
-            caption: "flex justify-center pt-1 relative items-center",
-            caption_label: "text-sm font-medium text-white",
-            nav: "space-x-1 flex items-center",
-            nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
-            nav_button_previous: "absolute left-1",
-            nav_button_next: "absolute right-1",
-            table: "w-full border-collapse space-y-1",
-            head_row: "flex",
-            head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-            row: "flex w-full mt-2",
-            cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-            day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
-            day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-            day_today: "bg-accent text-accent-foreground",
-            day_outside: "text-muted-foreground opacity-50",
-            day_disabled: "text-muted-foreground opacity-50",
-            day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
-            day_hidden: "invisible",
-          }}
-          components={{
-            IconLeft: () => <ChevronLeft className="h-4 w-4 text-podcast-accent" />,
-            IconRight: () => <ChevronRight className="h-4 w-4 text-podcast-accent" />,
-          }}
-        />
+    <ScrollAnimationWrapper animation="fade-up">
+      <div className="grid gap-8 md:grid-cols-2">
+        {/* Left Column - Calendar */}
+        <Card className="bg-black border-gray-800 text-white h-fit">
+          <CardContent className="pt-6">
+            <h3 className="text-xl font-semibold mb-4 text-podcast-accent">Select Date</h3>
+            
+            <div className="grid gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, 'PPP') : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-gray-900 border-gray-700">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(newDate) => newDate && setDate(newDate)}
+                    disabled={disabledDays}
+                    className="pointer-events-auto"
+                    classNames={{
+                      day_selected: "bg-podcast-accent text-white hover:bg-podcast-accent-hover",
+                      day_today: "bg-gray-700 text-white"
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Right Column - Session Details */}
+        <Card className="bg-black border-gray-800 text-white h-fit">
+          <CardContent className="pt-6">
+            <h3 className="text-xl font-semibold mb-4 text-podcast-accent">Session Details</h3>
+            
+            {/* Duration Selector */}
+            <div className="mb-6">
+              <label className="block text-gray-300 mb-2 flex items-center">
+                <Clock className="w-4 h-4 mr-2" /> Duration
+              </label>
+              <div className="flex items-center">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  onClick={() => handleDurationChange(false)}
+                  disabled={duration <= 1}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="px-4 py-2 mx-2 bg-gray-900 rounded-md min-w-[60px] text-center">
+                  {duration} {duration === 1 ? 'hour' : 'hours'}
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  onClick={() => handleDurationChange(true)}
+                  disabled={duration >= (studio?.max_booking_duration || 3)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            {/* Guests Selector */}
+            <div className="mb-6">
+              <label className="block text-gray-300 mb-2 flex items-center">
+                <Users className="w-4 h-4 mr-2" /> How many people will be recording?
+              </label>
+              <div className="flex items-center">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  onClick={() => handleGuestsChange(false)}
+                  disabled={guests <= 1}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="px-4 py-2 mx-2 bg-gray-900 rounded-md min-w-[60px] text-center">
+                  {guests} {guests === 1 ? 'guest' : 'guests'}
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  onClick={() => handleGuestsChange(true)}
+                  disabled={guests >= (studio?.max_guests || 10)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
       
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Available Times</h3>
-        
-        {loading ? (
-          <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-podcast-accent"></div>
-          </div>
-        ) : timeSlots.length === 0 ? (
-          <p className="text-center text-gray-400">No times available for the selected date.</p>
-        ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-            {timeSlots.map((slot, index) => {
-              const isSelectable = isSlotSelectable(index);
-              // Only show slots at full hour intervals and that have enough consecutive availability
-              if (slot.time.endsWith(':00') && isSelectable) {
-                return (
-                  <Button
-                    key={slot.id}
-                    onClick={() => isSelectable && handleTimeSelect(slot.time)}
-                    className={`
-                      h-auto py-2 px-3 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-podcast-accent focus:ring-opacity-50 
-                      transition-colors duration-200
-                      ${selectedTime === slot.time 
-                        ? 'bg-white text-black border border-gray-300' 
-                        : 'bg-black text-white border border-gray-600'
-                      }
-                      ${!isSelectable ? 'opacity-50 cursor-not-allowed' : ''}
-                    `}
-                    disabled={!isSelectable}
-                  >
-                    {slot.time}
-                  </Button>
-                );
-              }
-              return null;
-            })}
-          </div>
-        )}
-      </div>
-    </div>
+      {/* Time Slots Section */}
+      <Card className="mt-8 bg-black border-gray-800 text-white">
+        <CardContent className="pt-6">
+          <h3 className="text-xl font-semibold mb-4 text-podcast-accent">Available Time Slots</h3>
+          {loading ? (
+            <div className="flex justify-center items-center h-32">
+              <Loader2 className="h-8 w-8 animate-spin text-podcast-accent" />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                {availableTimeSlots.map((slot, index) => {
+                  const canSelect = canSelectTimeSlot(index);
+                  const isSelected = selectedStartTime === slot.time;
+                  
+                  return (
+                    <Button
+                      key={slot.time}
+                      className={cn(
+                        "transition-all",
+                        isSelected 
+                          ? "bg-podcast-accent hover:bg-podcast-accent-hover" 
+                          : canSelect 
+                            ? "bg-gray-800 hover:bg-gray-700" 
+                            : "bg-gray-900 opacity-50 cursor-not-allowed"
+                      )}
+                      disabled={!canSelect}
+                      onClick={() => handleSelectTimeSlot(slot.time, index)}
+                    >
+                      {formatTimeSlot(slot.time)}
+                    </Button>
+                  );
+                })}
+              </div>
+              
+              {availableTimeSlots.length === 0 && !loading && (
+                <p className="text-center text-gray-400 my-6">No available time slots for this date.</p>
+              )}
+              
+              <div className="mt-8 flex justify-center">
+                <Button 
+                  className="px-8 bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600"
+                  disabled={!selectedStartTime}
+                  onClick={handleProceed}
+                >
+                  Continue
+                </Button>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </ScrollAnimationWrapper>
   );
 };
 
