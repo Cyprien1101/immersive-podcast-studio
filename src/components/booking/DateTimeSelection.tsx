@@ -26,7 +26,7 @@ interface TimeSlot {
   isAvailable: boolean;
 }
 
-// Création des catégories de temps
+// Time categories
 interface TimeCategory {
   label: string;
   startHour: number;
@@ -83,10 +83,10 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
         
         // Organize slots into categories
         const categories: TimeCategory[] = [
-          { label: 'Matin', startHour: 6, endHour: 12, slots: [] },
-          { label: 'Après-midi', startHour: 12, endHour: 18, slots: [] },
-          { label: 'Soir', startHour: 18, endHour: 23, slots: [] },
-          { label: 'Nuit', startHour: 0, endHour: 6, slots: [] },
+          { label: 'Morning', startHour: 6, endHour: 12, slots: [] },
+          { label: 'Afternoon', startHour: 12, endHour: 18, slots: [] },
+          { label: 'Evening', startHour: 18, endHour: 23, slots: [] },
+          { label: 'Night', startHour: 0, endHour: 6, slots: [] },
         ];
         
         // Fill categories with time slots
@@ -103,10 +103,10 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
         
         // Order categories for display (morning first, night last)
         const orderedCategories = [
-          categories[0], // Matin
-          categories[1], // Après-midi
-          categories[2], // Soir
-          categories[3]  // Nuit
+          categories[0], // Morning
+          categories[1], // Afternoon
+          categories[2], // Evening
+          categories[3]  // Night
         ];
         
         setTimeCategories(orderedCategories);
@@ -195,7 +195,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
     <ScrollAnimationWrapper animation="fade-up">
       <div className="grid gap-8 md:grid-cols-2">
         {/* Left Column - Calendar */}
-        <Card className="bg-black border-gray-800 text-white h-fit">
+        <Card className="bg-podcast-dark border-gray-800 text-white h-fit">
           <CardContent className="pt-6">
             <h3 className="text-xl font-semibold mb-4 text-white">Select Date</h3>
             
@@ -204,13 +204,13 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-start text-left font-normal bg-gray-900 border-gray-700 hover:bg-gray-800"
+                    className="w-full justify-start text-left font-normal bg-podcast-dark border-gray-700 hover:bg-gray-800"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {date ? format(date, 'PPP') : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-gray-900 border-gray-700">
+                <PopoverContent className="w-auto p-0 bg-podcast-dark border-gray-700">
                   <Calendar
                     mode="single"
                     selected={date}
@@ -232,7 +232,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
         </Card>
         
         {/* Right Column - Session Details */}
-        <Card className="bg-black border-gray-800 text-white h-fit">
+        <Card className="bg-podcast-dark border-gray-800 text-white h-fit">
           <CardContent className="pt-6">
             <h3 className="text-xl font-semibold mb-4 text-white">Session Details</h3>
             
@@ -245,19 +245,19 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  className="bg-podcast-dark border-gray-700 hover:bg-gray-800"
                   onClick={() => handleDurationChange(false)}
                   disabled={duration <= 1}
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="px-4 py-2 mx-2 bg-gray-900 rounded-md min-w-[60px] text-center">
+                <span className="px-4 py-2 mx-2 bg-podcast-dark rounded-md min-w-[60px] text-center">
                   {duration} {duration === 1 ? 'hour' : 'hours'}
                 </span>
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  className="bg-podcast-dark border-gray-700 hover:bg-gray-800"
                   onClick={() => handleDurationChange(true)}
                   disabled={duration >= (studio?.max_booking_duration || 3)}
                 >
@@ -275,19 +275,19 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  className="bg-podcast-dark border-gray-700 hover:bg-gray-800"
                   onClick={() => handleGuestsChange(false)}
                   disabled={guests <= 1}
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="px-4 py-2 mx-2 bg-gray-900 rounded-md min-w-[60px] text-center">
+                <span className="px-4 py-2 mx-2 bg-podcast-dark rounded-md min-w-[60px] text-center">
                   {guests} {guests === 1 ? 'guest' : 'guests'}
                 </span>
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="bg-gray-900 border-gray-700 hover:bg-gray-800"
+                  className="bg-podcast-dark border-gray-700 hover:bg-gray-800"
                   onClick={() => handleGuestsChange(true)}
                   disabled={guests >= (studio?.max_guests || 10)}
                 >
@@ -300,7 +300,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
       </div>
       
       {/* Time Slots Section */}
-      <Card className="mt-8 bg-black border-gray-800 text-white">
+      <Card className="mt-8 bg-podcast-dark border-gray-800 text-white">
         <CardContent className="pt-6">
           <h3 className="text-xl font-semibold mb-4 text-white">Available Time Slots</h3>
           {loading ? (
