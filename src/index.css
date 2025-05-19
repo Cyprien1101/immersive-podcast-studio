@@ -104,8 +104,9 @@
     @apply bg-gradient-to-r from-podcast-accent via-purple-400 to-pink-500 bg-clip-text text-transparent animate-pulse-slow;
   }
   
+  /* Removed button-gradient class and replaced with simple black background */
   .button-gradient {
-    @apply bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600;
+    @apply bg-black text-white hover:bg-gray-800;
   }
   
   .video-container {

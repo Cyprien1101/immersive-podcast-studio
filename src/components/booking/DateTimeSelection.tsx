@@ -176,7 +176,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
                     disabled={disabledDays}
                     className="pointer-events-auto"
                     classNames={{
-                      day_selected: "bg-white text-black hover:bg-gray-200",
+                      day_selected: "bg-black text-white hover:bg-gray-800",
                       day_today: "bg-gray-700 text-white",
                       day: "text-white hover:bg-gray-800 focus:bg-gray-800",
                       caption_label: "text-white",
@@ -276,11 +276,11 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
                     <Button
                       key={slot.time}
                       className={cn(
-                        "transition-all",
+                        "transition-all border border-white",
                         isSelected 
                           ? "bg-white text-black hover:bg-gray-200" 
                           : canSelect && slot.isAvailable
-                            ? "bg-gray-800 hover:bg-gray-700" 
+                            ? "bg-black text-white hover:bg-gray-800" 
                             : "bg-gray-900 opacity-50 cursor-not-allowed"
                       )}
                       disabled={!canSelect || !slot.isAvailable}
@@ -298,7 +298,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onProceed
               
               <div className="mt-8 flex justify-center">
                 <Button 
-                  className="px-8 bg-white text-black hover:bg-gray-200"
+                  className="px-8 bg-black text-white border border-white hover:bg-gray-800"
                   disabled={!selectedStartTime}
                   onClick={handleProceed}
                 >
