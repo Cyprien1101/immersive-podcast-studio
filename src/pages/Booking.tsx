@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import StudioSelection from '@/components/booking/StudioSelection';
-import DateTimeSelection from '@/components/booking/DateTimeSelection';
 import StepperProgress from '@/components/booking/StepperProgress';
 import BookingHeader from '@/components/booking/BookingHeader';
 import Footer from '@/components/Footer';
@@ -23,12 +22,6 @@ const BookingPage = () => {
   const [studioImages, setStudioImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStudio, setSelectedStudio] = useState(null);
-  const [bookingDetails, setBookingDetails] = useState({
-    date: null,
-    startTime: null,
-    duration: 1,
-    guests: 1
-  });
   const navigate = useNavigate();
 
   // Fetch studios and their images from Supabase
@@ -68,54 +61,10 @@ const BookingPage = () => {
 
   const handleStudioSelect = (studio) => {
     setSelectedStudio(studio);
-    setCurrentStep('datetime');
-    // Scroll to top when moving to next step
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleDateTimeSelect = (details) => {
-    setBookingDetails({
-      ...bookingDetails,
-      date: details.date,
-      startTime: details.startTime,
-      duration: details.duration,
-      guests: details.guests
-    });
-    
-    // Move to the next step
-    setCurrentStep('service');
-    // Scroll to top when moving to next step
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const renderCurrentStep = () => {
-    switch (currentStep) {
-      case 'studio':
-        return (
-          <StudioSelection 
-            studios={studios} 
-            studioImages={studioImages} 
-            onSelectStudio={handleStudioSelect} 
-          />
-        );
-      case 'datetime':
-        return (
-          <DateTimeSelection 
-            studio={selectedStudio}
-            onProceed={handleDateTimeSelect}
-          />
-        );
-      case 'service':
-        // This would be the next step implementation
-        return (
-          <div className="text-center py-16">
-            <h2 className="text-2xl font-bold text-podcast-accent mb-4">Service Selection</h2>
-            <p className="text-white">This step is coming soon!</p>
-          </div>
-        );
-      default:
-        return null;
-    }
+    // In a real application, we would move to the next step here
+    // setCurrentStep('datetime');
+    // For now, we'll just log the selection as the next steps aren't implemented yet
+    console.log('Selected studio:', studio);
   };
 
   return (
@@ -137,7 +86,13 @@ const BookingPage = () => {
           </div>
         ) : (
           <>
-            {renderCurrentStep()}
+            {currentStep === 'studio' && (
+              <StudioSelection 
+                studios={studios} 
+                studioImages={studioImages} 
+                onSelectStudio={handleStudioSelect} 
+              />
+            )}
           </>
         )}
       </div>
