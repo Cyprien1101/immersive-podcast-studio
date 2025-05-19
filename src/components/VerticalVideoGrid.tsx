@@ -5,7 +5,7 @@ import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 
 // Sample data for videos - duplicated to fill the screen width
 const videoData = Array(8).fill({
-  videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//03252-1-1.mp4",
+  videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//reel.mp4",
   title: "Vertical Format"
 });
 

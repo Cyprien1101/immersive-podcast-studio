@@ -80,14 +80,14 @@ const ImpactSection = () => {
             </div>
           </ScrollAnimationWrapper>
 
-          {/* Center Column - Image 16:9 */}
+          {/* Center Column - Image 16:9 - MIS À JOUR AVEC LA NOUVELLE IMAGE */}
           <ScrollAnimationWrapper animation="fade-up" delay={400}>
             <div className="overflow-hidden rounded-lg bg-black shadow-lg transform hover:scale-[1.02] transition-transform duration-300 h-full">
               <div className="h-full flex flex-col">
                 <div className="flex-grow">
                   <AspectRatio ratio={16/9} className="w-full">
                     <img
-                      src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//2ljj5___T8TdQ___k8MKt___1.jpg"
+                      src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//photo%20studio.jpg"
                       alt="Studio Podcast"
                       className="w-full h-full object-cover"
                     />
