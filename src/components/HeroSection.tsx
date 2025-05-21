@@ -51,7 +51,7 @@ const HeroSection = () => {
 
   return (
     <>
-      <section className="relative h-screen w-full overflow-hidden">
+      <section className="relative min-h-screen w-full overflow-hidden pt-16">
         {/* Background video */}
         <video 
           className="absolute inset-0 min-h-full min-w-full object-cover"
@@ -67,8 +67,8 @@ const HeroSection = () => {
           Your browser does not support HTML5 videos.
         </video>
         
-        {/* Dark overlay for better readability */}
-        <div className="absolute inset-0 hero-overlay"></div>
+        {/* Dark overlay with upper part gradient for better integration with header */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80"></div>
         
         {/* Centered content with animation */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
