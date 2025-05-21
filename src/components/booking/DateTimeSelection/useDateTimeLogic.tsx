@@ -68,7 +68,7 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
         
         // Get availability data for the Los Angeles studio
         const { data, error } = await supabase
-          .from('website_availabilities')  // Using the new table
+          .from('studio_availability')
           .select('*')
           .eq('studio_id', losAngelesStudioId)
           .eq('date', formattedDate);
@@ -85,9 +85,9 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
             
             // Check if this time slot exists in the data and check its availability status
             const timeSlot = data?.find(slot => slot.start_time === time);
-            // If the slot exists in the database, use its booking status
+            // If the slot exists in the database, use its availability status
             // If it doesn't exist, assume it's available
-            const isAvailable = timeSlot ? !timeSlot.is_booked : true;
+            const isAvailable = timeSlot ? timeSlot.is_available : true;
             
             generatedTimeSlots.push({ time, isAvailable });
           }
