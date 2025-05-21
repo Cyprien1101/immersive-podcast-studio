@@ -54,10 +54,11 @@ const TimeCategoryContainer: React.FC<TimeCategoryContainerProps> = ({
     }
   };
 
+  // Vérifier si des créneaux existent
+  const hasTimeSlots = availableTimeSlots.length > 0;
+  
   // Vérifier s'il y a des créneaux disponibles
-  const hasAvailableSlots = timeCategories.some(category => 
-    category.slots.some(slot => slot.isAvailable)
-  );
+  const hasAvailableSlots = availableTimeSlots.some(slot => slot.isAvailable);
 
   return (
     <Card className="mt-8 bg-podcast-dark border-gray-800 text-white">
@@ -82,8 +83,12 @@ const TimeCategoryContainer: React.FC<TimeCategoryContainerProps> = ({
               />
             ))}
             
-            {!hasAvailableSlots && !loading && (
-              <p className="text-center text-gray-400 my-6">Aucun créneau horaire disponible pour cette date.</p>
+            {!hasTimeSlots && !loading && (
+              <p className="text-center text-gray-400 my-6">Aucun créneau horaire trouvé pour cette date.</p>
+            )}
+            
+            {hasTimeSlots && !hasAvailableSlots && !loading && (
+              <p className="text-center text-gray-400 my-6">Tous les créneaux sont indisponibles pour cette date.</p>
             )}
             
             <div className="mt-8 flex justify-center">

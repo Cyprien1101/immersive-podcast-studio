@@ -26,11 +26,8 @@ const TimeCategory: React.FC<TimeCategoryProps> = ({
   canSelectTimeSlot,
   formatTimeSlot,
 }) => {
+  // Ne pas afficher la catégorie si elle ne contient pas de créneaux
   if (slots.length === 0) return null;
-
-  // Filtrer pour ne montrer que les catégories qui ont au moins un créneau disponible
-  const hasAvailableSlots = slots.some(slot => slot.isAvailable);
-  if (!hasAvailableSlots) return null;
 
   return (
     <div className="mb-6">

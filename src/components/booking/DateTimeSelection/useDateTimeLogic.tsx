@@ -45,6 +45,7 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
       try {
         // Convert the date to the format used in the database
         const formattedDate = format(date, 'yyyy-MM-dd');
+        console.log("Searching for date:", formattedDate);
         
         // First, get the losangeles studio id
         const { data: studioData, error: studioError } = await supabase
@@ -73,9 +74,16 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
           .eq('studio_id', losAngelesStudioId)
           .eq('date', formattedDate);
         
-        if (error) throw error;
+        if (error) {
+          console.error('Erreur lors de la récupération des disponibilités:', error);
+          throw error;
+        }
         
         console.log("Données de disponibilité récupérées:", data);
+        
+        if (!data || data.length === 0) {
+          console.log(`Aucun créneau trouvé pour la date ${formattedDate}`);
+        }
         
         // Generate ALL time slots for the day (00:00 to 23:30, in 30-minute increments)
         const generatedTimeSlots: TimeSlot[] = [];
@@ -85,15 +93,21 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
             
             // Check if this time slot exists in the data and check its availability status
             const timeSlot = data?.find(slot => slot.start_time === time);
-            // Si le créneau existe dans la base de données, utilisez son statut de disponibilité
-            // Si non, supposez qu'il n'est pas disponible
-            const isAvailable = timeSlot ? timeSlot.is_available : false;
+            
+            // Par défaut, considérer le créneau comme disponible s'il n'existe pas dans la base de données
+            // Mais s'il existe et est marqué comme non disponible, alors le définir comme non disponible
+            const isAvailable = timeSlot !== undefined ? timeSlot.is_available : true;
             
             generatedTimeSlots.push({ time, isAvailable });
           }
         }
         
         console.log("Créneaux horaires générés:", generatedTimeSlots.length);
+        if (generatedTimeSlots.filter(slot => slot.isAvailable).length > 0) {
+          console.log("Nombre de créneaux disponibles:", generatedTimeSlots.filter(slot => slot.isAvailable).length);
+        } else {
+          console.log("Aucun créneau disponible trouvé");
+        }
         
         setAvailableTimeSlots(generatedTimeSlots);
         
@@ -125,7 +139,11 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
           categories[3]  // Night
         ];
         
-        console.log("Catégories de créneaux:", orderedCategories.map(c => ({ label: c.label, slotCount: c.slots.length })));
+        console.log("Catégories de créneaux:", orderedCategories.map(c => ({ 
+          label: c.label, 
+          slotCount: c.slots.length,
+          availableSlots: c.slots.filter(s => s.isAvailable).length 
+        })));
         
         setTimeCategories(orderedCategories);
       } catch (error) {
@@ -144,7 +162,7 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
     const slotsNeeded = duration * 2; 
     
     // Check if we have enough consecutive available slots
-    for (let i = startIndex; i < startIndex + slotsNeeded; i++) {
+    for (let i = startIndex; i < Math.min(startIndex + slotsNeeded, availableTimeSlots.length); i++) {
       if (!availableTimeSlots[i] || !availableTimeSlots[i].isAvailable) {
         return false;
       }
