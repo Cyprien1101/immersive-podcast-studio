@@ -13,14 +13,14 @@ import { BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-// Mock data for studios - Keep only Studio Lyon
+// Mock data for studios - Keep only Studio Eden
 const mockStudios = [
   {
     id: 1,
-    name: 'Studio Lyon',
+    name: 'Studio Eden',
     description: 'Notre studio d\'enregistrement professionnel au centre de Lyon',
     location: '280 Rue Vendôme, Lyon',
-    imageUrl: 'https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//photo%20studio.jpg'
+    imageUrl: 'https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//photo%20studio.JPG'
   }
 ];
 
@@ -41,11 +41,10 @@ const StudioCarousel = () => {
             <Carousel 
               opts={{
                 align: "center",
-                loop: true,
               }}
-              className="w-full"
+              className="w-full flex justify-center"
             >
-              <CarouselContent className="-ml-4">
+              <CarouselContent className="-ml-4 flex justify-center">
                 {mockStudios.map((studio) => (
                   <CarouselItem key={studio.id} className="pl-4 md:basis-4/5 lg:basis-3/4">
                     <div className="relative rounded-xl overflow-hidden group">
@@ -88,15 +87,7 @@ const StudioCarousel = () => {
                 ))}
               </CarouselContent>
               
-              <CarouselPrevious 
-                className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full border-podcast-accent bg-black/40 text-podcast-accent hover:bg-black/60 hover:scale-110 transition-transform"
-                aria-label="Diapositive précédente"
-              />
-              
-              <CarouselNext 
-                className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full border-podcast-accent bg-black/40 text-podcast-accent hover:bg-black/60 hover:scale-110 transition-transform"
-                aria-label="Diapositive suivante"
-              />
+              {/* Navigation arrows removed as there's only one studio */}
             </Carousel>
           </ScrollAnimationWrapper>
         </div>
