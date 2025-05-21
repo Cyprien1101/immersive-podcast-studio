@@ -7,7 +7,7 @@ import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 const services = [
   {
     title: "Enregistrement Audio",
-    description: "Capturez un son de qualité professionnelle avec notre équipement haut de gamme et nos ingénieurs expérimentés.",
+    description: "Capturez un son de qualité professionnelle avec notre équipement haut de gamme.",
     icon: Mic
   },
   {
@@ -22,7 +22,7 @@ const services = [
   },
   {
     title: "Distribution",
-    description: "Diffusez votre podcast sur toutes les plateformes majeures avec notre service de distribution intégré.",
+    description: "Diffusez votre podcast sur toutes les plateformes majeures.",
     icon: Share2
   },
   {

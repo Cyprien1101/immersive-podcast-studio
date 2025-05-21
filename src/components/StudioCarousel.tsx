@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 const mockStudios = [
   {
     id: 1,
-    name: 'Studio Eden',
+    name: 'Studio Lyon',
     description: 'Notre studio d\'enregistrement professionnel au centre de Lyon',
     location: '280 Rue Vendôme, Lyon',
     imageUrl: 'https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//photo%20studio.JPG'
@@ -32,7 +33,7 @@ const StudioCarousel = () => {
       <div className="container mx-auto">
         <ScrollAnimationWrapper animation="fade-down">
           <h2 className="mb-12 text-center text-5xl md:text-6xl font-bold">
-            <span className="text-gradient">Nos Studios</span>
+            <span className="text-gradient">Notre studio</span>
           </h2>
         </ScrollAnimationWrapper>
         

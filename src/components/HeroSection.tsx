@@ -73,12 +73,12 @@ const HeroSection = () => {
         {/* Centered content with animation */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
           <h1 ref={titleRef} className="mb-6 max-w-3xl text-3xl font-bold leading-tight md:text-5xl lg:text-7xl">
-            <span className="text-gradient-static">Premium Studio</span> for your 
+            <span className="text-gradient-static">Studio Premium</span> pour vos 
             <span className="text-gradient-static"> podcasts</span>
           </h1>
           
           <p ref={descRef} className="mb-8 max-w-xl text-lg text-white md:text-xl">
-            Professional spaces to record, produce, and broadcast your audio and video content
+            Espaces professionnels pour enregistrer, produire et diffuser vos contenus audio et vidéo
           </p>
           
           <div ref={buttonRef}>
@@ -87,7 +87,7 @@ const HeroSection = () => {
                 size="lg" 
                 className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent/90 hover:to-pink-500/90 font-bold text-white rounded-full px-8"
               >
-                Book Now
+                Réserver
               </Button>
             </Link>
           </div>

@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import ScrollAnimationWrapper from './ScrollAnimationWrapper';
@@ -6,35 +7,35 @@ import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 const videoData = [
   {
     videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-1.mp4",
-    title: "Vertical Format #1"
+    title: "Format Vertical #1"
   },
   {
     videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-2.mp4",
-    title: "Vertical Format #2"
+    title: "Format Vertical #2"
   },
   {
     videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-3.mp4",
-    title: "Vertical Format #3"
+    title: "Format Vertical #3"
   },
   {
     videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-4.mp4",
-    title: "Vertical Format #4"
+    title: "Format Vertical #4"
   },
   {
     videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-5.mp4",
-    title: "Vertical Format #5"
+    title: "Format Vertical #5"
   },
   {
     videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-6.mp4",
-    title: "Vertical Format #6"
+    title: "Format Vertical #6"
   },
   {
     videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-7.mp4",
-    title: "Vertical Format #7"
+    title: "Format Vertical #7"
   },
   {
     videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//reel.mp4",
-    title: "Vertical Format #8"
+    title: "Format Vertical #8"
   }
 ];
 
@@ -62,7 +63,7 @@ const VerticalVideoGrid = () => {
       <div className="container px-0 mx-auto max-w-[100%]">
         <ScrollAnimationWrapper animation="zoom-in" className="mb-8">
           <h2 className="text-center text-3xl font-bold">
-            <span className="text-gradient-static">Examples of Delivered Vertical Formats</span>
+            <span className="text-gradient-static">Nos shorts et reels</span>
           </h2>
         </ScrollAnimationWrapper>
         
@@ -87,7 +88,7 @@ const VerticalVideoGrid = () => {
                       </div>
                       <div className="bg-podcast-dark p-3 rounded-b-2xl">
                         <h3 className="text-podcast-accent font-medium text-sm">{item.title}</h3>
-                        <p className="text-xs text-gray-400">Format optimized for social media</p>
+                        <p className="text-xs text-gray-400">Format optimisé pour les réseaux sociaux</p>
                       </div>
                     </div>
                   </div>
