@@ -68,7 +68,7 @@ const HeroSection = () => {
         </video>
         
         {/* Dark overlay with upper part gradient for better integration with header */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80"></div>
+        <div className="absolute inset-0 hero-overlay"></div>
         
         {/* Centered content with animation */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
