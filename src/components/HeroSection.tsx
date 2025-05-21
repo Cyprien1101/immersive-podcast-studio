@@ -77,7 +77,7 @@ const HeroSection = () => {
             <span className="text-gradient-static"> podcasts</span>
           </h1>
           
-          <p ref={descRef} className="mb-8 max-w-xl text-lg text-gray-200 md:text-xl">
+          <p ref={descRef} className="mb-8 max-w-xl text-lg text-white md:text-xl">
             Professional spaces to record, produce, and broadcast your audio and video content
           </p>
           
