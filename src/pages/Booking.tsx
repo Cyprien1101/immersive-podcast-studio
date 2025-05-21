@@ -7,10 +7,12 @@ import StepperProgress from '@/components/booking/StepperProgress';
 import BookingHeader from '@/components/booking/BookingHeader';
 import Footer from '@/components/Footer';
 import { Loader2 } from 'lucide-react';
+import DateTimeSelection from '@/components/booking/DateTimeSelection';
 
-// Define booking steps (removed datetime step)
+// Define booking steps with the new datetime step
 const STEPS = [
   { id: 'studio', label: 'Studio' },
+  { id: 'datetime', label: 'Date & Heure' },
   { id: 'service', label: 'Service' },
   { id: 'additional', label: 'Services Additionnels' },
 ];
@@ -21,6 +23,8 @@ const BookingPage = () => {
   const [studioImages, setStudioImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStudio, setSelectedStudio] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const navigate = useNavigate();
 
   // Fetch studios and their images from Supabase
@@ -48,7 +52,7 @@ const BookingPage = () => {
         if (losAngelesStudio) {
           setSelectedStudio(losAngelesStudio);
           // Skip the studio selection step
-          setCurrentStep('service');
+          setCurrentStep('datetime');
         }
         
         setStudios(studioData || []);
@@ -68,6 +72,14 @@ const BookingPage = () => {
 
   const handleStudioSelect = (studio) => {
     setSelectedStudio(studio);
+    setCurrentStep('datetime');
+    // Scroll to top when moving to next step
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDateTimeSelect = (date, timeSlot) => {
+    setSelectedDate(date);
+    setSelectedTimeSlot(timeSlot);
     setCurrentStep('service');
     // Scroll to top when moving to next step
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -83,12 +95,25 @@ const BookingPage = () => {
             onSelectStudio={handleStudioSelect} 
           />
         );
+      case 'datetime':
+        return (
+          <DateTimeSelection 
+            studio={selectedStudio}
+            onDateTimeSelect={handleDateTimeSelect}
+          />
+        );
       case 'service':
         // This would be the next step implementation
         return (
           <div className="text-center py-16">
             <h2 className="text-2xl font-bold text-podcast-accent mb-4">Sélection du Service</h2>
             <p className="text-white">Cette étape sera disponible prochainement !</p>
+            {selectedDate && selectedTimeSlot && (
+              <div className="mt-4 p-4 bg-podcast-dark-accent rounded-lg">
+                <p className="text-gray-300">Date sélectionnée: {selectedDate?.toLocaleDateString()}</p>
+                <p className="text-gray-300">Créneau sélectionné: {selectedTimeSlot?.start_time} - {selectedTimeSlot?.end_time}</p>
+              </div>
+            )}
           </div>
         );
       default:
