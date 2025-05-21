@@ -1,9 +1,10 @@
 
 import React, { useEffect } from 'react';
-import { Map, Phone, Mail } from 'lucide-react';
+import { MapPin, Phone, Mail } from 'lucide-react';
 import Footer from '@/components/Footer';
 import FaqSection from '@/components/FaqSection';
 import ScrollAnimationWrapper from '@/components/ScrollAnimationWrapper';
+import Header from '@/components/Header';
 
 const Contact = () => {
   // Add useEffect to scroll to top when component mounts
@@ -13,10 +14,11 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-podcast-dark">
-      <div className="container px-4 mx-auto py-20">
+      <Header />
+      <div className="container px-4 mx-auto py-20 mt-16">
         <ScrollAnimationWrapper animation="fade-down">
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-12">
-            <span className="text-gradient">Get In Touch</span>
+            <span className="text-gradient">Nous Contacter</span>
           </h1>
         </ScrollAnimationWrapper>
         
@@ -27,11 +29,11 @@ const Contact = () => {
                 <div className="space-y-8">
                   <div className="flex items-start space-x-4">
                     <div className="bg-gradient-to-r from-podcast-accent to-pink-500 p-3 rounded-lg">
-                      <Map className="h-6 w-6 text-white" />
+                      <MapPin className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-podcast-accent mb-1">Address</h3>
-                      <p className="text-gray-300">123 Studio Lane, Los Angeles, CA 90001</p>
+                      <h3 className="text-xl font-semibold text-podcast-accent mb-1">Adresse</h3>
+                      <p className="text-gray-300">280 Rue Vendôme, Lyon</p>
                     </div>
                   </div>
                   
@@ -40,8 +42,8 @@ const Contact = () => {
                       <Phone className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-podcast-accent mb-1">Phone</h3>
-                      <p className="text-gray-300">+1 (555) 123-4567</p>
+                      <h3 className="text-xl font-semibold text-podcast-accent mb-1">Téléphone</h3>
+                      <p className="text-gray-300">+33 7 66 80 50 41</p>
                     </div>
                   </div>
                   
@@ -51,7 +53,7 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold text-podcast-accent mb-1">Email</h3>
-                      <p className="text-gray-300">hello@studiobooking.com</p>
+                      <p className="text-gray-300">cyprien@podroom.fr</p>
                     </div>
                   </div>
                 </div>

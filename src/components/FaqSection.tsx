@@ -10,28 +10,28 @@ import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 
 const faqItems = [
   {
-    question: "What types of podcasts can I record in your studios?",
-    answer: "Our studios are equipped for all podcast formats, from individual interviews to round tables with multiple guests, solo narrations and video podcasts. We adapt the technical configuration to your specific needs."
+    question: "Quels types de podcasts puis-je enregistrer dans vos studios ?",
+    answer: "Nos studios sont équipés pour tous les formats de podcast, des interviews individuelles aux tables rondes avec plusieurs invités, narrations solo et podcasts vidéo. Nous adaptons la configuration technique à vos besoins spécifiques."
   },
   {
-    question: "How does a recording session work?",
-    answer: "Upon arrival, our sound engineer welcomes you and configures the studio according to your needs. After a short testing period, you can start recording. The engineer remains available throughout the session to assist you and ensure technical quality."
+    question: "Comment se déroule une séance d'enregistrement ?",
+    answer: "À votre arrivée, notre ingénieur du son vous accueille et configure le studio selon vos besoins. Après une courte période de test, vous pouvez commencer l'enregistrement. L'ingénieur reste disponible tout au long de la séance pour vous assister et garantir la qualité technique."
   },
   {
-    question: "How much does it cost to rent a studio?",
-    answer: "Our rates vary depending on the chosen studio, rental duration, and additional services. Contact us for a personalized quote tailored to your podcast project."
+    question: "Combien coûte la location d'un studio ?",
+    answer: "Nos tarifs varient en fonction du studio choisi, de la durée de location et des services supplémentaires. Contactez-nous pour un devis personnalisé adapté à votre projet de podcast."
   },
   {
-    question: "Do you offer post-production services?",
-    answer: "Yes, we offer complete post-production services including editing, mixing, mastering, adding jingles and sound effects, as well as audio cleaning for a professional result."
+    question: "Proposez-vous des services de post-production ?",
+    answer: "Oui, nous proposons des services complets de post-production comprenant le montage, le mixage, le mastering, l'ajout de jingles et d'effets sonores, ainsi que le nettoyage audio pour un résultat professionnel."
   },
   {
-    question: "How do I book a slot in your studios?",
-    answer: "You can book directly online via our reservation system, by phone, or by email. We recommend booking at least one week in advance to ensure availability."
+    question: "Comment réserver un créneau dans vos studios ?",
+    answer: "Vous pouvez réserver directement en ligne via notre système de réservation, par téléphone ou par email. Nous recommandons de réserver au moins une semaine à l'avance pour garantir la disponibilité."
   },
   {
-    question: "Do you provide equipment for remote recordings?",
-    answer: "Yes, we offer rental of portable recording kits for your remote sessions, as well as technical solutions to connect remote guests to your studio session."
+    question: "Fournissez-vous du matériel pour les enregistrements à distance ?",
+    answer: "Oui, nous proposons la location de kits d'enregistrement portables pour vos sessions à distance, ainsi que des solutions techniques pour connecter des invités à distance à votre session en studio."
   },
 ];
 
@@ -41,7 +41,7 @@ const FaqSection = () => {
       <div className="container px-4 mx-auto">
         <ScrollAnimationWrapper animation="fade-down">
           <h2 className="mb-12 text-center text-4xl font-bold">
-            <span className="text-gradient">Frequently Asked Questions</span>
+            <span className="text-gradient">Questions Fréquentes</span>
           </h2>
         </ScrollAnimationWrapper>
         

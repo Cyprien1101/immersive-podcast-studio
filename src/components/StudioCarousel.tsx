@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -14,36 +13,15 @@ import { BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-// Mock data for studios
+// Mock data for studios - Keep only Studio Lyon
 const mockStudios = [
   {
     id: 1,
-    name: 'Studio Eden',
-    description: 'Our premier recording studio in downtown Los Angeles',
-    location: 'Los Angeles, CA',
+    name: 'Studio Lyon',
+    description: 'Notre studio d\'enregistrement professionnel au centre de Lyon',
+    location: '280 Rue Vendôme, Lyon',
     imageUrl: 'https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//photo%20studio.jpg'
-  },
-  {
-    id: 2,
-    name: 'Studio Harmony',
-    description: 'A peaceful recording environment with state-of-the-art equipment',
-    location: 'New York, NY',
-    imageUrl: 'https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//photo%20studio.jpg'
-  },
-  {
-    id: 3,
-    name: 'Studio Rhythm',
-    description: 'Perfect for bands and musical collaborations',
-    location: 'Austin, TX',
-    imageUrl: 'https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//photo%20studio.jpg'
-  },
-  {
-    id: 4,
-    name: 'Studio Beats',
-    description: 'Urban studio designed for hip-hop and electronic music',
-    location: 'Miami, FL',
-    imageUrl: 'https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//photo%20studio.jpg'
-  },
+  }
 ];
 
 const StudioCarousel = () => {
@@ -54,7 +32,7 @@ const StudioCarousel = () => {
       <div className="container mx-auto">
         <ScrollAnimationWrapper animation="fade-down">
           <h2 className="mb-12 text-center text-5xl md:text-6xl font-bold">
-            <span className="text-gradient">Our Studios</span>
+            <span className="text-gradient">Nos Studios</span>
           </h2>
         </ScrollAnimationWrapper>
         
@@ -99,7 +77,7 @@ const StudioCarousel = () => {
                                 className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600 text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300"
                               >
                                 <BookOpen className="h-5 w-5" />
-                                Book Now
+                                Réserver maintenant
                               </Button>
                             </Link>
                           </div>
@@ -112,12 +90,12 @@ const StudioCarousel = () => {
               
               <CarouselPrevious 
                 className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full border-podcast-accent bg-black/40 text-podcast-accent hover:bg-black/60 hover:scale-110 transition-transform"
-                aria-label="Previous slide"
+                aria-label="Diapositive précédente"
               />
               
               <CarouselNext 
                 className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full border-podcast-accent bg-black/40 text-podcast-accent hover:bg-black/60 hover:scale-110 transition-transform"
-                aria-label="Next slide"
+                aria-label="Diapositive suivante"
               />
             </Carousel>
           </ScrollAnimationWrapper>

@@ -25,7 +25,7 @@ const StudioSelection: React.FC<StudioSelectionProps> = ({
   return (
     <div className="py-8">
       <h2 className="text-2xl font-semibold text-center text-white mb-8">
-        Select a Studio
+        Sélectionner un Studio
       </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
@@ -58,15 +58,15 @@ const StudioSelection: React.FC<StudioSelectionProps> = ({
                 
                 <div className="flex items-center justify-between">
                   <div className="text-podcast-accent">
-                    <span className="text-lg font-bold">${studio.price_per_hour}</span>
-                    <span className="text-sm text-gray-300">/hour</span>
+                    <span className="text-lg font-bold">{studio.price_per_hour}€</span>
+                    <span className="text-sm text-gray-300">/heure</span>
                   </div>
                   
                   <Button 
                     className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600 text-white rounded-full px-6 py-2 flex items-center gap-2 transition-transform hover:scale-105 duration-300"
                     onClick={() => onSelectStudio(studio)}
                   >
-                    Choose this studio
+                    Choisir ce studio
                   </Button>
                 </div>
               </CardContent>

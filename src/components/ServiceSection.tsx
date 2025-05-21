@@ -6,33 +6,33 @@ import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 
 const services = [
   {
-    title: "Audio Recording",
-    description: "Capture professional-quality sound with our high-end equipment and experienced engineers.",
+    title: "Enregistrement Audio",
+    description: "Capturez un son de qualité professionnelle avec notre équipement haut de gamme et nos ingénieurs expérimentés.",
     icon: Mic
   },
   {
-    title: "Video Production",
-    description: "Transform your podcast into engaging video content with our dedicated video production team.",
+    title: "Production Vidéo",
+    description: "Transformez votre podcast en contenu vidéo engageant avec notre équipe dédiée à la production vidéo.",
     icon: Video
   },
   {
     title: "Post-production",
-    description: "Editing, mixing, and mastering by professionals for an impeccable final result.",
+    description: "Édition, mixage et mastering par des professionnels pour un résultat final impeccable.",
     icon: Radio
   },
   {
     title: "Distribution",
-    description: "Broadcast your podcast on all major platforms with our integrated distribution service.",
+    description: "Diffusez votre podcast sur toutes les plateformes majeures avec notre service de distribution intégré.",
     icon: Share2
   },
   {
-    title: "Branding",
-    description: "Create a strong visual identity for your podcast with our team of creative designers.",
+    title: "Identité Visuelle",
+    description: "Créez une identité visuelle forte pour votre podcast avec notre équipe de designers créatifs.",
     icon: Palette
   },
   {
-    title: "Analytics & Insights",
-    description: "Track your podcast's performance and get valuable insights about your audience.",
+    title: "Analyses & Statistiques",
+    description: "Suivez les performances de votre podcast et obtenez des informations précieuses sur votre audience.",
     icon: BarChart
   }
 ];
@@ -43,11 +43,11 @@ const ServiceSection = () => {
       <div className="container px-4 mx-auto">
         <ScrollAnimationWrapper animation="zoom-in">
           <h2 className="mb-4 text-center text-4xl font-bold">
-            <span className="text-gradient">Our Services</span>
+            <span className="text-gradient">Nos Services</span>
           </h2>
           
           <p className="mx-auto mb-12 max-w-2xl text-center text-gray-300">
-            A complete range of services to transform your vision into a high-quality professional podcast
+            Une gamme complète de services pour transformer votre vision en un podcast professionnel de haute qualité
           </p>
         </ScrollAnimationWrapper>
         
