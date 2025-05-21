@@ -26,12 +26,11 @@ const TimeCategory: React.FC<TimeCategoryProps> = ({
   canSelectTimeSlot,
   formatTimeSlot,
 }) => {
-  if (slots.length === 0) {
-    console.log(`No slots for category: ${label}`);
-    return null;
-  }
+  if (slots.length === 0) return null;
 
-  console.log(`${label} category has ${slots.length} slots`);
+  // Filtrer pour ne montrer que les catégories qui ont au moins un créneau disponible
+  const hasAvailableSlots = slots.some(slot => slot.isAvailable);
+  if (!hasAvailableSlots) return null;
 
   return (
     <div className="mb-6">
@@ -39,7 +38,7 @@ const TimeCategory: React.FC<TimeCategoryProps> = ({
       <div className="bg-podcast-dark bg-opacity-60 p-4 rounded-md border border-gray-800">
         <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-1">
           {slots.map((slot, index) => {
-            // Find the slot index in the overall availableTimeSlots array for checking consecutive availability
+            // Trouver l'index du créneau dans l'array global pour vérifier la disponibilité consécutive
             const slotIndex = availableTimeSlots.findIndex(s => s.time === slot.time);
             const canSelect = slot.isAvailable && canSelectTimeSlot(slotIndex);
             const isSelected = selectedStartTime === slot.time;

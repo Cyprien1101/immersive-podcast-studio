@@ -61,7 +61,7 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
         const losAngelesStudioId = studioData?.id;
         
         if (!losAngelesStudioId) {
-          console.error('Studio Lyon non trouvé');
+          console.error('Studio Los Angeles non trouvé');
           setLoading(false);
           return;
         }
@@ -75,7 +75,7 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
         
         if (error) throw error;
         
-        console.log("Données de disponibilité de la base de données:", data);
+        console.log("Données de disponibilité récupérées:", data);
         
         // Generate ALL time slots for the day (00:00 to 23:30, in 30-minute increments)
         const generatedTimeSlots: TimeSlot[] = [];
@@ -85,9 +85,9 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
             
             // Check if this time slot exists in the data and check its availability status
             const timeSlot = data?.find(slot => slot.start_time === time);
-            // If the slot exists in the database, use its availability status
-            // If it doesn't exist, assume it's available
-            const isAvailable = timeSlot ? timeSlot.is_available : true;
+            // Si le créneau existe dans la base de données, utilisez son statut de disponibilité
+            // Si non, supposez qu'il n'est pas disponible
+            const isAvailable = timeSlot ? timeSlot.is_available : false;
             
             generatedTimeSlots.push({ time, isAvailable });
           }
@@ -125,7 +125,7 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
           categories[3]  // Night
         ];
         
-        console.log("Catégories de temps:", orderedCategories.map(c => ({ label: c.label, slotCount: c.slots.length })));
+        console.log("Catégories de créneaux:", orderedCategories.map(c => ({ label: c.label, slotCount: c.slots.length })));
         
         setTimeCategories(orderedCategories);
       } catch (error) {
