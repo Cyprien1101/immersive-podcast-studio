@@ -358,7 +358,6 @@ export type Database = {
           max_booking_duration: number
           max_guests: number
           name: string
-          price_per_hour: number
           rating: number | null
           style: string
           updated_at: string
@@ -371,7 +370,6 @@ export type Database = {
           max_booking_duration?: number
           max_guests: number
           name: string
-          price_per_hour: number
           rating?: number | null
           style: string
           updated_at?: string
@@ -384,7 +382,6 @@ export type Database = {
           max_booking_duration?: number
           max_guests?: number
           name?: string
-          price_per_hour?: number
           rating?: number | null
           style?: string
           updated_at?: string
@@ -474,9 +471,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_hours: {
+        Args: { p_user_id: string; p_hours: number; p_tier: string }
+        Returns: undefined
+      }
       cancel_subscription: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      deduct_hours: {
+        Args: { p_user_id: string; p_hours_to_deduct: number }
+        Returns: boolean
       }
       get_users_with_emails: {
         Args: Record<PropertyKey, never>
@@ -485,9 +490,17 @@ export type Database = {
           email: string
         }[]
       }
+      increment: {
+        Args: { x: number; n: number }
+        Returns: number
+      }
       is_admin: {
         Args: { uid: string }
         Returns: boolean
+      }
+      migrate_user_hours: {
+        Args: { p_user_id: string }
+        Returns: undefined
       }
     }
     Enums: {

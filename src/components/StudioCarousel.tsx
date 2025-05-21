@@ -13,10 +13,12 @@ import {
 import { BookOpen } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const StudioCarousel = () => {
   const [studios, setStudios] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     async function fetchStudios() {
@@ -90,38 +92,70 @@ const StudioCarousel = () => {
                 <CarouselContent className="-ml-4">
                   {studios.map((studio) => (
                     <CarouselItem key={studio.id} className="pl-4 md:basis-4/5 lg:basis-3/4">
-                      <div className="relative h-[70vh] w-full overflow-hidden rounded-xl group">
-                        <div className="w-full h-full overflow-hidden">
-                          <img
-                            src={studio.imageUrl}
-                            alt={`Studio ${studio.name}`}
-                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110 rounded-xl"
-                          />
-                        </div>
-                        
-                        {/* Semi-transparent overlay for better text readability */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                        
-                        {/* Studio info overlay - bottom left */}
-                        <div className="absolute bottom-10 left-10 max-w-md text-white">
-                          <h3 className="mb-2 text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">
-                            {studio.name}
-                          </h3>
-                          <p className="text-xl md:text-2xl text-white/90 drop-shadow-md">
-                            {studio.location}
-                          </p>
-                        </div>
-                        
-                        {/* Book now button - bottom right */}
-                        <div className="absolute bottom-10 right-10">
-                          <Link to="/booking">
-                            <Button 
-                              className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600 text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300"
-                            >
-                              <BookOpen className="h-5 w-5" />
-                              Book Now
-                            </Button>
-                          </Link>
+                      <div className="relative rounded-xl group">
+                        {/* Conteneur flex pour le contenu */}
+                        <div className={`flex flex-col ${isMobile ? 'h-auto' : 'h-[70vh]'}`}>
+                          {/* Image centrée */}
+                          <div className={`w-full ${isMobile ? 'h-[50vh]' : 'h-full'} overflow-hidden rounded-t-xl ${!isMobile && 'rounded-b-xl'}`}>
+                            <div className="w-full h-full flex items-center justify-center bg-black">
+                              <img
+                                src={studio.imageUrl}
+                                alt={`Studio ${studio.name}`}
+                                className={`${isMobile ? 'w-full h-auto object-contain' : 'w-full h-full object-cover'} transition-transform duration-500 group-hover:scale-110`}
+                              />
+                            </div>
+                          </div>
+                          
+                          {/* Overlay semi-transparent pour une meilleure lisibilité du texte */}
+                          {!isMobile && <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent rounded-xl"></div>}
+                          
+                          {/* Informations sur le studio - en bas à gauche sur desktop, centrées en haut sur mobile */}
+                          {isMobile ? (
+                            <div className="px-4 py-6 bg-black rounded-b-xl">
+                              <h3 className="mb-2 text-3xl font-bold tracking-tight text-white text-center">
+                                {studio.name}
+                              </h3>
+                              <p className="text-lg text-white/90 text-center mb-6">
+                                {studio.location}
+                              </p>
+                              
+                              {/* Bouton "Book Now" centré en bas sur mobile */}
+                              <div className="flex justify-center">
+                                <Link to="/booking">
+                                  <Button 
+                                    className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600 text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300"
+                                  >
+                                    <BookOpen className="h-5 w-5" />
+                                    Book Now
+                                  </Button>
+                                </Link>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              {/* Version desktop - texte en bas à gauche */}
+                              <div className="absolute bottom-10 left-10 max-w-md text-white">
+                                <h3 className="mb-2 text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">
+                                  {studio.name}
+                                </h3>
+                                <p className="text-xl md:text-2xl text-white/90 drop-shadow-md">
+                                  {studio.location}
+                                </p>
+                              </div>
+                              
+                              {/* Bouton "Book Now" - en bas à droite sur desktop */}
+                              <div className="absolute bottom-10 right-10">
+                                <Link to="/booking">
+                                  <Button 
+                                    className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600 text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300"
+                                  >
+                                    <BookOpen className="h-5 w-5" />
+                                    Book Now
+                                  </Button>
+                                </Link>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
                     </CarouselItem>
