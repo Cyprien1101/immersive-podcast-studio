@@ -51,7 +51,7 @@ const ImpactSection = () => {
 
         {/* 2. Three-column Grid with consistent media heights */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          {/* Left Column - Video 16:9 */}
+          {/* Left Column - Video 16:9 - Updated with new video URL */}
           <ScrollAnimationWrapper animation="fade-right" delay={200}>
             <div className="overflow-hidden rounded-lg bg-black shadow-lg transform hover:scale-[1.02] transition-transform duration-300 h-full">
               <div className="h-full flex flex-col">
@@ -65,7 +65,7 @@ const ImpactSection = () => {
                       playsInline
                     >
                       <source 
-                        src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//reels%20website%20.mp4" 
+                        src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//videos%20et%20podcast-2.mp4" 
                         type="video/mp4" 
                       />
                       Your browser does not support HTML5 videos.
@@ -80,17 +80,25 @@ const ImpactSection = () => {
             </div>
           </ScrollAnimationWrapper>
 
-          {/* Center Column - Image 16:9 - MIS À JOUR AVEC LA NOUVELLE IMAGE */}
+          {/* Center Column - Changed from Image to Video 16:9 */}
           <ScrollAnimationWrapper animation="fade-up" delay={400}>
             <div className="overflow-hidden rounded-lg bg-black shadow-lg transform hover:scale-[1.02] transition-transform duration-300 h-full">
               <div className="h-full flex flex-col">
                 <div className="flex-grow">
                   <AspectRatio ratio={16/9} className="w-full">
-                    <img
-                      src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//photo%20studio.jpg"
-                      alt="Studio Podcast"
+                    <video
                       className="w-full h-full object-cover"
-                    />
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    >
+                      <source 
+                        src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//videos%20et%20podcast-1.mp4" 
+                        type="video/mp4" 
+                      />
+                      Your browser does not support HTML5 videos.
+                    </video>
                   </AspectRatio>
                 </div>
                 <div className="p-3 bg-black">
