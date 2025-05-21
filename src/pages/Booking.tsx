@@ -7,7 +7,7 @@ import DateTimeSelection from '@/components/booking/DateTimeSelection';
 import StepperProgress from '@/components/booking/StepperProgress';
 import BookingHeader from '@/components/booking/BookingHeader';
 import Footer from '@/components/Footer';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Users } from 'lucide-react';
 
 // Define booking steps
 const STEPS = [
