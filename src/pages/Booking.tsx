@@ -3,16 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import StudioSelection from '@/components/booking/StudioSelection';
-import DateTimeSelection from '@/components/booking/DateTimeSelection';
 import StepperProgress from '@/components/booking/StepperProgress';
 import BookingHeader from '@/components/booking/BookingHeader';
 import Footer from '@/components/Footer';
 import { Loader2 } from 'lucide-react';
 
-// Define booking steps
+// Define booking steps (removed datetime step)
 const STEPS = [
   { id: 'studio', label: 'Studio' },
-  { id: 'datetime', label: 'Date & Heure' },
   { id: 'service', label: 'Service' },
   { id: 'additional', label: 'Services Additionnels' },
 ];
@@ -23,12 +21,6 @@ const BookingPage = () => {
   const [studioImages, setStudioImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStudio, setSelectedStudio] = useState(null);
-  const [bookingDetails, setBookingDetails] = useState({
-    date: null,
-    startTime: null,
-    duration: 1,
-    guests: 1
-  });
   const navigate = useNavigate();
 
   // Fetch studios and their images from Supabase
@@ -56,7 +48,7 @@ const BookingPage = () => {
         if (losAngelesStudio) {
           setSelectedStudio(losAngelesStudio);
           // Skip the studio selection step
-          setCurrentStep('datetime');
+          setCurrentStep('service');
         }
         
         setStudios(studioData || []);
@@ -76,21 +68,6 @@ const BookingPage = () => {
 
   const handleStudioSelect = (studio) => {
     setSelectedStudio(studio);
-    setCurrentStep('datetime');
-    // Scroll to top when moving to next step
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleDateTimeSelect = (details) => {
-    setBookingDetails({
-      ...bookingDetails,
-      date: details.date,
-      startTime: details.startTime,
-      duration: details.duration,
-      guests: details.guests
-    });
-    
-    // Move to the next step
     setCurrentStep('service');
     // Scroll to top when moving to next step
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -104,13 +81,6 @@ const BookingPage = () => {
             studios={studios} 
             studioImages={studioImages} 
             onSelectStudio={handleStudioSelect} 
-          />
-        );
-      case 'datetime':
-        return (
-          <DateTimeSelection 
-            studio={selectedStudio}
-            onProceed={handleDateTimeSelect}
           />
         );
       case 'service':
