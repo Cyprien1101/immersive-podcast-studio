@@ -21,8 +21,8 @@ const TrustedBy = () => {
     <section className="py-8 bg-black">
       <div className="container mx-auto px-4">
         <ScrollAnimationWrapper animation="fade-down">
-          <h3 className="text-xl md:text-2xl text-center mb-6 text-gray-300">
-            Ils nous ont fait confiance
+          <h3 className="text-2xl md:text-3xl text-center mb-6 text-gray-300">
+            Ils nous ont fait <span className="text-gradient-hero">confiance</span>
           </h3>
         </ScrollAnimationWrapper>
 
