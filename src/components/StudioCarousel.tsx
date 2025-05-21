@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -110,7 +109,7 @@ const StudioCarousel = () => {
                           {/* Overlay semi-transparent pour une meilleure lisibilité du texte */}
                           {!isMobile && <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent rounded-xl"></div>}
                           
-                          {/* Informations sur le studio - en bas à gauche sur desktop, centrées en haut sur mobile */}
+                          {/* Informations sur le studio */}
                           {isMobile ? (
                             <div className="px-4 py-6 bg-black rounded-b-xl">
                               <h3 className="mb-2 text-3xl font-bold tracking-tight text-white text-center">
@@ -133,29 +132,23 @@ const StudioCarousel = () => {
                               </div>
                             </div>
                           ) : (
-                            <>
-                              {/* Version desktop - texte en bas à gauche */}
-                              <div className="absolute bottom-10 left-10 max-w-md text-white">
-                                <h3 className="mb-2 text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">
-                                  {studio.name}
-                                </h3>
-                                <p className="text-xl md:text-2xl text-white/90 drop-shadow-md">
-                                  {studio.location}
-                                </p>
-                              </div>
-                              
-                              {/* Bouton "Book Now" - en bas à droite sur desktop */}
-                              <div className="absolute bottom-10 right-10">
-                                <Link to="/booking">
-                                  <Button 
-                                    className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600 text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300"
-                                  >
-                                    <BookOpen className="h-5 w-5" />
-                                    Book Now
-                                  </Button>
-                                </Link>
-                              </div>
-                            </>
+                            // Version desktop : tout centré verticalement et horizontalement
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10">
+                              <h3 className="mb-4 text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">
+                                {studio.name}
+                              </h3>
+                              <p className="mb-8 text-xl md:text-2xl text-white/90 drop-shadow-md">
+                                {studio.location}
+                              </p>
+                              <Link to="/booking">
+                                <Button 
+                                  className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600 text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300"
+                                >
+                                  <BookOpen className="h-5 w-5" />
+                                  Book Now
+                                </Button>
+                              </Link>
+                            </div>
                           )}
                         </div>
                       </div>
