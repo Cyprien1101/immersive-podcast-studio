@@ -18,7 +18,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ date, setDate, disabledDays
   return (
     <Card className="bg-podcast-dark border-gray-800 text-white h-fit">
       <CardContent className="pt-6">
-        <h3 className="text-xl font-semibold mb-4 text-white">Select Date</h3>
+        <h3 className="text-xl font-semibold mb-4 text-white">Sélectionner une date</h3>
         
         <div className="grid gap-2">
           <Popover>
@@ -28,7 +28,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ date, setDate, disabledDays
                 className="w-full justify-start text-left font-normal bg-podcast-dark border-gray-700 hover:bg-gray-800"
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, 'PPP') : <span>Pick a date</span>}
+                {date ? format(date, 'PPP') : <span>Choisir une date</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0 bg-podcast-dark border-gray-700">

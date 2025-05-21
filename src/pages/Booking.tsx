@@ -12,9 +12,9 @@ import { Loader2 } from 'lucide-react';
 // Define booking steps
 const STEPS = [
   { id: 'studio', label: 'Studio' },
-  { id: 'datetime', label: 'Date & Time' },
+  { id: 'datetime', label: 'Date & Heure' },
   { id: 'service', label: 'Service' },
-  { id: 'additional', label: 'Additional Services' },
+  { id: 'additional', label: 'Services Additionnels' },
 ];
 
 const BookingPage = () => {
@@ -117,8 +117,8 @@ const BookingPage = () => {
         // This would be the next step implementation
         return (
           <div className="text-center py-16">
-            <h2 className="text-2xl font-bold text-podcast-accent mb-4">Service Selection</h2>
-            <p className="text-white">This step is coming soon!</p>
+            <h2 className="text-2xl font-bold text-podcast-accent mb-4">Sélection du Service</h2>
+            <p className="text-white">Cette étape sera disponible prochainement !</p>
           </div>
         );
       default:
@@ -136,7 +136,7 @@ const BookingPage = () => {
         <StepperProgress steps={STEPS} currentStep={currentStep} />
         
         <h1 className="text-4xl md:text-5xl font-bold text-center my-6 text-white">
-          Book Your Studio
+          Réservez Votre Studio
         </h1>
         
         {loading ? (

@@ -54,14 +54,14 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
           .single();
         
         if (studioError) {
-          console.error('Error fetching studio:', studioError);
+          console.error('Erreur lors de la récupération du studio:', studioError);
           throw studioError;
         }
         
         const losAngelesStudioId = studioData?.id;
         
         if (!losAngelesStudioId) {
-          console.error('Los Angeles studio not found');
+          console.error('Studio Lyon non trouvé');
           setLoading(false);
           return;
         }
@@ -75,7 +75,7 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
         
         if (error) throw error;
         
-        console.log("Availability data from database:", data);
+        console.log("Données de disponibilité de la base de données:", data);
         
         // Generate ALL time slots for the day (00:00 to 23:30, in 30-minute increments)
         const generatedTimeSlots: TimeSlot[] = [];
@@ -93,7 +93,7 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
           }
         }
         
-        console.log("Generated time slots:", generatedTimeSlots.length);
+        console.log("Créneaux horaires générés:", generatedTimeSlots.length);
         
         setAvailableTimeSlots(generatedTimeSlots);
         
@@ -125,11 +125,11 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
           categories[3]  // Night
         ];
         
-        console.log("Time categories:", orderedCategories.map(c => ({ label: c.label, slotCount: c.slots.length })));
+        console.log("Catégories de temps:", orderedCategories.map(c => ({ label: c.label, slotCount: c.slots.length })));
         
         setTimeCategories(orderedCategories);
       } catch (error) {
-        console.error('Error fetching availability:', error);
+        console.error('Erreur lors de la récupération des disponibilités:', error);
       } finally {
         setLoading(false);
       }
@@ -157,9 +157,8 @@ export const useDateTimeLogic = ({ studio, onProceed }: UseDateTimeLogicProps) =
   const formatTimeSlot = (time: string): string => {
     const [hours, minutes] = time.split(':');
     const hour = parseInt(hours, 10);
-    const period = hour >= 12 ? 'PM' : 'AM';
-    const hour12 = hour % 12 || 12;
-    return `${hour12}:${minutes} ${period}`;
+    // En français, on utilise souvent le format 24h
+    return `${hour}:${minutes}`;
   };
   
   // Handle duration changes

@@ -38,10 +38,26 @@ const TimeCategoryContainer: React.FC<TimeCategoryContainerProps> = ({
   formatTimeSlot,
   handleProceed,
 }) => {
+  // Traduire les labels des catégories
+  const translateTimeCategory = (label: string): string => {
+    switch (label) {
+      case 'Morning':
+        return 'Matin';
+      case 'Afternoon':
+        return 'Après-midi';
+      case 'Evening':
+        return 'Soirée';
+      case 'Night':
+        return 'Nuit';
+      default:
+        return label;
+    }
+  };
+
   return (
     <Card className="mt-8 bg-podcast-dark border-gray-800 text-white">
       <CardContent className="pt-6">
-        <h3 className="text-xl font-semibold mb-4 text-white">Available Time Slots</h3>
+        <h3 className="text-xl font-semibold mb-4 text-white">Créneaux Horaires Disponibles</h3>
         {loading ? (
           <div className="flex justify-center items-center h-32">
             <Loader2 className="h-8 w-8 animate-spin text-white" />
@@ -51,7 +67,7 @@ const TimeCategoryContainer: React.FC<TimeCategoryContainerProps> = ({
             {timeCategories.map((category, categoryIndex) => (
               <TimeCategory
                 key={categoryIndex}
-                label={category.label}
+                label={translateTimeCategory(category.label)}
                 slots={category.slots}
                 selectedStartTime={selectedStartTime}
                 availableTimeSlots={availableTimeSlots}
@@ -62,7 +78,7 @@ const TimeCategoryContainer: React.FC<TimeCategoryContainerProps> = ({
             ))}
             
             {availableTimeSlots.length === 0 && !loading && (
-              <p className="text-center text-gray-400 my-6">No time slots found for this date.</p>
+              <p className="text-center text-gray-400 my-6">Aucun créneau horaire trouvé pour cette date.</p>
             )}
             
             <div className="mt-8 flex justify-center">
@@ -71,7 +87,7 @@ const TimeCategoryContainer: React.FC<TimeCategoryContainerProps> = ({
                 disabled={!selectedStartTime}
                 onClick={handleProceed}
               >
-                Continue
+                Continuer
               </Button>
             </div>
           </>

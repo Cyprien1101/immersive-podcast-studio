@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import ScrollAnimationWrapper from '@/components/ScrollAnimationWrapper';
-import { MapPin } from 'lucide-react';
+import { MapPin, Users } from 'lucide-react';
 
 interface StudioSelectionProps {
   studios: any[];
@@ -57,9 +57,9 @@ const StudioSelection: React.FC<StudioSelectionProps> = ({
                 </p>
                 
                 <div className="flex items-center justify-between">
-                  <div className="text-podcast-accent">
-                    <span className="text-lg font-bold">{studio.price_per_hour}€</span>
-                    <span className="text-sm text-gray-300">/heure</span>
+                  <div className="text-podcast-accent flex items-center">
+                    <Users className="h-5 w-5 mr-2" />
+                    <span className="text-lg font-bold">Max {studio.max_guests} personnes</span>
                   </div>
                   
                   <Button 

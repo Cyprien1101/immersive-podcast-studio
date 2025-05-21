@@ -38,7 +38,7 @@ const BookingHeader = () => {
         <Button 
           className="bg-black text-white border border-white rounded-full px-6 py-2 transition-transform hover:scale-105 hover:bg-gray-800 duration-300"
         >
-          Sign in
+          Connexion
         </Button>
       </div>
     </div>
