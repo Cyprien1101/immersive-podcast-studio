@@ -30,9 +30,9 @@ const Footer = () => {
             <h4 className="mb-4 text-lg font-semibold text-white">Liens Rapides</h4>
             <ul className="space-y-2">
               <li><a href="#" className="hover:text-podcast-accent">Nos Studios</a></li>
-              <li><a href="#" className="hover:text-podcast-accent">Services</a></li>
-              <li><a href="#" className="hover:text-podcast-accent">Exemples</a></li>
-              <li><a href="#" className="hover:text-podcast-accent">FAQ</a></li>
+              
+              
+              
             </ul>
           </div>
 
