@@ -1,13 +1,42 @@
-
 import React, { useEffect } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 
-// Sample data for videos - duplicated to fill the screen width
-const videoData = Array(8).fill({
-  videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//reel.mp4",
-  title: "Vertical Format"
-});
+// Updated video data with new reels, keeping one original
+const videoData = [
+  {
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-1.mp4",
+    title: "Vertical Format #1"
+  },
+  {
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-2.mp4",
+    title: "Vertical Format #2"
+  },
+  {
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-3.mp4",
+    title: "Vertical Format #3"
+  },
+  {
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-4.mp4",
+    title: "Vertical Format #4"
+  },
+  {
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-5.mp4",
+    title: "Vertical Format #5"
+  },
+  {
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-6.mp4",
+    title: "Vertical Format #6"
+  },
+  {
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-7.mp4",
+    title: "Vertical Format #7"
+  },
+  {
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//reel.mp4",
+    title: "Vertical Format #8"
+  }
+];
 
 const VerticalVideoGrid = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
@@ -57,7 +86,7 @@ const VerticalVideoGrid = () => {
                         </video>
                       </div>
                       <div className="bg-podcast-dark p-3 rounded-b-2xl">
-                        <h3 className="text-podcast-accent font-medium text-sm">Vertical Format #{index + 1}</h3>
+                        <h3 className="text-podcast-accent font-medium text-sm">{item.title}</h3>
                         <p className="text-xs text-gray-400">Format optimized for social media</p>
                       </div>
                     </div>
