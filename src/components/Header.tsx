@@ -28,7 +28,7 @@ const Header = () => {
   return (
     <header 
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-        scrolled ? 'bg-black/70 backdrop-blur-md' : 'bg-black/50'
+        scrolled ? 'bg-black/40 backdrop-blur-md' : 'bg-black/30'
       }`}
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -37,25 +37,25 @@ const Header = () => {
           <img 
             src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//logo.png" 
             alt="Logo" 
-            className="h-8 md:h-10"
+            className="h-8 md:h-10 rounded-lg"
           />
         </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4">
-          <Link to="/contact" className="text-white hover:text-podcast-accent transition-colors">
+          <Link to="/contact" className="text-white hover:text-podcast-accent transition-colors font-bold">
             Nous contacter
           </Link>
           
           <Link to="/booking">
             <Button 
-              className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent/90 hover:to-pink-500/90 font-medium text-white"
+              className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent/90 hover:to-pink-500/90 font-bold text-white rounded-full px-6"
             >
               Réserver
             </Button>
           </Link>
           
-          <Button variant="ghost" className="text-white hover:text-podcast-accent hover:bg-black/30">
+          <Button variant="ghost" className="text-white hover:text-podcast-accent hover:bg-black/30 font-bold">
             Se connecter
           </Button>
         </nav>
@@ -72,11 +72,11 @@ const Header = () => {
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-black/90 backdrop-blur-md">
+        <div className="md:hidden bg-black/40 backdrop-blur-md">
           <nav className="flex flex-col items-center py-4 space-y-4">
             <Link 
               to="/contact" 
-              className="text-white hover:text-podcast-accent transition-colors w-full text-center py-2"
+              className="text-white hover:text-podcast-accent transition-colors w-full text-center py-2 font-bold"
               onClick={() => setMobileMenuOpen(false)}
             >
               Nous contacter
@@ -88,7 +88,7 @@ const Header = () => {
               onClick={() => setMobileMenuOpen(false)}
             >
               <Button 
-                className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent/90 hover:to-pink-500/90 font-medium text-white w-full"
+                className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent/90 hover:to-pink-500/90 font-bold text-white w-full rounded-full"
               >
                 Réserver
               </Button>
@@ -96,7 +96,7 @@ const Header = () => {
             
             <Button 
               variant="ghost" 
-              className="text-white hover:text-podcast-accent hover:bg-black/30 w-full"
+              className="text-white hover:text-podcast-accent hover:bg-black/30 w-full font-bold"
             >
               Se connecter
             </Button>

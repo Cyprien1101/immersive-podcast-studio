@@ -85,7 +85,7 @@ const HeroSection = () => {
             <Link to="/booking">
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent/90 hover:to-pink-500/90 font-bold text-white"
+                className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent/90 hover:to-pink-500/90 font-bold text-white rounded-full px-8"
               >
                 Book Now
               </Button>
