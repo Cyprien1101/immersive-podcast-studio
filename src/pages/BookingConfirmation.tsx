@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,8 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import BookingHeader from '@/components/booking/BookingHeader';
 import Footer from '@/components/Footer';
+import { useBooking } from '@/context/BookingContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface Booking {
   id: string;
@@ -28,9 +31,10 @@ interface Booking {
 const BookingConfirmation = () => {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
-  const [calendarEvent, setCalendarEvent] = useState<boolean>(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { state, createBooking, resetBooking } = useBooking();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!user) {
@@ -38,46 +42,80 @@ const BookingConfirmation = () => {
       return;
     }
 
-    const fetchLatestBooking = async () => {
+    const createOrFetchBooking = async () => {
       setLoading(true);
       try {
-        // Get the latest booking for the current user
-        const { data, error } = await supabase
-          .from('bookings')
-          .select(`
-            *,
-            studio:studio_id (
-              name,
-              location
-            )
-          `)
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
+        // Si nous avons des données de réservation en cours, créer la réservation
+        if (state.bookingData && state.isComplete) {
+          const result = await createBooking(user.id);
+          
+          if (!result.success) {
+            toast({
+              title: "Erreur de réservation",
+              description: "Une erreur est survenue lors de la création de votre réservation.",
+              variant: "destructive",
+            });
+            navigate('/booking');
+            return;
+          }
+          
+          // Après avoir créé la réservation, récupérer les détails
+          const { data, error } = await supabase
+            .from('bookings')
+            .select(`
+              *,
+              studio:studio_id (
+                name,
+                location
+              )
+            `)
+            .eq('id', result.bookingId)
+            .single();
+          
+          if (error) {
+            console.error('Error fetching booking:', error);
+            return;
+          }
+          
+          setBooking(data);
+          resetBooking(); // Réinitialiser les données de réservation en cours
+        } else {
+          // Si pas de réservation en cours, récupérer la dernière réservation
+          const { data, error } = await supabase
+            .from('bookings')
+            .select(`
+              *,
+              studio:studio_id (
+                name,
+                location
+              )
+            `)
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
 
-        if (error) {
-          console.error('Error fetching booking:', error);
-          return;
-        }
+          if (error) {
+            console.error('Error fetching booking:', error);
+            return;
+          }
 
-        // Logs pour déboguer le problème de date
-        if (data) {
-          console.log("Original booking date from DB:", data.date);
           setBooking(data);
         }
-        
-        // Remove calendar event flag check since we're not using it anymore
-        localStorage.removeItem('calendar_event_created');
       } catch (error) {
         console.error('Error in booking confirmation:', error);
+        toast({
+          title: "Erreur",
+          description: "Une erreur est survenue. Veuillez réessayer.",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchLatestBooking();
-  }, [user, navigate]);
+    createOrFetchBooking();
+  }, [user, navigate, state.bookingData, state.isComplete]);
 
   // Helper function to calculate booking duration in hours
   const calculateDuration = (startTime: string, endTime: string): number => {
@@ -127,7 +165,6 @@ const BookingConfirmation = () => {
   }
 
   // Format date safely with parseISO
-  // L'erreur pourrait être ici, assurons-nous que la date est correctement formatée
   const displayDate = booking ? format(parseISO(booking.date), 'dd MMMM yyyy', { locale: fr }) : '';
   console.log("Formatted date for display:", displayDate, "Original date from DB:", booking.date);
   

@@ -9,7 +9,8 @@ import Footer from '@/components/Footer';
 import { Loader2 } from 'lucide-react';
 import DateTimeSelection from '@/components/booking/DateTimeSelection';
 import ServiceSelection from '@/components/booking/ServiceSelection';
-import { BookingProvider } from '@/context/BookingContext';
+import { BookingProvider, useBooking } from '@/context/BookingContext';
+import { useAuth } from '@/context/AuthContext';
 
 // Define booking steps with the datetime step
 const STEPS = [
@@ -19,17 +20,16 @@ const STEPS = [
   { id: 'additional', label: 'Services Additionnels' },
 ];
 
-const BookingPage = () => {
+// Contenu principal de la page de réservation
+const BookingContent = () => {
   const [currentStep, setCurrentStep] = useState('studio');
   const [studios, setStudios] = useState([]);
   const [studioImages, setStudioImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStudio, setSelectedStudio] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-  const [bookingDuration, setBookingDuration] = useState(1);
-  const [guestCount, setGuestCount] = useState(1);
   const navigate = useNavigate();
+  const { setStudioInfo } = useBooking();
+  const { user, showAuthDialog } = useAuth();
 
   // Fetch studios and their images from Supabase
   useEffect(() => {
@@ -51,11 +51,12 @@ const BookingPage = () => {
         
         if (imageError) throw imageError;
         
-        // Set the Studio Lyon as selected by default
-        const lyonStudio = studioData?.find(studio => studio.name === 'Studio Lyon');
+        // Set the Studio Lyon as selected by default (using the specific studio ID)
+        const lyonStudio = studioData?.find(studio => studio.id === "d9c24a0a-d94a-4cbc-b489-fa5cfe73ce08");
         if (lyonStudio) {
           console.log("Found Studio Lyon:", lyonStudio);
           setSelectedStudio(lyonStudio);
+          setStudioInfo({ studio_id: lyonStudio.id });
           // Skip the studio selection step
           setCurrentStep('datetime');
         } else {
@@ -79,6 +80,7 @@ const BookingPage = () => {
 
   const handleStudioSelect = (studio) => {
     setSelectedStudio(studio);
+    setStudioInfo({ studio_id: studio.id });
     setCurrentStep('datetime');
     // Scroll to top when moving to next step
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -90,27 +92,17 @@ const BookingPage = () => {
   };
 
   const handleDateTimeSelect = (date, timeSlot, duration, guests) => {
-    setSelectedDate(date);
-    setSelectedTimeSlot(timeSlot);
-    setBookingDuration(duration);
-    setGuestCount(guests);
-    
     // Formatage de la date en utilisant la méthode fiable sans décalage de timezone
     const formattedDate = formatDateToISOString(date);
     console.log("Date sélectionnée (handleDateTimeSelect):", formattedDate, "Date brute:", date);
     
-    // Store the booking data in localStorage for persistence
-    const bookingData = {
-      studio_id: selectedStudio.id,
-      date: formattedDate,
-      start_time: timeSlot.start_time,
-      end_time: timeSlot.end_time,
-      number_of_guests: guests,
-      created_at: new Date().toISOString()
-    };
+    // Si l'utilisateur n'est pas connecté, afficher la popup d'authentification
+    if (!user) {
+      showAuthDialog();
+      return;
+    }
     
-    localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
-    
+    // Passer à l'étape suivante
     setCurrentStep('service');
     
     // Scroll to top when moving to next step
@@ -155,35 +147,41 @@ const BookingPage = () => {
   };
 
   return (
-    <BookingProvider>
-      <div className="min-h-screen bg-podcast-dark pt-20">
-        {/* Added BookingHeader component */}
-        <BookingHeader />
+    <div className="min-h-screen bg-podcast-dark pt-20">
+      {/* Added BookingHeader component */}
+      <BookingHeader />
+      
+      <div className="container mx-auto px-4 py-8 relative">
+        {/* Step Progress Indicator - now with click handler */}
+        <StepperProgress 
+          steps={STEPS} 
+          currentStep={currentStep} 
+          onStepClick={handleStepClick}
+        />
         
-        <div className="container mx-auto px-4 py-8 relative">
-          {/* Step Progress Indicator - now with click handler */}
-          <StepperProgress 
-            steps={STEPS} 
-            currentStep={currentStep} 
-            onStepClick={handleStepClick}
-          />
-          
-          <h1 className="text-4xl md:text-5xl font-bold text-center my-6 text-white">
-            Réservez Votre Studio
-          </h1>
-          
-          {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <Loader2 className="h-12 w-12 animate-spin text-white" />
-            </div>
-          ) : (
-            <>
-              {renderCurrentStep()}
-            </>
-          )}
-        </div>
-        <Footer />
+        <h1 className="text-4xl md:text-5xl font-bold text-center my-6 text-white">
+          Réservez Votre Studio
+        </h1>
+        
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-12 w-12 animate-spin text-white" />
+          </div>
+        ) : (
+          <>
+            {renderCurrentStep()}
+          </>
+        )}
       </div>
+      <Footer />
+    </div>
+  );
+};
+
+const BookingPage = () => {
+  return (
+    <BookingProvider>
+      <BookingContent />
     </BookingProvider>
   );
 };
