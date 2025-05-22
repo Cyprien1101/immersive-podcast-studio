@@ -155,26 +155,17 @@ const ServiceSelection = () => {
           Choisissez votre formule
         </h2>
         
-        {state.bookingData && (
-          <div className="mb-8 p-6 booking-card">
-            <h3 className="text-xl font-semibold text-podcast-accent mb-3">Récapitulatif de la réservation</h3>
-            <p className="text-gray-300 mb-2 booking-section">Date: {state.bookingData.date}</p>
-            <p className="text-gray-300 mb-2 booking-section">Horaire: {state.bookingData.start_time} - {state.bookingData.end_time}</p>
-            <p className="text-gray-300">Personnes: {state.bookingData.number_of_guests}</p>
-          </div>
-        )}
-        
         <div className="mb-12">
           <h3 className="text-2xl font-semibold text-center text-white mb-6">Abonnements</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {subscriptionPlans.map((plan) => (
-              <Card key={plan.id} className={`booking-card ${plan.is_popular ? 'ring-2 ring-podcast-accent' : ''}`}>
-                <CardHeader>
-                  {plan.is_popular && (
-                    <div className="absolute top-0 right-0 bg-podcast-accent text-black px-3 py-1 rounded-bl-lg rounded-tr-lg text-sm font-semibold">
-                      Populaire
-                    </div>
-                  )}
+              <Card key={plan.id} className={`booking-card relative ${plan.is_popular ? 'ring-2 ring-podcast-accent' : ''}`}>
+                {plan.is_popular && (
+                  <div className="absolute top-0 right-0 left-0 bg-podcast-accent text-black px-3 py-1 text-sm font-semibold text-center rounded-t-lg">
+                    Populaire
+                  </div>
+                )}
+                <CardHeader className={plan.is_popular ? 'pt-8' : ''}>
                   <CardTitle className="text-podcast-accent">{plan.name}</CardTitle>
                   <CardDescription>{plan.description}</CardDescription>
                 </CardHeader>
@@ -184,9 +175,9 @@ const ServiceSelection = () => {
                   </p>
                   <ul className="space-y-2">
                     {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center text-sm text-gray-300">
-                        <span className="mr-2 text-green-500">✓</span>
-                        {feature}
+                      <li key={index} className="flex items-center text-sm text-green-500">
+                        <span className="mr-2">✓</span>
+                        <span className="text-green-500">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -205,7 +196,7 @@ const ServiceSelection = () => {
           </div>
         </div>
         
-        <div>
+        <div className="mb-12">
           <h3 className="text-2xl font-semibold text-center text-white mb-6">Forfaits à l'heure</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {hourPackages.map((pkg) => (
@@ -220,9 +211,9 @@ const ServiceSelection = () => {
                   </p>
                   <ul className="space-y-2">
                     {pkg.features.map((feature, index) => (
-                      <li key={index} className="flex items-center text-sm text-gray-300">
-                        <span className="mr-2 text-green-500">✓</span>
-                        {feature}
+                      <li key={index} className="flex items-center text-sm text-green-500">
+                        <span className="mr-2">✓</span>
+                        <span className="text-green-500">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -240,6 +231,15 @@ const ServiceSelection = () => {
             ))}
           </div>
         </div>
+        
+        {state.bookingData && (
+          <div className="mt-12 p-6 booking-card">
+            <h3 className="text-xl font-semibold text-podcast-accent mb-3">Récapitulatif de la réservation</h3>
+            <p className="text-gray-300 mb-2 booking-section">Date: {state.bookingData.date}</p>
+            <p className="text-gray-300 mb-2 booking-section">Horaire: {state.bookingData.start_time} - {state.bookingData.end_time}</p>
+            <p className="text-gray-300">Personnes: {state.bookingData.number_of_guests}</p>
+          </div>
+        )}
       </div>
       
       {selectedService && !user && (
