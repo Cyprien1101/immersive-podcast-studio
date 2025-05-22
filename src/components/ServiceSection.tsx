@@ -7,22 +7,22 @@ import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 const services = [
   {
     title: "Enregistrement Audio",
-    description: "Capturez un son de qualité professionnelle avec notre équipement haut de gamme.",
+    description: "Capturez un son de qualité professionnelle avec notre équipement haut de gamme et nos opérateurs sur place.",
     icon: Mic
   },
   {
     title: "Production Vidéo",
-    description: "Transformez votre podcast en contenu vidéo engageant avec notre équipe dédiée à la production vidéo.",
+    description: "Tournage libre pour podcast, YouTube et autres formats avec changement de plans en direct et opérateur qualifié.",
     icon: Video
   },
   {
     title: "Post-production",
-    description: "Édition, mixage et mastering par des professionnels pour un résultat final impeccable.",
+    description: "Montage et mixage professionnel disponible avec nos forfaits premium pour un résultat final impeccable.",
     icon: Radio
   },
   {
     title: "Distribution",
-    description: "Diffusez votre podcast sur toutes les plateformes majeures.",
+    description: "Diffusez votre podcast sur toutes les plateformes majeures avec nos conseils et outils adaptés.",
     icon: Share2
   },
   {
