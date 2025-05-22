@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,7 +29,6 @@ interface Booking {
 const BookingConfirmation = () => {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
-  const [calendarEvent, setCalendarEvent] = useState<boolean>(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -62,13 +62,6 @@ const BookingConfirmation = () => {
         }
 
         setBooking(data);
-        
-        // Check for calendar event flag in localStorage
-        const hasCalendarEvent = localStorage.getItem('calendar_event_created') === 'true';
-        setCalendarEvent(hasCalendarEvent);
-        
-        // Clean up localStorage flag
-        localStorage.removeItem('calendar_event_created');
       } catch (error) {
         console.error('Error in booking confirmation:', error);
       } finally {
@@ -145,11 +138,6 @@ const BookingConfirmation = () => {
               <CardTitle className="text-3xl text-center text-white">Réservation confirmée!</CardTitle>
               <CardDescription className="text-center text-gray-400">
                 Votre session au studio a été réservée avec succès.
-                {calendarEvent && (
-                  <span className="block mt-2 text-xs text-podcast-accent">
-                    Un événement a été ajouté au calendrier de l'équipe.
-                  </span>
-                )}
               </CardDescription>
             </CardHeader>
             
