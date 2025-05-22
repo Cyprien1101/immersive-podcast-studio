@@ -8,6 +8,7 @@ import BookingHeader from '@/components/booking/BookingHeader';
 import Footer from '@/components/Footer';
 import { Loader2, Calendar } from 'lucide-react';
 import DateTimeSelection from '@/components/booking/DateTimeSelection';
+import ServiceSelection from '@/components/booking/ServiceSelection';
 import { BookingProvider } from '@/context/BookingContext';
 import { toast } from 'sonner';
 
@@ -136,24 +137,7 @@ const BookingPage = () => {
           />
         );
       case 'service':
-        // This would be the next step implementation
-        return (
-          <div className="text-center py-16">
-            <h2 className="text-2xl font-bold text-podcast-accent mb-4">Sélection du Service</h2>
-            <p className="text-white mb-4">Cette étape sera disponible prochainement !</p>
-            {selectedDate && selectedTimeSlot && (
-              <div className="mt-4 p-6 bg-black border border-gray-800 rounded-lg max-w-md mx-auto">
-                <h3 className="text-xl font-semibold text-podcast-accent mb-3">Récapitulatif de la réservation</h3>
-                <p className="text-gray-300 mb-2">Studio: {selectedStudio?.name}</p>
-                <p className="text-gray-300 mb-2">Date: {selectedDate?.toLocaleDateString('fr-FR')}</p>
-                <p className="text-gray-300 mb-2">Horaire: {selectedTimeSlot?.start_time} - {calculateEndTime(selectedTimeSlot?.start_time, bookingDuration)}</p>
-                <p className="text-gray-300 mb-2">Durée: {bookingDuration}h</p>
-                <p className="text-gray-300 mb-2">Personnes: {guestCount}</p>
-                <p className="text-gray-300 mt-4 text-sm">Les informations de réservation sont enregistrées localement. Elles seront envoyées à la base de données lorsque vous créerez un compte.</p>
-              </div>
-            )}
-          </div>
-        );
+        return <ServiceSelection />;
       default:
         return null;
     }
