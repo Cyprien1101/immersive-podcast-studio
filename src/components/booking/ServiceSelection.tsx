@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, SUPABASE_URL_ENDPOINT } from "@/integrations/supabase/client";
 import { Loader2, Check, X } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -210,88 +209,6 @@ const ServiceSelection = () => {
     }
   };
 
-  const updateAvailabilitySlots = async (studioId: string, date: string, startTime: string, endTime: string) => {
-    try {
-      // Convert times to hours and minutes
-      const [startHour, startMinute] = startTime.split(':').map(Number);
-      const [endHour, endMinute] = endTime.split(':').map(Number);
-      
-      // Calculate total minutes for start and end times
-      const startTotalMinutes = startHour * 60 + startMinute;
-      const endTotalMinutes = endHour * 60 + endMinute;
-      
-      // Generate an array of 30-minute time slots between start and end time
-      const timeSlots = [];
-      for (let minutes = startTotalMinutes; minutes < endTotalMinutes; minutes += 30) {
-        const slotHour = Math.floor(minutes / 60);
-        const slotMinute = minutes % 60;
-        
-        const formattedHour = slotHour < 10 ? `0${slotHour}` : `${slotHour}`;
-        const formattedMinute = slotMinute < 10 ? `0${slotMinute}` : `${slotMinute}`;
-        const startSlotTime = `${formattedHour}:${formattedMinute}`;
-        
-        const endMinutes = minutes + 30;
-        const endSlotHour = Math.floor(endMinutes / 60);
-        const endSlotMinute = endMinutes % 60;
-        
-        const formattedEndHour = endSlotHour < 10 ? `0${endSlotHour}` : `${endSlotHour}`;
-        const formattedEndMinute = endSlotMinute < 10 ? `0${endSlotMinute}` : `${endSlotMinute}`;
-        const endSlotTime = `${formattedEndHour}:${formattedEndMinute}`;
-        
-        timeSlots.push({ startTime: startSlotTime, endTime: endSlotTime });
-      }
-      
-      // Update each time slot in the database
-      for (const slot of timeSlots) {
-        // Check if the slot exists and update it
-        const { data, error } = await supabase
-          .from('studio_availability')
-          .select('id')
-          .eq('studio_id', studioId)
-          .eq('date', date)
-          .eq('start_time', slot.startTime)
-          .eq('end_time', slot.endTime)
-          .maybeSingle();
-          
-        if (error) {
-          console.error('Error checking studio availability:', error);
-          continue;
-        }
-        
-        if (data) {
-          // Update existing slot
-          const { error: updateError } = await supabase
-            .from('studio_availability')
-            .update({ is_available: false })
-            .eq('id', data.id);
-            
-          if (updateError) {
-            console.error('Error updating availability slot:', updateError);
-          }
-        } else {
-          // Create new slot if it doesn't exist
-          const { error: insertError } = await supabase
-            .from('studio_availability')
-            .insert({
-              studio_id: studioId,
-              date: date,
-              start_time: slot.startTime,
-              end_time: slot.endTime,
-              is_available: false
-            });
-            
-          if (insertError) {
-            console.error('Error creating availability slot:', insertError);
-          }
-        }
-      }
-      
-      console.log('All availability slots updated successfully');
-    } catch (error) {
-      console.error('Error updating availability slots:', error);
-    }
-  };
-
   const createBooking = async (service: SubscriptionPlan | HourPackage, serviceType: 'subscription' | 'hourPackage', userId: string) => {
     if (state.bookingData) {
       try {
@@ -337,13 +254,65 @@ const ServiceSelection = () => {
           }
         }
 
-        // Update studio availability slots
-        await updateAvailabilitySlots(
-          state.bookingData.studio_id,
-          state.bookingData.date,
-          state.bookingData.start_time,
-          state.bookingData.end_time
-        );
+        // Create Google Calendar event if booking was created successfully
+        if (bookingData) {
+          try {
+            const { data: userData } = await supabase
+              .from('profiles')
+              .select('full_name, email')
+              .eq('id', userId)
+              .single();
+
+            // Format the event data
+            const formattedDate = state.bookingData.date;
+            const eventData = {
+              summary: `Réservation Studio: ${bookingData.studio?.name || 'Podcast Studio'}`,
+              description: `Réservation par: ${userData?.full_name || 'Client'}\nEmail: ${userData?.email || ''}\nNombre de personnes: ${state.bookingData.number_of_guests}\nFormule: ${service.name}`,
+              start: {
+                dateTime: `${formattedDate}T${state.bookingData.start_time}:00`,
+                timeZone: 'Europe/Paris'
+              },
+              end: {
+                dateTime: `${formattedDate}T${state.bookingData.end_time}:00`,
+                timeZone: 'Europe/Paris'
+              },
+              location: bookingData.studio?.location || 'Studio',
+              colorId: "5", // Color for events (5 is yellow)
+              attendees: [
+                { email: userData?.email || '' }
+              ],
+              studioId: state.bookingData.studio_id // Add the studio_id to the event data
+            };
+            
+            // Call the edge function to create the calendar event
+            const { data: sessionData } = await supabase.auth.getSession();
+            
+            const response = await fetch(
+              `${SUPABASE_URL_ENDPOINT}/functions/v1/create-calendar-event`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${sessionData?.session?.access_token}`
+                },
+                body: JSON.stringify(eventData)
+              }
+            );
+            
+            const calendarResult = await response.json();
+            if (calendarResult.error) {
+              console.error('Error creating calendar event:', calendarResult.error);
+              // Still proceed with the booking - consider this a non-critical error
+            } else {
+              console.log('Calendar event created successfully:', calendarResult);
+              // Set flag in localStorage for BookingConfirmation page
+              localStorage.setItem('calendar_event_created', 'true');
+            }
+          } catch (calendarError) {
+            console.error('Error with calendar integration:', calendarError);
+            // Still proceed with the booking - consider this a non-critical error
+          }
+        }
 
         // Redirect to the booking confirmation page
         navigate('/booking-confirmation');
