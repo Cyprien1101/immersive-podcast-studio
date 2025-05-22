@@ -2,18 +2,25 @@
 project_id = "zqnejedmmwcumpqihupt"
 
 [api]
-# Swagger documentation for the OpenAPI spec generated for all Supabase projects
 enabled = true
 port = 54321
 schemas = ["public", "storage", "graphql_public"]
 
 [db]
 port = 54322
+shadow_port = 54320
+major_version = 15
+
+[realtime]
+enabled = true
 
 [studio]
+enabled = true
 port = 54323
+api_url = "http://localhost"
 
 [inbucket]
+enabled = true
 port = 54324
 
 [storage]
@@ -21,16 +28,20 @@ enabled = true
 
 [auth]
 enabled = true
+site_url = "http://localhost:3000"
 
-[realtime]
+[auth.email]
 enabled = true
 
-[analytics]
-enabled = false
-
-[vector]
-enabled = false
+[auth.sms]
+enabled = true
 
 [functions]
+[functions.google-calendar-auth]
+verify_jwt = true
+
 [functions.refresh-availability]
+verify_jwt = true
+
+[functions.callback-google-calendar]
 verify_jwt = false

@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_calendar_tokens: {
+        Row: {
+          access_token: string
+          calendar_id: string | null
+          created_at: string | null
+          expiry_date: string | null
+          id: string
+          refresh_token: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          calendar_id?: string | null
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          refresh_token?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          calendar_id?: string | null
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          refresh_token?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           created_at: string
@@ -495,6 +528,10 @@ export type Database = {
         Returns: number
       }
       is_admin: {
+        Args: { uid: string }
+        Returns: boolean
+      }
+      is_admin_user: {
         Args: { uid: string }
         Returns: boolean
       }
