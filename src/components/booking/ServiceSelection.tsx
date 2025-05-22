@@ -304,6 +304,8 @@ const ServiceSelection = () => {
               // Still proceed with the booking - consider this a non-critical error
             } else {
               console.log('Calendar event created successfully:', calendarResult);
+              // Set flag in localStorage for BookingConfirmation page
+              localStorage.setItem('calendar_event_created', 'true');
             }
           } catch (calendarError) {
             console.error('Error with calendar integration:', calendarError);

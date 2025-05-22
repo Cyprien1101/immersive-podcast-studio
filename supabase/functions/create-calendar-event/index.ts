@@ -38,22 +38,38 @@ serve(async (req: Request) => {
       throw new Error('Utilisateur non authentifié');
     }
 
-    // Vérifier si l'utilisateur est un administrateur
+    // Récupérer le rôle de l'utilisateur
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single();
 
-    if (profileError || profileData?.role !== 'admin') {
-      throw new Error('Accès non autorisé - rôle admin requis');
+    // Récupérer les données de l'événement
+    const eventData = await req.json();
+    
+    // Vérifier les données requises
+    if (!eventData.summary || !eventData.start || !eventData.end) {
+      throw new Error('Données d\'événement incomplètes');
+    }
+
+    // Récupérer les tokens de l'administrateur cyprien.baudouin4@gmail.com 
+    // (indépendamment de l'utilisateur qui fait la requête)
+    const { data: adminData, error: adminError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', 'cyprien.baudouin4@gmail.com')
+      .single();
+    
+    if (adminError || !adminData) {
+      throw new Error('Administrateur non trouvé');
     }
 
     // Récupérer les tokens de l'administrateur
     const { data: tokenData, error: tokenError } = await supabase
       .from('admin_calendar_tokens')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', adminData.id)
       .maybeSingle();
 
     if (tokenError || !tokenData) {
@@ -90,21 +106,13 @@ serve(async (req: Request) => {
           access_token: refreshData.access_token,
           expiry_date: new Date(Date.now() + (refreshData.expires_in * 1000)).toISOString(),
         })
-        .eq('user_id', user.id);
+        .eq('user_id', adminData.id);
 
       if (updateError) {
         throw new Error(`Erreur lors de la mise à jour du token: ${updateError.message}`);
       }
 
       accessToken = refreshData.access_token;
-    }
-
-    // Récupérer les données de l'événement
-    const eventData = await req.json();
-    
-    // Vérifier les données requises
-    if (!eventData.summary || !eventData.start || !eventData.end) {
-      throw new Error('Données d\'événement incomplètes');
     }
 
     // Créer l'événement dans Google Calendar

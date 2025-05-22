@@ -28,6 +28,7 @@ interface Booking {
 const BookingConfirmation = () => {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
+  const [calendarEvent, setCalendarEvent] = useState<boolean>(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -61,6 +62,13 @@ const BookingConfirmation = () => {
         }
 
         setBooking(data);
+        
+        // Check for calendar event flag in localStorage
+        const hasCalendarEvent = localStorage.getItem('calendar_event_created') === 'true';
+        setCalendarEvent(hasCalendarEvent);
+        
+        // Clean up localStorage flag
+        localStorage.removeItem('calendar_event_created');
       } catch (error) {
         console.error('Error in booking confirmation:', error);
       } finally {
@@ -137,9 +145,11 @@ const BookingConfirmation = () => {
               <CardTitle className="text-3xl text-center text-white">Réservation confirmée!</CardTitle>
               <CardDescription className="text-center text-gray-400">
                 Votre session au studio a été réservée avec succès.
-                <span className="block mt-2 text-xs text-podcast-accent">
-                  Un événement a été ajouté au calendrier de l'équipe.
-                </span>
+                {calendarEvent && (
+                  <span className="block mt-2 text-xs text-podcast-accent">
+                    Un événement a été ajouté au calendrier de l'équipe.
+                  </span>
+                )}
               </CardDescription>
             </CardHeader>
             
@@ -214,7 +224,7 @@ const BookingConfirmation = () => {
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/')} 
-                className="w-full border-[#292930] text-black hover:bg-gray-800 hover:text-white"
+                className="w-full border-[#292930] text-gray-200 hover:bg-gray-800 hover:text-white"
               >
                 Retour à l'accueil
               </Button>
