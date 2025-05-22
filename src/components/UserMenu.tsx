@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from '@/context/AuthContext';
-import { LogOut, User, BookText } from 'lucide-react';
+import { LogOut, User, BookText, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const UserMenu = () => {
@@ -51,6 +51,13 @@ const UserMenu = () => {
           <DropdownMenuItem className="flex items-center gap-2 cursor-pointer hover:bg-gray-800 rounded-lg py-2">
             <User className="h-4 w-4 text-podcast-accent" />
             <span>Mon profil</span>
+          </DropdownMenuItem>
+        </Link>
+        
+        <Link to="/profile" className="block w-full">
+          <DropdownMenuItem className="flex items-center gap-2 cursor-pointer hover:bg-gray-800 rounded-lg py-2">
+            <CreditCard className="h-4 w-4 text-podcast-accent" />
+            <span>Mon abonnement</span>
           </DropdownMenuItem>
         </Link>
         

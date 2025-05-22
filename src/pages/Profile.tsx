@@ -8,6 +8,7 @@ import BookingHeader from '@/components/booking/BookingHeader';
 import { useAuth } from '@/context/AuthContext';
 import ProfileInfo from '@/components/profile/ProfileInfo';
 import UserBookings from '@/components/profile/UserBookings';
+import UserSubscription from '@/components/profile/UserSubscription';
 
 const Profile = () => {
   const { user, loading } = useAuth();
@@ -84,6 +85,7 @@ const Profile = () => {
                 </TabsList>
                 
                 <TabsContent value="profile" className="pt-6">
+                  <UserSubscription />
                   <ProfileInfo user={user} />
                 </TabsContent>
                 
