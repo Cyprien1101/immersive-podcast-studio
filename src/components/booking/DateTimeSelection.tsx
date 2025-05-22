@@ -24,7 +24,7 @@ interface DateTimeSelectionProps {
 }
 
 const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTimeSelect }) => {
-  const [date, setDate] = useState<Date | null>(null);
+  const [date, setDate] = useState<Date | null>(new Date());
   const [allTimeSlots, setAllTimeSlots] = useState<TimeSlot[]>([]);
   const [filteredTimeSlots, setFilteredTimeSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(false);
@@ -89,54 +89,31 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
 
     // Helper function to check if a set of consecutive slots are all available
     const areConsecutiveSlotsAvailable = (startSlot: TimeSlot, requiredSlots: number) => {
-      // Parse the start time
-      const [startHour, startMinute] = startSlot.start_time.split(':').map(Number);
+      const slots = [...allTimeSlots];
       
-      // If we only need one slot, just check if it's available
-      if (requiredSlots <= 1) {
-        return startSlot.is_available;
+      // Sort slots by start_time to ensure correct order
+      slots.sort((a, b) => a.start_time.localeCompare(b.start_time));
+      
+      // Find the index of the start slot
+      const startSlotIndex = slots.findIndex(slot => slot.id === startSlot.id);
+      if (startSlotIndex === -1) return false;
+      
+      // Check if we have enough consecutive slots available
+      if (startSlotIndex + requiredSlots > slots.length) return false;
+      
+      // Check if all required slots are available
+      for (let i = 0; i < requiredSlots; i++) {
+        if (!slots[startSlotIndex + i]?.is_available) return false;
       }
       
-      // We need to check additional slots
-      let isValid = startSlot.is_available; // Start with the first slot
-      let currentHour = startHour;
-      let currentMinute = startMinute;
-      
-      // How many additional 30-min slots we need to check
-      // Each hour needs 2 slots
-      const additionalSlotsNeeded = (duration * 2) - 1;
-      
-      for (let i = 0; i < additionalSlotsNeeded; i++) {
-        // Move to the next 30-minute slot
-        currentMinute += 30;
-        if (currentMinute >= 60) {
-          currentHour += 1;
-          currentMinute -= 60;
-        }
-        
-        // Format the time for comparison
-        const nextTimeStr = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
-        
-        // Find the corresponding slot
-        const nextSlot = allTimeSlots.find(
-          slot => slot.start_time === nextTimeStr
-        );
-        
-        // If we can't find the slot or it's not available, this sequence isn't valid
-        if (!nextSlot || !nextSlot.is_available) {
-          isValid = false;
-          break;
-        }
-      }
-      
-      return isValid;
+      return true;
     };
 
     // Filter slots to those that are valid for the selected duration
     const validSlots = allTimeSlots.filter(slot => {
       // Each hour needs 2 slots (30 min each)
       const requiredSlots = duration * 2;
-      return areConsecutiveSlotsAvailable(slot, requiredSlots);
+      return areConsecutiveSlotsAvailable(slot, requiredSlots - 1);
     });
     
     console.log(`Found ${validSlots.length} valid slots for duration: ${duration} hours`);
@@ -194,7 +171,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
         <CalendarIcon className="inline-block mr-2 mb-1" /> Sélectionnez une Date et une Heure
       </h2>
       
-      {/* Duration and Guest Count Selectors */}
+      {/* Duration and Guest Count Selectors - Updated UI */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className="bg-black rounded-2xl p-6 border border-gray-800">
           <h3 className="text-xl font-medium text-podcast-accent mb-4">Durée de la Session</h3>
@@ -204,27 +181,23 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
               size="icon"
               onClick={decrementDuration}
               disabled={duration <= 1}
-              className="h-10 w-10 rounded-full border-gray-700"
+              className="h-10 w-10 rounded-full bg-white border-gray-300"
             >
-              <Minus className="h-5 w-5 text-gray-300" />
+              <Minus className="h-5 w-5 text-black" />
             </Button>
-            <div className="w-24 text-center">
+            <div className="w-20 flex justify-center">
               <span className="text-3xl font-bold text-white">{duration}</span>
-              <span className="ml-2 text-gray-400">heure{duration > 1 ? 's' : ''}</span>
             </div>
             <Button
               variant="outline"
               size="icon"
               onClick={incrementDuration}
               disabled={duration >= maxDuration}
-              className="h-10 w-10 rounded-full border-gray-700"
+              className="h-10 w-10 rounded-full bg-white border-gray-300"
             >
-              <Plus className="h-5 w-5 text-gray-300" />
+              <Plus className="h-5 w-5 text-black" />
             </Button>
           </div>
-          <p className="text-gray-400 text-center mt-2 text-sm">
-            Maximum: {maxDuration} heures
-          </p>
         </div>
         
         <div className="bg-black rounded-2xl p-6 border border-gray-800">
@@ -235,27 +208,23 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
               size="icon"
               onClick={decrementGuests}
               disabled={guestCount <= 1}
-              className="h-10 w-10 rounded-full border-gray-700"
+              className="h-10 w-10 rounded-full bg-white border-gray-300"
             >
-              <Minus className="h-5 w-5 text-gray-300" />
+              <Minus className="h-5 w-5 text-black" />
             </Button>
-            <div className="w-24 text-center">
+            <div className="w-20 flex justify-center">
               <span className="text-3xl font-bold text-white">{guestCount}</span>
-              <span className="ml-2 text-gray-400">personne{guestCount > 1 ? 's' : ''}</span>
             </div>
             <Button
               variant="outline"
               size="icon"
               onClick={incrementGuests}
               disabled={guestCount >= maxGuests}
-              className="h-10 w-10 rounded-full border-gray-700"
+              className="h-10 w-10 rounded-full bg-white border-gray-300"
             >
-              <Plus className="h-5 w-5 text-gray-300" />
+              <Plus className="h-5 w-5 text-black" />
             </Button>
           </div>
-          <p className="text-gray-400 text-center mt-2 text-sm">
-            Maximum: {maxGuests} personnes
-          </p>
         </div>
       </div>
       
