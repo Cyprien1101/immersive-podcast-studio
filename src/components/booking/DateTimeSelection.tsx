@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Calendar as CalendarIcon } from 'lucide-react';
+import { Loader2, Calendar as CalendarIcon, Plus, Minus, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -24,9 +25,16 @@ interface DateTimeSelectionProps {
 
 const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTimeSelect }) => {
   const [date, setDate] = useState<Date | null>(null);
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [allTimeSlots, setAllTimeSlots] = useState<TimeSlot[]>([]);
+  const [filteredTimeSlots, setFilteredTimeSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null);
+  const [duration, setDuration] = useState(1); // Default duration is 1 hour
+  const [guestCount, setGuestCount] = useState(1); // Default guest count is 1
+  
+  // Calculate max duration and guests based on studio data
+  const maxDuration = studio?.max_booking_duration || 3;
+  const maxGuests = studio?.max_guests || 10;
 
   // Fetch available time slots when date changes
   useEffect(() => {
@@ -49,7 +57,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
         }
         
         console.log(`Found ${data?.length || 0} time slots:`, data);
-        setTimeSlots(data || []);
+        setAllTimeSlots(data || []);
         
         if (data?.length === 0) {
           toast.info("Aucun créneau disponible pour cette date");
@@ -65,9 +73,73 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
     if (date) {
       fetchTimeSlots();
     } else {
-      setTimeSlots([]);
+      setAllTimeSlots([]);
     }
   }, [date, studio]);
+
+  // Filter time slots based on selected duration
+  useEffect(() => {
+    if (!allTimeSlots.length) {
+      setFilteredTimeSlots([]);
+      return;
+    }
+
+    // Helper function to determine if a time slot is valid for the selected duration
+    const isValidTimeSlot = (startSlot: TimeSlot): boolean => {
+      // If duration is 1, only check if the current slot is available
+      if (duration === 1) return startSlot.is_available;
+
+      const startTime = startSlot.start_time;
+      const [startHour, startMinute] = startTime.split(':').map(Number);
+      
+      // Find all necessary consecutive slots
+      let consecutiveSlotsAvailable = true;
+      let slotCount = 1;
+      
+      // We need to find (duration - 1) more slots after the starting slot
+      while (slotCount < duration) {
+        // Calculate the time for the next slot
+        let nextHour = startHour;
+        let nextMinute = startMinute + 30 * slotCount;
+        
+        while (nextMinute >= 60) {
+          nextHour += 1;
+          nextMinute -= 60;
+        }
+        
+        const nextTime = `${nextHour.toString().padStart(2, '0')}:${nextMinute.toString().padStart(2, '0')}`;
+        
+        // Find if this next slot exists and is available
+        const nextSlot = allTimeSlots.find(slot => 
+          slot.start_time === nextTime && slot.is_available
+        );
+        
+        if (!nextSlot) {
+          consecutiveSlotsAvailable = false;
+          break;
+        }
+        
+        slotCount += 0.5; // Each slot is 30 minutes
+      }
+      
+      return consecutiveSlotsAvailable;
+    };
+    
+    // Filter slots based on the selected duration
+    const validTimeSlots = allTimeSlots.filter(slot => {
+      if (!slot.is_available) return false;
+      
+      // Check if the time slot can accommodate the selected duration
+      return isValidTimeSlot(slot);
+    });
+    
+    setFilteredTimeSlots(validTimeSlots);
+    
+    // Reset selected time slot if it's no longer valid with the new duration
+    if (selectedTimeSlot && !validTimeSlots.find(slot => slot.id === selectedTimeSlot.id)) {
+      setSelectedTimeSlot(null);
+    }
+  }, [allTimeSlots, duration]);
 
   const handleDateChange = (newDate: Date | null) => {
     setDate(newDate);
@@ -85,11 +157,100 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
     }
   };
 
+  const incrementDuration = () => {
+    if (duration < maxDuration) {
+      setDuration(prev => prev + 1);
+    }
+  };
+
+  const decrementDuration = () => {
+    if (duration > 1) {
+      setDuration(prev => prev - 1);
+    }
+  };
+
+  const incrementGuests = () => {
+    if (guestCount < maxGuests) {
+      setGuestCount(prev => prev + 1);
+    }
+  };
+
+  const decrementGuests = () => {
+    if (guestCount > 1) {
+      setGuestCount(prev => prev - 1);
+    }
+  };
+
   return (
     <div className="py-8">
       <h2 className="text-2xl font-semibold text-center text-white mb-8">
         <CalendarIcon className="inline-block mr-2 mb-1" /> Sélectionnez une Date et une Heure
       </h2>
+      
+      {/* Duration and Guest Count Selectors */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="bg-black rounded-2xl p-6 border border-gray-800">
+          <h3 className="text-xl font-medium text-podcast-accent mb-4">Durée de la Session</h3>
+          <div className="flex items-center justify-center">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={decrementDuration}
+              disabled={duration <= 1}
+              className="h-10 w-10 rounded-full border-gray-700"
+            >
+              <Minus className="h-5 w-5 text-gray-300" />
+            </Button>
+            <div className="w-24 text-center">
+              <span className="text-3xl font-bold text-white">{duration}</span>
+              <span className="ml-2 text-gray-400">heure{duration > 1 ? 's' : ''}</span>
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={incrementDuration}
+              disabled={duration >= maxDuration}
+              className="h-10 w-10 rounded-full border-gray-700"
+            >
+              <Plus className="h-5 w-5 text-gray-300" />
+            </Button>
+          </div>
+          <p className="text-gray-400 text-center mt-2 text-sm">
+            Maximum: {maxDuration} heures
+          </p>
+        </div>
+        
+        <div className="bg-black rounded-2xl p-6 border border-gray-800">
+          <h3 className="text-xl font-medium text-podcast-accent mb-4">Nombre de Personnes</h3>
+          <div className="flex items-center justify-center">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={decrementGuests}
+              disabled={guestCount <= 1}
+              className="h-10 w-10 rounded-full border-gray-700"
+            >
+              <Minus className="h-5 w-5 text-gray-300" />
+            </Button>
+            <div className="w-24 text-center">
+              <span className="text-3xl font-bold text-white">{guestCount}</span>
+              <span className="ml-2 text-gray-400">personne{guestCount > 1 ? 's' : ''}</span>
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={incrementGuests}
+              disabled={guestCount >= maxGuests}
+              className="h-10 w-10 rounded-full border-gray-700"
+            >
+              <Plus className="h-5 w-5 text-gray-300" />
+            </Button>
+          </div>
+          <p className="text-gray-400 text-center mt-2 text-sm">
+            Maximum: {maxGuests} personnes
+          </p>
+        </div>
+      </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Calendar section */}
@@ -124,23 +285,21 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
             <div className="flex justify-center items-center h-64">
               <Loader2 className="h-8 w-8 animate-spin text-podcast-accent" />
             </div>
-          ) : timeSlots.length === 0 ? (
+          ) : filteredTimeSlots.length === 0 ? (
             <p className="text-gray-400 text-center py-8">
-              Aucun créneau disponible pour cette date
+              Aucun créneau disponible pour cette date et cette durée
             </p>
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-2">
-              {timeSlots.map((slot) => (
+              {filteredTimeSlots.map((slot) => (
                 <div
                   key={slot.id}
                   onClick={() => handleTimeSlotSelect(slot)}
                   className={cn(
                     "py-2 px-3 rounded-xl text-center cursor-pointer transition-all text-sm whitespace-nowrap",
-                    slot.is_available 
-                      ? selectedTimeSlot?.id === slot.id
-                        ? "bg-podcast-accent text-white shadow-lg"
-                        : "bg-gray-800 text-white hover:bg-gray-700" 
-                      : "bg-gray-900 text-gray-500 cursor-not-allowed opacity-60"
+                    selectedTimeSlot?.id === slot.id
+                      ? "bg-podcast-accent text-white shadow-lg"
+                      : "bg-gray-800 text-white hover:bg-gray-700"
                   )}
                 >
                   {slot.start_time}
@@ -170,6 +329,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
           </h3>
           <p className="text-gray-300 mb-2">{studio.description}</p>
           <div className="flex items-center text-gray-400">
+            <Users className="h-4 w-4 mr-1" />
             <span className="mr-4">Max {studio.max_guests} personnes</span>
             <span>Durée max: {studio.max_booking_duration}h</span>
           </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +25,8 @@ const BookingPage = () => {
   const [selectedStudio, setSelectedStudio] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+  const [bookingDuration, setBookingDuration] = useState(1);
+  const [guestCount, setGuestCount] = useState(1);
   const navigate = useNavigate();
 
   // Fetch studios and their images from Supabase
