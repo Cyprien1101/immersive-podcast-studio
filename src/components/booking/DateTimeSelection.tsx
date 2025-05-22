@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Calendar as CalendarIcon, Minus, Plus } from 'lucide-react';
@@ -76,7 +77,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
   
   // Check if a slot can accommodate the selected duration
   const canSelectTimeSlot = (slotIndex: number): boolean => {
-    if (!timeSlots || timeSlots.length === 0 || bookingDuration <= 1) return true;
+    if (!timeSlots || timeSlots.length === 0 || bookingDuration <= 0) return false;
     
     // For multi-hour bookings, check consecutive slots
     const hoursNeeded = bookingDuration;
@@ -99,6 +100,20 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
         if (prevEndTime !== currStartTime) return false;
       }
     }
+    
+    // Check if the booking would end after the closing time (19:30)
+    const startSlot = timeSlots[slotIndex];
+    const [startHour, startMinute] = startSlot.start_time.split(':').map(Number);
+    
+    const endHour = startHour + Math.floor((startMinute + bookingDuration * 60) / 60);
+    const endMinute = (startMinute + bookingDuration * 60) % 60;
+    
+    const formattedEndHour = endHour.toString().padStart(2, '0');
+    const formattedEndMinute = endMinute.toString().padStart(2, '0');
+    const calculatedEndTime = `${formattedEndHour}:${formattedEndMinute}`;
+    
+    // Check if the calculated end time is after closing time (19:30)
+    if (calculatedEndTime > '19:30') return false;
     
     return true;
   };
