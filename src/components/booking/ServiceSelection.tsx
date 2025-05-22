@@ -16,6 +16,7 @@ interface SubscriptionPlan {
   price: number;
   price_interval: string;
   features: string[];
+  after_session_features?: string[];
   is_popular: boolean;
 }
 
@@ -25,6 +26,7 @@ interface HourPackage {
   description: string;
   price_per_hour: number;
   features: string[];
+  after_session_features?: string[];
 }
 
 const ServiceSelection = () => {
@@ -70,8 +72,26 @@ const ServiceSelection = () => {
           ascending: true
         });
         if (packagesError) throw packagesError;
-        setSubscriptionPlans(plansData || []);
-        setHourPackages(packagesData || []);
+        
+        // Add some after session features for demo purposes
+        const enhancedPlansData = plansData?.map(plan => ({
+          ...plan,
+          after_session_features: [
+            "Accès à vos fichiers audio pendant 30 jours",
+            "Support technique par email"
+          ]
+        }));
+        
+        const enhancedPackagesData = packagesData?.map(pkg => ({
+          ...pkg,
+          after_session_features: [
+            "Fichiers audio bruts",
+            "Notes de session"
+          ]
+        }));
+        
+        setSubscriptionPlans(enhancedPlansData || []);
+        setHourPackages(enhancedPackagesData || []);
       } catch (error) {
         console.error('Error fetching services:', error);
       } finally {
@@ -153,32 +173,56 @@ const ServiceSelection = () => {
           Choisissez votre formule
         </h2>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        {/* Service cards in a responsive grid layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 max-w-[1200px] mx-auto">
           {/* Left column - Subscription Plans */}
           <div className="space-y-8">
-            <h3 className="text-2xl font-semibold text-center text-white mb-6">Abonnements</h3>
-            <div className="grid grid-cols-1 gap-6">
+            <h3 className="text-2xl font-semibold text-white text-center mb-6">Abonnements</h3>
+            <div className="grid grid-cols-1 gap-8">
               {subscriptionPlans.map(plan => (
-                <Card key={plan.id} className="booking-card h-full flex flex-col">
+                <Card 
+                  key={plan.id} 
+                  className="bg-[#1a1a1a] border border-podcast-border-gray rounded-xl min-h-[36rem] flex flex-col min-w-[320px]"
+                >
                   <CardHeader>
-                    <CardTitle className="text-podcast-accent">{plan.name}</CardTitle>
-                    <CardDescription className="text-slate-300">{plan.description}</CardDescription>
+                    <CardTitle className="text-2xl text-podcast-accent">{plan.name}</CardTitle>
+                    <CardDescription className="text-[#eee]">{plan.description}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-grow">
-                    <p className="text-2xl font-bold text-white mb-4">
-                      {plan.price}€<span className="text-sm font-normal">/{plan.price_interval}</span>
+                    <p className="text-3xl font-bold text-white mb-6">
+                      {plan.price}€<span className="text-lg font-normal">/{plan.price_interval}</span>
                     </p>
-                    <ul className="space-y-2">
-                      {plan.features.map((feature, index) => (
-                        <li key={index} className="flex items-center text-sm text-green-500">
-                          <span className="mr-2">✓</span>
-                          <span className="text-green-500">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    
+                    <div className="mb-8">
+                      <h4 className="text-lg font-medium text-white mb-4">Ce qui est inclus:</h4>
+                      <ul className="space-y-3">
+                        {plan.features.map((feature, index) => (
+                          <li key={index} className="flex items-center text-[#eee]">
+                            <span className="mr-2 text-green-500">✅</span>
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-lg font-medium text-white mb-4">Ce que vous obtenez après la session:</h4>
+                      <ul className="space-y-3">
+                        {plan.after_session_features?.map((feature, index) => (
+                          <li key={index} className="flex items-center text-[#eee]">
+                            <span className="mr-2 text-green-500">✅</span>
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </CardContent>
-                  <CardFooter className="mt-auto pt-4">
-                    <Button variant="default" className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black" onClick={() => handleServiceSelect('subscription', plan)}>
+                  <CardFooter className="mt-auto pt-6">
+                    <Button 
+                      variant="default" 
+                      className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
+                      onClick={() => handleServiceSelect('subscription', plan)}
+                    >
                       Choisir
                     </Button>
                   </CardFooter>
@@ -189,29 +233,52 @@ const ServiceSelection = () => {
           
           {/* Right column - Hour Packages */}
           <div className="space-y-8">
-            <h3 className="text-2xl font-semibold text-center text-white mb-6">Forfaits à l'heure</h3>
-            <div className="grid grid-cols-1 gap-6">
+            <h3 className="text-2xl font-semibold text-white text-center mb-6">Forfaits à l'heure</h3>
+            <div className="grid grid-cols-1 gap-8">
               {hourPackages.map(pkg => (
-                <Card key={pkg.id} className="booking-card h-full flex flex-col">
+                <Card 
+                  key={pkg.id} 
+                  className="bg-[#1a1a1a] border border-podcast-border-gray rounded-xl min-h-[36rem] flex flex-col min-w-[320px]"
+                >
                   <CardHeader>
-                    <CardTitle className="text-podcast-accent">{pkg.name}</CardTitle>
-                    <CardDescription className="text-slate-300">{pkg.description}</CardDescription>
+                    <CardTitle className="text-2xl text-podcast-accent">{pkg.name}</CardTitle>
+                    <CardDescription className="text-[#eee]">{pkg.description}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-grow">
-                    <p className="text-2xl font-bold text-white mb-4">
-                      {pkg.price_per_hour}€<span className="text-sm font-normal">/heure</span>
+                    <p className="text-3xl font-bold text-white mb-6">
+                      {pkg.price_per_hour}€<span className="text-lg font-normal">/heure</span>
                     </p>
-                    <ul className="space-y-2">
-                      {pkg.features.map((feature, index) => (
-                        <li key={index} className="flex items-center text-sm text-green-500">
-                          <span className="mr-2">✓</span>
-                          <span className="text-green-500">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    
+                    <div className="mb-8">
+                      <h4 className="text-lg font-medium text-white mb-4">Ce qui est inclus:</h4>
+                      <ul className="space-y-3">
+                        {pkg.features.map((feature, index) => (
+                          <li key={index} className="flex items-center text-[#eee]">
+                            <span className="mr-2 text-green-500">✅</span>
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-lg font-medium text-white mb-4">Ce que vous obtenez après la session:</h4>
+                      <ul className="space-y-3">
+                        {pkg.after_session_features?.map((feature, index) => (
+                          <li key={index} className="flex items-center text-[#eee]">
+                            <span className="mr-2 text-green-500">✅</span>
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </CardContent>
-                  <CardFooter className="mt-auto pt-4">
-                    <Button variant="default" className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black" onClick={() => handleServiceSelect('hourPackage', pkg)}>
+                  <CardFooter className="mt-auto pt-6">
+                    <Button 
+                      variant="default"
+                      className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
+                      onClick={() => handleServiceSelect('hourPackage', pkg)}
+                    >
                       Choisir
                     </Button>
                   </CardFooter>
@@ -222,11 +289,11 @@ const ServiceSelection = () => {
         </div>
         
         {state.bookingData && (
-          <div className="mt-12 p-6 booking-card">
+          <div className="mt-12 p-6 bg-[#1a1a1a] border border-podcast-border-gray rounded-xl max-w-[1200px] mx-auto">
             <h3 className="text-xl font-semibold text-podcast-accent mb-3">Récapitulatif de la réservation</h3>
-            <p className="text-gray-300 mb-2 booking-section">Date: {state.bookingData.date}</p>
-            <p className="text-gray-300 mb-2 booking-section">Horaire: {state.bookingData.start_time} - {state.bookingData.end_time}</p>
-            <p className="text-gray-300">Personnes: {state.bookingData.number_of_guests}</p>
+            <p className="text-[#eee] mb-2 border-b border-podcast-border-gray pb-4">Date: {state.bookingData.date}</p>
+            <p className="text-[#eee] mb-2 border-b border-podcast-border-gray pb-4">Horaire: {state.bookingData.start_time} - {state.bookingData.end_time}</p>
+            <p className="text-[#eee]">Personnes: {state.bookingData.number_of_guests}</p>
           </div>
         )}
       </div>
