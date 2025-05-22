@@ -6,10 +6,10 @@ import StudioSelection from '@/components/booking/StudioSelection';
 import StepperProgress from '@/components/booking/StepperProgress';
 import BookingHeader from '@/components/booking/BookingHeader';
 import Footer from '@/components/Footer';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Calendar } from 'lucide-react';
 import DateTimeSelection from '@/components/booking/DateTimeSelection';
 
-// Define booking steps with the new datetime step
+// Define booking steps with the datetime step
 const STEPS = [
   { id: 'studio', label: 'Studio' },
   { id: 'datetime', label: 'Date & Heure' },
@@ -47,12 +47,15 @@ const BookingPage = () => {
         
         if (imageError) throw imageError;
         
-        // Set the losangeles studio as selected by default
-        const losAngelesStudio = studioData?.find(studio => studio.name === 'losangeles');
-        if (losAngelesStudio) {
-          setSelectedStudio(losAngelesStudio);
+        // Set the Studio Lyon as selected by default
+        const lyonStudio = studioData?.find(studio => studio.name === 'Studio Lyon');
+        if (lyonStudio) {
+          console.log("Found Studio Lyon:", lyonStudio);
+          setSelectedStudio(lyonStudio);
           // Skip the studio selection step
           setCurrentStep('datetime');
+        } else {
+          console.log("Studio Lyon not found in:", studioData);
         }
         
         setStudios(studioData || []);

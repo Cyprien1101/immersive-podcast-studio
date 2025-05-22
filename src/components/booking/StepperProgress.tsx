@@ -44,7 +44,7 @@ const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep })
                   )}
                 </div>
                 <span 
-                  className={`text-sm ${isMobile ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[70px] text-center
+                  className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[70px] text-center
                     ${isActive ? 'text-podcast-accent' : 
                       isCompleted ? 'text-green-600' : 
                       'text-gray-400'}`}

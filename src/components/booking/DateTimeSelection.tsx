@@ -7,6 +7,7 @@ import { fr } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Calendar as CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface TimeSlot {
   id: string;
@@ -27,48 +28,36 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null);
-  const [lyonStudio, setLyonStudio] = useState<any>(null);
-
-  // Fetch Lyon studio on component mount
-  useEffect(() => {
-    const fetchLyonStudio = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('studios')
-          .select('*')
-          .eq('name', 'lyon')
-          .single();
-        
-        if (error) throw error;
-        setLyonStudio(data);
-      } catch (error) {
-        console.error('Error fetching Lyon studio:', error);
-      }
-    };
-
-    fetchLyonStudio();
-  }, []);
 
   // Fetch available time slots when date changes
   useEffect(() => {
     const fetchTimeSlots = async () => {
-      if (!date || !lyonStudio) return;
+      if (!date || !studio) return;
       
       setLoading(true);
       try {
         const formattedDate = format(date, 'yyyy-MM-dd');
+        console.log(`Fetching time slots for studio ID: ${studio.id} and date: ${formattedDate}`);
         
         const { data, error } = await supabase
           .from('studio_availability')
           .select('*')
-          .eq('studio_id', lyonStudio.id)
+          .eq('studio_id', studio.id)
           .eq('date', formattedDate);
         
-        if (error) throw error;
+        if (error) {
+          throw error;
+        }
         
+        console.log(`Found ${data?.length || 0} time slots:`, data);
         setTimeSlots(data || []);
+        
+        if (data?.length === 0) {
+          toast.info("Aucun créneau disponible pour cette date");
+        }
       } catch (error) {
         console.error('Error fetching time slots:', error);
+        toast.error('Erreur lors de la récupération des créneaux disponibles');
       } finally {
         setLoading(false);
       }
@@ -76,8 +65,10 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
 
     if (date) {
       fetchTimeSlots();
+    } else {
+      setTimeSlots([]);
     }
-  }, [date, lyonStudio]);
+  }, [date, studio]);
 
   const handleDateChange = (newDate: Date | null) => {
     setDate(newDate);
@@ -139,7 +130,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
               Aucun créneau disponible pour cette date
             </p>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-64 overflow-y-auto pr-2">
               {timeSlots.map((slot) => (
                 <div
                   key={slot.id}
@@ -175,15 +166,15 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       </div>
       
       {/* Studio information */}
-      {lyonStudio && (
+      {studio && (
         <div className="mt-8 p-5 rounded-xl bg-gray-900 border border-gray-800">
           <h3 className="text-lg font-semibold text-podcast-accent mb-2">
-            Studio sélectionné : Studio Lyon
+            Studio sélectionné : {studio.name}
           </h3>
-          <p className="text-gray-300 mb-2">{lyonStudio.description}</p>
+          <p className="text-gray-300 mb-2">{studio.description}</p>
           <div className="flex items-center text-gray-400">
-            <span className="mr-4">Max {lyonStudio.max_guests} personnes</span>
-            <span>Durée max: {lyonStudio.max_booking_duration}h</span>
+            <span className="mr-4">Max {studio.max_guests} personnes</span>
+            <span>Durée max: {studio.max_booking_duration}h</span>
           </div>
         </div>
       )}
