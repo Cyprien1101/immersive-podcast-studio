@@ -87,40 +87,56 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
 
     console.log(`Filtering time slots for duration: ${duration} hours`);
 
-    // Helper function to check if a set of consecutive slots are all available
-    const areConsecutiveSlotsAvailable = (startSlot: TimeSlot, requiredSlots: number) => {
-      const slots = [...allTimeSlots];
+    // Fixed version of areConsecutiveSlotsAvailable function
+    const areConsecutiveSlotsAvailable = (startIndex: number, requiredSlots: number): boolean => {
+      const slots = [...allTimeSlots].sort((a, b) => a.start_time.localeCompare(b.start_time));
       
-      // Sort slots by start_time to ensure correct order
-      slots.sort((a, b) => a.start_time.localeCompare(b.start_time));
+      // Make sure we have enough slots
+      if (startIndex + requiredSlots > slots.length) return false;
       
-      // Find the index of the start slot
-      const startSlotIndex = slots.findIndex(slot => slot.id === startSlot.id);
-      if (startSlotIndex === -1) return false;
+      // Get the start slot time
+      const startTime = slots[startIndex].start_time;
+      const startHour = parseInt(startTime.split(':')[0]);
+      const startMinute = parseInt(startTime.split(':')[1]);
       
-      // Check if we have enough consecutive slots available
-      if (startSlotIndex + requiredSlots > slots.length) return false;
-      
-      // Check if all required slots are available
+      // Check each slot to make sure they are consecutive and available
       for (let i = 0; i < requiredSlots; i++) {
-        if (!slots[startSlotIndex + i]?.is_available) return false;
+        // The slot we're checking
+        const currentSlot = slots[startIndex + i];
+        
+        // If the slot is not available, the consecutive slots are not available
+        if (!currentSlot.is_available) return false;
+        
+        // Calculate expected time for this slot position
+        const expectedHour = startHour + Math.floor((startMinute + i * 30) / 60);
+        const expectedMinute = (startMinute + i * 30) % 60;
+        const expectedTime = `${expectedHour.toString().padStart(2, '0')}:${expectedMinute.toString().padStart(2, '0')}`;
+        
+        // If the slot doesn't match the expected time, they are not consecutive
+        if (currentSlot.start_time !== expectedTime) return false;
       }
       
       return true;
     };
 
-    // Filter slots to those that are valid for the selected duration
-    const validSlots = allTimeSlots.filter(slot => {
-      // Each hour needs 2 slots (30 min each)
-      const requiredSlots = duration * 2;
-      return areConsecutiveSlotsAvailable(slot, requiredSlots - 1);
-    });
+    // Get valid starting slots for the selected duration
+    const validStartingSlots = [];
+    const sortedSlots = [...allTimeSlots].sort((a, b) => a.start_time.localeCompare(b.start_time));
     
-    console.log(`Found ${validSlots.length} valid slots for duration: ${duration} hours`);
-    setFilteredTimeSlots(validSlots);
+    // Each hour needs 2 slots (30 min each)
+    const requiredSlots = duration * 2;
+    
+    for (let i = 0; i < sortedSlots.length; i++) {
+      if (areConsecutiveSlotsAvailable(i, requiredSlots)) {
+        validStartingSlots.push(sortedSlots[i]);
+      }
+    }
+    
+    console.log(`Found ${validStartingSlots.length} valid slots for duration: ${duration} hours`);
+    setFilteredTimeSlots(validStartingSlots);
     
     // Reset selected time slot if it's no longer valid
-    if (selectedTimeSlot && !validSlots.find(slot => slot.id === selectedTimeSlot.id)) {
+    if (selectedTimeSlot && !validStartingSlots.find(slot => slot.id === selectedTimeSlot.id)) {
       setSelectedTimeSlot(null);
     }
   }, [allTimeSlots, duration]);
@@ -186,7 +202,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
               <Minus className="h-5 w-5 text-black" />
             </Button>
             <div className="w-20 flex justify-center">
-              <span className="text-3xl font-bold text-white">{duration}</span>
+              <span className="text-3xl font-bold text-white">{duration}<span className="text-sm ml-1">h</span></span>
             </div>
             <Button
               variant="outline"
@@ -306,8 +322,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
           <p className="text-gray-300 mb-2">{studio.description}</p>
           <div className="flex items-center text-gray-400">
             <Users className="h-4 w-4 mr-1" />
-            <span className="mr-4">Max {studio.max_guests} personnes</span>
-            <span>Durée max: {studio.max_booking_duration}h</span>
+            <span>{studio.max_guests} personnes</span>
           </div>
         </div>
       )}
