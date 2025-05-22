@@ -47,12 +47,14 @@ const UserMenu = () => {
       </DropdownMenuTrigger>
       
       <DropdownMenuContent align="end" className="bg-black border border-gray-800 text-white p-2 rounded-xl">
-        <DropdownMenuItem className="flex items-center gap-2 cursor-pointer hover:bg-gray-800 rounded-lg py-2">
-          <User className="h-4 w-4 text-podcast-accent" />
-          <span>Mon profil</span>
-        </DropdownMenuItem>
+        <Link to="/profile" className="block w-full">
+          <DropdownMenuItem className="flex items-center gap-2 cursor-pointer hover:bg-gray-800 rounded-lg py-2">
+            <User className="h-4 w-4 text-podcast-accent" />
+            <span>Mon profil</span>
+          </DropdownMenuItem>
+        </Link>
         
-        <Link to="/booking-confirmation" className="block w-full">
+        <Link to="/profile#bookings" className="block w-full">
           <DropdownMenuItem className="flex items-center gap-2 cursor-pointer hover:bg-gray-800 rounded-lg py-2">
             <BookText className="h-4 w-4 text-podcast-accent" />
             <span>Mes réservations</span>

@@ -9,6 +9,7 @@ import Contact from "./pages/Contact";
 import Booking from "./pages/Booking";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 import { BookingProvider } from "./context/BookingContext";
 import { AuthProvider } from "./context/AuthContext";
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/booking" element={<Booking />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/booking-confirmation" element={
               <BookingProvider>
                 <BookingConfirmation />
