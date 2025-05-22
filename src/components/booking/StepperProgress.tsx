@@ -32,19 +32,19 @@ const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep })
             <React.Fragment key={step.id}>
               <div className="flex flex-col items-center">
                 <div 
-                  className={`flex items-center justify-center w-10 h-10 rounded-full mb-2
+                  className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full mb-1 sm:mb-2
                     ${isActive ? 'bg-podcast-accent text-white' : 
                       isCompleted ? 'bg-green-600 text-white' : 
                       'bg-gray-700 text-gray-300'}`}
                 >
                   {isCompleted ? (
-                    <CheckCircle className="h-6 w-6" />
+                    <CheckCircle className={`h-4 w-4 sm:h-6 sm:w-6`} />
                   ) : (
-                    <span>{index + 1}</span>
+                    <span className={`${isMobile ? 'text-xs sm:text-sm' : 'text-sm'}`}>{index + 1}</span>
                   )}
                 </div>
                 <span 
-                  className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[70px] text-center
+                  className={`${isMobile ? 'text-[10px]' : 'text-xs sm:text-sm'} font-medium truncate max-w-[60px] sm:max-w-[80px] text-center
                     ${isActive ? 'text-podcast-accent' : 
                       isCompleted ? 'text-green-600' : 
                       'text-gray-400'}`}
@@ -53,11 +53,11 @@ const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep })
                 </span>
               </div>
               
-              {/* Ligne fine entre les étapes */}
+              {/* Separator line between steps */}
               {!isLast && (
                 <Separator 
                   orientation="horizontal" 
-                  className="h-0.5 flex-1 mx-2 bg-gray-700"
+                  className={`h-0.5 flex-1 mx-1 sm:mx-2 bg-gray-700`}
                 />
               )}
             </React.Fragment>

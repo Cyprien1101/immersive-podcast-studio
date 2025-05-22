@@ -1,1 +1,36 @@
+
 project_id = "zqnejedmmwcumpqihupt"
+
+[api]
+# Swagger documentation for the OpenAPI spec generated for all Supabase projects
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+
+[db]
+port = 54322
+
+[studio]
+port = 54323
+
+[inbucket]
+port = 54324
+
+[storage]
+enabled = true
+
+[auth]
+enabled = true
+
+[realtime]
+enabled = true
+
+[analytics]
+enabled = false
+
+[vector]
+enabled = false
+
+[functions]
+[functions.refresh-availability]
+verify_jwt = false
