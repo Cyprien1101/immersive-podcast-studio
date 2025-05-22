@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -74,11 +75,12 @@ const ServiceSelection = () => {
         });
         if (packagesError) throw packagesError;
         
-        // Mise à jour des abonnements avec les nouvelles fonctionnalités
+        // Mise à jour des abonnements avec les nouvelles fonctionnalités et noms
         const enhancedPlansData = plansData?.map(plan => {
           if (plan.name === "Standard") {
             return {
               ...plan,
+              name: "Abonnement Standard",
               features: [
                 "1h de studio par jour",
                 "Tout l'équipement inclus",
@@ -97,6 +99,7 @@ const ServiceSelection = () => {
           } else {
             return {
               ...plan,
+              name: "Abonnement Premium",
               features: [
                 "1h de studio par jour",
                 "Tout l'équipement inclus",
@@ -115,11 +118,12 @@ const ServiceSelection = () => {
           }
         });
         
-        // Mise à jour des forfaits horaires avec les nouvelles fonctionnalités
+        // Mise à jour des forfaits horaires avec les nouvelles fonctionnalités et noms
         const enhancedPackagesData = packagesData?.map(pkg => {
           if (pkg.name === "Basic Studio Time") {
             return {
               ...pkg,
+              name: "1h Standard",
               features: [
                 "Tout l'équipement inclus",
                 "Opérateur sur place",
@@ -137,6 +141,7 @@ const ServiceSelection = () => {
           } else {
             return {
               ...pkg,
+              name: "1h Premium",
               features: [
                 "Tout l'équipement inclus",
                 "Opérateur sur place",
