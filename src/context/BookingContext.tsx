@@ -53,6 +53,9 @@ const bookingReducer = (state: BookingContextState, action: BookingAction): Book
         }
       };
     case 'SET_DATE_TIME_INFO':
+      // Log pour s'assurer que la date est bien reçue
+      console.log("Setting date in context:", action.payload.date);
+      
       return {
         ...state,
         bookingData: {

@@ -61,9 +61,9 @@ const BookingConfirmation = () => {
           return;
         }
 
-        // Make sure we're handling the date correctly without timezone adjustment
+        // Logs pour déboguer le problème de date
         if (data) {
-          console.log("Original booking date:", data.date);
+          console.log("Original booking date from DB:", data.date);
           setBooking(data);
         }
         
@@ -126,8 +126,11 @@ const BookingConfirmation = () => {
     );
   }
 
-  // IMPORTANT FIX: Format date properly using parseISO without timezone issues
-  const formattedDate = booking ? format(parseISO(booking.date), 'dd MMMM yyyy', { locale: fr }) : '';
+  // Format date safely with parseISO
+  // L'erreur pourrait être ici, assurons-nous que la date est correctement formatée
+  const displayDate = booking ? format(parseISO(booking.date), 'dd MMMM yyyy', { locale: fr }) : '';
+  console.log("Formatted date for display:", displayDate, "Original date from DB:", booking.date);
+  
   const bookingDuration = booking ? calculateDuration(booking.start_time, booking.end_time) : 0;
 
   return (
@@ -155,7 +158,7 @@ const BookingConfirmation = () => {
                   <Calendar className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
                   <div>
                     <p className="text-sm text-gray-400">Date</p>
-                    <p className="text-white font-medium">{formattedDate}</p>
+                    <p className="text-white font-medium">{displayDate}</p>
                   </div>
                 </div>
                 

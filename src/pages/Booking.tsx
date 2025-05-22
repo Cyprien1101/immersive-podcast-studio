@@ -84,19 +84,25 @@ const BookingPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Fonction qui garantit que la date est correctement formatée sans décalage de timezone
+  const formatDateToISOString = (date: Date): string => {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  };
+
   const handleDateTimeSelect = (date, timeSlot, duration, guests) => {
     setSelectedDate(date);
     setSelectedTimeSlot(timeSlot);
     setBookingDuration(duration);
     setGuestCount(guests);
     
-    // IMPORTANT FIX: Use direct ISO date string format without timezone adjustment
-    const formattedDate = date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    // Formatage de la date en utilisant la méthode fiable sans décalage de timezone
+    const formattedDate = formatDateToISOString(date);
+    console.log("Date sélectionnée (handleDateTimeSelect):", formattedDate, "Date brute:", date);
     
     // Store the booking data in localStorage for persistence
     const bookingData = {
       studio_id: selectedStudio.id,
-      date: formattedDate, // Use the fixed formatted date
+      date: formattedDate,
       start_time: timeSlot.start_time,
       end_time: timeSlot.end_time,
       number_of_guests: guests,
