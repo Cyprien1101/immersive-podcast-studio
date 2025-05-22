@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 import { Loader2 } from 'lucide-react';
 import DateTimeSelection from '@/components/booking/DateTimeSelection';
 import ServiceSelection from '@/components/booking/ServiceSelection';
-import { BookingProvider } from '@/context/BookingContext';
+import { BookingProvider, useBooking } from '@/context/BookingContext';
 
 // Define booking steps with the datetime step
 const STEPS = [
@@ -18,6 +18,9 @@ const STEPS = [
   { id: 'service', label: 'Service' },
   { id: 'additional', label: 'Services Additionnels' },
 ];
+
+// ID du Studio Lyon
+const STUDIO_LYON_ID = "d9c24a0a-d94a-4cbc-b489-fa5cfe73ce08";
 
 const BookingPage = () => {
   const [currentStep, setCurrentStep] = useState('studio');
@@ -52,7 +55,7 @@ const BookingPage = () => {
         if (imageError) throw imageError;
         
         // Set the Studio Lyon as selected by default
-        const lyonStudio = studioData?.find(studio => studio.name === 'Studio Lyon');
+        const lyonStudio = studioData?.find(studio => studio.id === STUDIO_LYON_ID);
         if (lyonStudio) {
           console.log("Found Studio Lyon:", lyonStudio);
           setSelectedStudio(lyonStudio);
