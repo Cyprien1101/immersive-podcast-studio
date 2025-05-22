@@ -200,13 +200,16 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
   // Fonction pour mettre à jour la disponibilité du studio
   const updateStudioAvailability = async (booking: BookingData) => {
     try {
+      // Correction : utiliser le baseURL correct pour les fonctions edge
+      const functionUrl = `${supabase.functions.getBaseUrl()}/update-studio-availability`;
+      
       const response = await fetch(
-        `${supabase.functions.url}/update-studio-availability`,
+        functionUrl,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabase.auth.getSession()}`
+            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
           },
           body: JSON.stringify({ booking })
         }
