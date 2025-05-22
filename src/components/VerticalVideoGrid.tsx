@@ -3,39 +3,31 @@ import React, { useEffect } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 
-// Updated video data with new reels, keeping one original
+// Video data with new reels
 const videoData = [
   {
-    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-1.mp4",
-    title: "Format Vertical #1"
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-1.mp4"
   },
   {
-    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-2.mp4",
-    title: "Format Vertical #2"
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-2.mp4"
   },
   {
-    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-3.mp4",
-    title: "Format Vertical #3"
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-3.mp4"
   },
   {
-    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-4.mp4",
-    title: "Format Vertical #4"
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-4.mp4"
   },
   {
-    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-5.mp4",
-    title: "Format Vertical #5"
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-5.mp4"
   },
   {
-    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-6.mp4",
-    title: "Format Vertical #6"
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-6.mp4"
   },
   {
-    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-7.mp4",
-    title: "Format Vertical #7"
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//clips%20site%20web%20reels-7.mp4"
   },
   {
-    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//reel.mp4",
-    title: "Format Vertical #8"
+    videoUrl: "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//reel.mp4"
   }
 ];
 
@@ -86,10 +78,7 @@ const VerticalVideoGrid = () => {
                           Your browser does not support HTML5 videos.
                         </video>
                       </div>
-                      <div className="bg-podcast-dark p-3 rounded-b-2xl">
-                        <h3 className="text-podcast-accent font-medium text-sm">{item.title}</h3>
-                        <p className="text-xs text-gray-400">Format optimisé pour les réseaux sociaux</p>
-                      </div>
+                      {/* Removed text below videos */}
                     </div>
                   </div>
                 ))}

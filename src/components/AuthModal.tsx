@@ -118,7 +118,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md bg-black rounded-2xl border border-gray-800">
+      <DialogContent className="sm:max-w-md bg-podcast-soft-black rounded-2xl border border-podcast-border-gray">
         <DialogHeader>
           <DialogTitle className="text-center text-xl text-white">
             {activeTab === "connexion" ? "Connexion" : "Créer un compte"}
@@ -127,7 +127,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         
         <div className="py-4">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-900">
+            <TabsList className="grid w-full grid-cols-2 bg-podcast-dark">
               <TabsTrigger value="connexion" className="text-white data-[state=active]:bg-podcast-accent data-[state=active]:text-black">Connexion</TabsTrigger>
               <TabsTrigger value="inscription" className="text-white data-[state=active]:bg-podcast-accent data-[state=active]:text-black">Inscription</TabsTrigger>
             </TabsList>
@@ -143,7 +143,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                       value={loginEmail} 
                       onChange={(e) => setLoginEmail(e.target.value)} 
                       required
-                      className="bg-gray-800 border-gray-700 text-white"
+                      className="bg-podcast-dark border-podcast-border-gray text-white"
                     />
                   </div>
                   
@@ -155,7 +155,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                       value={loginPassword} 
                       onChange={(e) => setLoginPassword(e.target.value)} 
                       required
-                      className="bg-gray-800 border-gray-700 text-white"
+                      className="bg-podcast-dark border-podcast-border-gray text-white"
                     />
                   </div>
                   
@@ -182,7 +182,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                       value={registerFullName} 
                       onChange={(e) => setRegisterFullName(e.target.value)} 
                       required
-                      className="bg-gray-800 border-gray-700 text-white"
+                      className="bg-podcast-dark border-podcast-border-gray text-white"
                     />
                   </div>
                   
@@ -194,7 +194,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                       value={registerEmail} 
                       onChange={(e) => setRegisterEmail(e.target.value)} 
                       required
-                      className="bg-gray-800 border-gray-700 text-white"
+                      className="bg-podcast-dark border-podcast-border-gray text-white"
                     />
                   </div>
                   
@@ -208,7 +208,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                       value={registerPhone} 
                       onChange={(e) => setRegisterPhone(e.target.value)} 
                       required
-                      className="bg-gray-800 border-gray-700 text-white"
+                      className="bg-podcast-dark border-podcast-border-gray text-white"
                     />
                   </div>
                   
@@ -220,7 +220,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                       value={registerPassword} 
                       onChange={(e) => setRegisterPassword(e.target.value)} 
                       required
-                      className="bg-gray-800 border-gray-700 text-white"
+                      className="bg-podcast-dark border-podcast-border-gray text-white"
                     />
                   </div>
                   

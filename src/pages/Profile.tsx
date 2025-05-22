@@ -43,9 +43,10 @@ const Profile = () => {
         <div className="max-w-4xl mx-auto">
           <Card className="booking-card overflow-hidden">
             <CardContent className="p-0">
-              <div className="bg-gradient-to-r from-podcast-accent to-pink-500 p-8">
+              {/* Clean header instead of gradient background */}
+              <div className="bg-podcast-soft-black p-8 border-b border-podcast-border-gray">
                 <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <Avatar className="h-24 w-24 border-4 border-white">
+                  <Avatar className="h-24 w-24 border-4 border-podcast-border-gray">
                     <AvatarImage
                       src={user.user_metadata?.avatar_url || ''}
                       alt={user.user_metadata?.full_name || 'Profil utilisateur'}
