@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
 import { useBooking } from '@/context/BookingContext';
+import AuthDialog from './AuthDialog';
 
 interface SubscriptionPlan {
   id: string;
@@ -29,7 +30,10 @@ const ServiceSelection = () => {
   const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
   const [hourPackages, setHourPackages] = useState<HourPackage[]>([]);
   const [loading, setLoading] = useState(true);
-  const { state } = useBooking();
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<{id: string, name: string, type: 'subscription' | 'hourPackage'} | null>(null);
+  
+  const { state, setStudioInfo, setDateTimeInfo } = useBooking();
   
   useEffect(() => {
     const fetchServices = async () => {
@@ -64,15 +68,59 @@ const ServiceSelection = () => {
     
     fetchServices();
   }, []);
-  
+
   const handleSelectSubscription = (plan: SubscriptionPlan) => {
-    toast.info(`Abonnement "${plan.name}" sélectionné. Cette fonctionnalité sera disponible prochainement.`);
-    // In the future, this will save the selection and move to the next step
+    setSelectedService({
+      id: plan.id,
+      name: plan.name,
+      type: 'subscription'
+    });
+    setAuthDialogOpen(true);
   };
   
   const handleSelectHourPackage = (pkg: HourPackage) => {
-    toast.info(`Forfait "${pkg.name}" sélectionné. Cette fonctionnalité sera disponible prochainement.`);
-    // In the future, this will save the selection and move to the next step
+    setSelectedService({
+      id: pkg.id,
+      name: pkg.name,
+      type: 'hourPackage'
+    });
+    setAuthDialogOpen(true);
+  };
+  
+  const handleAuthSuccess = async (userId: string) => {
+    if (selectedService) {
+      // Enregistrer la sélection de service
+      toast.success(`Formule "${selectedService.name}" sélectionnée`);
+      
+      // Ici on pourrait enregistrer la réservation complète dans Supabase
+      // si toutes les informations sont disponibles
+      if (state.bookingData) {
+        try {
+          const { error } = await supabase.from('bookings').insert({
+            user_id: userId,
+            studio_id: state.bookingData.studio_id,
+            date: state.bookingData.date,
+            start_time: state.bookingData.start_time,
+            end_time: state.bookingData.end_time,
+            number_of_guests: state.bookingData.number_of_guests,
+            total_price: selectedService.type === 'subscription' ? 
+              subscriptionPlans.find(p => p.id === selectedService.id)?.price || 0 :
+              hourPackages.find(p => p.id === selectedService.id)?.price_per_hour || 0,
+            status: 'upcoming'
+          });
+
+          if (error) throw error;
+          toast.success("Votre réservation a été enregistrée avec succès!");
+          
+          // Rediriger vers une page de confirmation ou le tableau de bord
+          // window.location.href = '/dashboard';
+          
+        } catch (error) {
+          console.error('Error saving booking:', error);
+          toast.error("Erreur lors de l'enregistrement de la réservation");
+        }
+      }
+    }
   };
   
   if (loading) {
@@ -177,6 +225,17 @@ const ServiceSelection = () => {
           </div>
         </div>
       </div>
+      
+      {selectedService && (
+        <AuthDialog 
+          isOpen={authDialogOpen}
+          onClose={() => setAuthDialogOpen(false)}
+          onAuthSuccess={handleAuthSuccess}
+          serviceName={selectedService.name}
+          serviceType={selectedService.type}
+          serviceId={selectedService.id}
+        />
+      )}
     </div>
   );
 };
