@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +30,7 @@ interface HourPackage {
   features: string[];
   missing_features?: string[];
   after_session_features?: string[];
+  after_session_missing_features?: string[];
 }
 
 const ServiceSelection = () => {
@@ -95,6 +97,7 @@ const ServiceSelection = () => {
                 "Accès aux fichiers pendant 7 jours"
               ],
               after_session_missing_features: [
+                "Intro teaser percutante",
                 "Épisode monté et mixé",
                 "5 shorts/reels sous-titrés",
                 "2 révisions incluses"
@@ -113,6 +116,7 @@ const ServiceSelection = () => {
               missing_features: [],
               after_session_features: [
                 "Fichier vidéo avec Mix live (changement de plans) et audio",
+                "Intro teaser percutante",
                 "Épisode monté et mixé",
                 "Accès aux fichiers pendant 7 jours",
                 "5 shorts/reels sous-titrés",
@@ -142,6 +146,7 @@ const ServiceSelection = () => {
                 "Accès aux fichiers pendant 7 jours"
               ],
               after_session_missing_features: [
+                "Intro teaser percutante",
                 "Épisode monté et mixé",
                 "5 shorts/reels sous-titrés",
                 "2 révisions incluses"
@@ -159,6 +164,7 @@ const ServiceSelection = () => {
               missing_features: [],
               after_session_features: [
                 "Fichier vidéo avec Mix live (changement de plans) et audio",
+                "Intro teaser percutante",
                 "Épisode monté et mixé",
                 "Accès aux fichiers pendant 7 jours",
                 "5 shorts/reels sous-titrés",
