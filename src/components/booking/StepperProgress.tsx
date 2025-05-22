@@ -38,7 +38,7 @@ const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep })
                       'bg-gray-700 text-gray-300'}`}
                 >
                   {isCompleted ? (
-                    <CheckCircle className={`h-4 w-4 sm:h-6 sm:w-6`} />
+                    <CheckCircle className="h-4 w-4 sm:h-6 sm:w-6" />
                   ) : (
                     <span className={`${isMobile ? 'text-xs sm:text-sm' : 'text-sm'}`}>{index + 1}</span>
                   )}
@@ -57,7 +57,7 @@ const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep })
               {!isLast && (
                 <Separator 
                   orientation="horizontal" 
-                  className={`h-0.5 flex-1 mx-1 sm:mx-2 bg-gray-700`}
+                  className="h-0.5 flex-1 mx-1 sm:mx-2 bg-gray-700"
                 />
               )}
             </React.Fragment>

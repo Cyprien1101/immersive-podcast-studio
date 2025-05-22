@@ -8,6 +8,7 @@ import BookingHeader from '@/components/booking/BookingHeader';
 import Footer from '@/components/Footer';
 import { Loader2, Calendar } from 'lucide-react';
 import DateTimeSelection from '@/components/booking/DateTimeSelection';
+import AdminRefreshButton from '@/components/booking/AdminRefreshButton';
 
 // Define booking steps with the datetime step
 const STEPS = [
@@ -129,7 +130,10 @@ const BookingPage = () => {
       {/* Added BookingHeader component */}
       <BookingHeader />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 relative">
+        {/* Admin Refresh Button */}
+        <AdminRefreshButton />
+        
         {/* Step Progress Indicator */}
         <StepperProgress steps={STEPS} currentStep={currentStep} />
         
