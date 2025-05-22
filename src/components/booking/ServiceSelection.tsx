@@ -5,9 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { toast } from 'sonner';
 import { useBooking } from '@/context/BookingContext';
 import AuthDialog from './AuthDialog';
+import { useAuth } from '@/context/AuthContext';
 
 interface SubscriptionPlan {
   id: string;
@@ -35,7 +35,8 @@ const ServiceSelection = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<{id: string, name: string, type: 'subscription' | 'hourPackage'} | null>(null);
   
-  const { state, setStudioInfo, setDateTimeInfo, setServiceInfo } = useBooking();
+  const { state, setServiceInfo } = useBooking();
+  const { user } = useAuth();
   
   useEffect(() => {
     const fetchServices = async () => {
@@ -62,7 +63,6 @@ const ServiceSelection = () => {
         setHourPackages(packagesData || []);
       } catch (error) {
         console.error('Error fetching services:', error);
-        toast.error("Erreur lors du chargement des services");
       } finally {
         setLoading(false);
       }
@@ -71,55 +71,71 @@ const ServiceSelection = () => {
     fetchServices();
   }, []);
 
-  const handleSelectSubscription = (plan: SubscriptionPlan) => {
+  const handleServiceSelect = async (serviceType: 'subscription' | 'hourPackage', service: SubscriptionPlan | HourPackage) => {
     setSelectedService({
-      id: plan.id,
-      name: plan.name,
-      type: 'subscription'
+      id: service.id,
+      name: service.name,
+      type: serviceType
     });
-    setAuthDialogOpen(true);
+    
+    // Save the service info in context
+    setServiceInfo({
+      id: service.id,
+      name: service.name,
+      type: serviceType
+    });
+
+    // If user is already logged in, create booking directly and redirect
+    if (user) {
+      await createBooking(service, serviceType, user.id);
+    } else {
+      // Open auth dialog if not logged in
+      setAuthDialogOpen(true);
+    }
   };
   
-  const handleSelectHourPackage = (pkg: HourPackage) => {
-    setSelectedService({
-      id: pkg.id,
-      name: pkg.name,
-      type: 'hourPackage'
-    });
-    setAuthDialogOpen(true);
+  const createBooking = async (service: SubscriptionPlan | HourPackage, serviceType: 'subscription' | 'hourPackage', userId: string) => {
+    if (state.bookingData) {
+      try {
+        const servicePrice = serviceType === 'subscription' 
+          ? (service as SubscriptionPlan).price 
+          : (service as HourPackage).price_per_hour;
+        
+        const { error } = await supabase.from('bookings').insert({
+          user_id: userId,
+          studio_id: state.bookingData.studio_id,
+          date: state.bookingData.date,
+          start_time: state.bookingData.start_time,
+          end_time: state.bookingData.end_time,
+          number_of_guests: state.bookingData.number_of_guests,
+          total_price: servicePrice,
+          status: 'upcoming'
+        });
+
+        if (error) throw error;
+        
+        // Redirect to the booking confirmation page
+        navigate('/booking-confirmation');
+        
+      } catch (error) {
+        console.error('Error saving booking:', error);
+      }
+    }
   };
   
   const handleAuthSuccess = async (userId: string) => {
     if (selectedService) {
-      // Enregistrer la sélection de service dans le contexte
-      setServiceInfo(selectedService);
+      // Get the selected service details
+      const service = selectedService.type === 'subscription' 
+        ? subscriptionPlans.find(p => p.id === selectedService.id)
+        : hourPackages.find(p => p.id === selectedService.id);
       
-      // Enregistrer la réservation complète dans Supabase
-      if (state.bookingData) {
-        try {
-          const { error } = await supabase.from('bookings').insert({
-            user_id: userId,
-            studio_id: state.bookingData.studio_id,
-            date: state.bookingData.date,
-            start_time: state.bookingData.start_time,
-            end_time: state.bookingData.end_time,
-            number_of_guests: state.bookingData.number_of_guests,
-            total_price: selectedService.type === 'subscription' ? 
-              subscriptionPlans.find(p => p.id === selectedService.id)?.price || 0 :
-              hourPackages.find(p => p.id === selectedService.id)?.price_per_hour || 0,
-            status: 'upcoming'
-          });
-
-          if (error) throw error;
-          toast.success("Votre réservation a été enregistrée avec succès!");
-          
-          // Rediriger vers la page de confirmation
-          navigate('/booking-confirmation');
-          
-        } catch (error) {
-          console.error('Error saving booking:', error);
-          toast.error("Erreur lors de l'enregistrement de la réservation");
-        }
+      if (service) {
+        await createBooking(
+          service, 
+          selectedService.type,
+          userId
+        );
       }
     }
   };
@@ -179,7 +195,7 @@ const ServiceSelection = () => {
                   <Button 
                     variant="default" 
                     className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black"
-                    onClick={() => handleSelectSubscription(plan)}
+                    onClick={() => handleServiceSelect('subscription', plan)}
                   >
                     Choisir
                   </Button>
@@ -215,7 +231,7 @@ const ServiceSelection = () => {
                   <Button 
                     variant="default" 
                     className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black"
-                    onClick={() => handleSelectHourPackage(pkg)}
+                    onClick={() => handleServiceSelect('hourPackage', pkg)}
                   >
                     Choisir
                   </Button>
@@ -226,7 +242,7 @@ const ServiceSelection = () => {
         </div>
       </div>
       
-      {selectedService && (
+      {selectedService && !user && (
         <AuthDialog 
           isOpen={authDialogOpen}
           onClose={() => setAuthDialogOpen(false)}

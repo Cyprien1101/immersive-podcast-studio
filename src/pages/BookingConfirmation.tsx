@@ -1,139 +1,194 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Calendar, Clock, Users, Phone, Check } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Loader2, Calendar, Users, Clock, MapPin, CheckCircle } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import BookingHeader from '@/components/booking/BookingHeader';
 import Footer from '@/components/Footer';
-import { useBooking } from '@/context/BookingContext';
+
+interface Booking {
+  id: string;
+  studio_id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  number_of_guests: number;
+  total_price: number;
+  status: string;
+  studio: {
+    name: string;
+    location: string;
+  };
+}
 
 const BookingConfirmation = () => {
-  const { state } = useBooking();
+  const [booking, setBooking] = useState<Booking | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
   const navigate = useNavigate();
-  
-  // Rediriger vers la page de réservation si aucune réservation n'est en cours
+
   useEffect(() => {
-    if (!state.bookingData || !state.isComplete) {
-      navigate('/booking');
+    if (!user) {
+      navigate('/');
+      return;
     }
-  }, [state.bookingData, state.isComplete, navigate]);
 
-  // Formater la date pour l'affichage
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    const fetchLatestBooking = async () => {
+      setLoading(true);
+      try {
+        // Get the latest booking for the current user
+        const { data, error } = await supabase
+          .from('bookings')
+          .select(`
+            *,
+            studio:studio_id (
+              name,
+              location
+            )
+          `)
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (error) {
+          console.error('Error fetching booking:', error);
+          return;
+        }
+
+        setBooking(data);
+      } catch (error) {
+        console.error('Error in booking confirmation:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-    return new Date(dateString).toLocaleDateString('fr-FR', options);
-  };
 
-  if (!state.bookingData) {
-    return null;
+    fetchLatestBooking();
+  }, [user, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-podcast-dark flex items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-podcast-accent" />
+      </div>
+    );
   }
+
+  if (!booking) {
+    return (
+      <div className="min-h-screen bg-podcast-dark pt-20">
+        <BookingHeader />
+        <div className="container mx-auto px-4 py-12">
+          <Card className="bg-black border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-2xl text-white">Aucune réservation trouvée</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-400">Nous n'avons pas pu trouver votre dernière réservation.</p>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={() => navigate('/booking')} className="bg-podcast-accent hover:bg-podcast-accent/80 text-black">
+                Créer une réservation
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  const formattedDate = format(parseISO(booking.date), 'dd MMMM yyyy', { locale: fr });
 
   return (
     <div className="min-h-screen bg-podcast-dark pt-20">
+      <BookingHeader />
+      
       <div className="container mx-auto px-4 py-12">
-        <div className="max-w-2xl mx-auto bg-black rounded-2xl border border-gray-800 p-8">
-          <div className="flex items-center justify-center mb-6">
-            <div className="rounded-full bg-green-500/20 p-3">
-              <Check className="h-8 w-8 text-green-500" />
-            </div>
-          </div>
-          
-          <h1 className="text-3xl font-bold text-center text-podcast-accent mb-6">
-            Réservation Confirmée !
-          </h1>
-          
-          <div className="space-y-6">
-            <div className="p-4 bg-gray-900 rounded-xl">
-              <h2 className="text-xl font-semibold text-white mb-4">Récapitulatif</h2>
-              
-              <div className="space-y-4">
-                {state.selectedService && (
-                  <div className="flex items-start">
-                    <div className="mr-4 mt-1">
-                      <Check className="h-5 w-5 text-podcast-accent" />
-                    </div>
-                    <div>
-                      <p className="text-white font-medium">Formule sélectionnée</p>
-                      <p className="text-gray-400">{state.selectedService.name}</p>
-                    </div>
-                  </div>
-                )}
-                
-                <div className="flex items-start">
-                  <div className="mr-4 mt-1">
-                    <Calendar className="h-5 w-5 text-podcast-accent" />
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">Date</p>
-                    <p className="text-gray-400">{formatDate(state.bookingData.date)}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="mr-4 mt-1">
-                    <Clock className="h-5 w-5 text-podcast-accent" />
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">Horaire</p>
-                    <p className="text-gray-400">
-                      {state.bookingData.start_time} - {state.bookingData.end_time}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="mr-4 mt-1">
-                    <Users className="h-5 w-5 text-podcast-accent" />
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">Nombre de personnes</p>
-                    <p className="text-gray-400">{state.bookingData.number_of_guests}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div className="max-w-2xl mx-auto">
+          <Card className="bg-black border-gray-800 overflow-hidden">
+            <div className="bg-gradient-to-r from-podcast-accent to-pink-500 h-2"></div>
             
-            <div className="p-4 bg-gray-900 rounded-xl">
-              <h2 className="text-xl font-semibold text-white mb-4">Adresse du studio</h2>
-              
-              <div className="flex items-start">
-                <div className="mr-4 mt-1">
-                  <MapPin className="h-5 w-5 text-podcast-accent" />
-                </div>
-                <div>
-                  <p className="text-white font-medium">Studio Lyon</p>
-                  <p className="text-gray-400">280 Rue Vendôme, Lyon</p>
-                </div>
+            <CardHeader>
+              <div className="flex items-center justify-center mb-6">
+                <CheckCircle className="text-green-500 h-16 w-16" />
               </div>
-            </div>
+              <CardTitle className="text-3xl text-center text-white">Réservation confirmée!</CardTitle>
+              <CardDescription className="text-center text-gray-400">
+                Votre session au studio a été réservée avec succès.
+              </CardDescription>
+            </CardHeader>
             
-            <div className="p-4 bg-gray-900 rounded-xl">
-              <h2 className="text-xl font-semibold text-white mb-4">Instructions d'arrivée</h2>
-              
-              <div className="flex items-start">
-                <div className="mr-4 mt-1">
-                  <Phone className="h-5 w-5 text-podcast-accent" />
+            <CardContent className="space-y-6">
+              <div className="bg-gray-900 rounded-lg p-6 space-y-4">
+                <div className="flex items-start gap-4">
+                  <Calendar className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
+                  <div>
+                    <p className="text-sm text-gray-400">Date</p>
+                    <p className="text-white font-medium">{formattedDate}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-white">Merci d'appeler le <span className="text-podcast-accent font-semibold">07 66 80 50 41</span> à votre arrivée pour que l'on puisse vous accueillir.</p>
+                
+                <div className="flex items-start gap-4">
+                  <Clock className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
+                  <div>
+                    <p className="text-sm text-gray-400">Horaire</p>
+                    <p className="text-white font-medium">{booking.start_time} - {booking.end_time}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4">
+                  <MapPin className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
+                  <div>
+                    <p className="text-sm text-gray-400">Studio</p>
+                    <p className="text-white font-medium">{booking.studio?.name}</p>
+                    <p className="text-sm text-gray-400">{booking.studio?.location}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4">
+                  <Users className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
+                  <div>
+                    <p className="text-sm text-gray-400">Nombre de personnes</p>
+                    <p className="text-white font-medium">{booking.number_of_guests}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-          
-          <div className="mt-8 text-center">
-            <button 
-              onClick={() => navigate('/')}
-              className="px-6 py-3 bg-podcast-accent text-black font-semibold rounded-lg hover:bg-podcast-accent/80 transition-colors"
-            >
-              Retour à l'accueil
-            </button>
-          </div>
+              
+              {booking.total_price > 0 && (
+                <div className="border-t border-gray-800 pt-6">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Total</span>
+                    <span className="text-white font-bold">{booking.total_price} €</span>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+            
+            <CardFooter className="flex flex-col gap-4">
+              <Button 
+                onClick={() => navigate('/profile#bookings')} 
+                className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black"
+              >
+                Voir mes réservations
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/')} 
+                className="w-full border-gray-700 text-white hover:bg-gray-800"
+              >
+                Retour à l'accueil
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
       </div>
+      
       <Footer />
     </div>
   );

@@ -88,7 +88,7 @@ const Profile = () => {
                 </TabsContent>
                 
                 <TabsContent value="bookings" className="pt-6">
-                  <UserBookings userId={user.id} />
+                  <UserBookings />
                 </TabsContent>
               </Tabs>
             </CardContent>

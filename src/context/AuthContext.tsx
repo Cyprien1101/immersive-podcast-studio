@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Session, User } from '@supabase/supabase-js';
@@ -55,11 +56,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Réinitialiser l'état local
       setUser(null);
       setSession(null);
-      
-      // Removed success toast for logout
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
-      toast.error('Erreur lors de la déconnexion');
     } finally {
       setLoading(false);
     }
@@ -72,8 +70,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-
-        // Removed success toasts for login/logout
       }
     );
 
