@@ -297,20 +297,24 @@ const ServiceSelection = () => {
               <CardHeader>
                 <CardTitle className="text-2xl text-podcast-accent">{plan.name}</CardTitle>
                 <CardDescription className="text-[#eee]">{plan.description}</CardDescription>
-                
-                {/* Moved button between description and price */}
-                <Button 
-                  variant="default" 
-                  className="w-full mt-4 bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
-                  onClick={() => handleServiceSelect('subscription', plan)}
-                >
-                  Choisir
-                </Button>
               </CardHeader>
               <CardContent className="flex-grow text-[15px]">
-                <p className="text-3xl font-bold text-white mb-6">
-                  {plan.price}€<span className="text-lg font-normal">/{plan.price_interval}</span>
+                <p className="text-3xl font-bold text-white mb-4">
+                  {plan.price}€<span className="text-lg font-normal">/{plan.price_interval === 'month' ? 'mois' : plan.price_interval}</span>
                 </p>
+                
+                {/* Button moved below price with separator lines */}
+                <div className="my-4">
+                  <div className="border-t border-gray-700 my-3"></div>
+                  <Button 
+                    variant="default" 
+                    className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
+                    onClick={() => handleServiceSelect('subscription', plan)}
+                  >
+                    Choisir
+                  </Button>
+                  <div className="border-b border-gray-700 my-3"></div>
+                </div>
                 
                 <div className="mb-6">
                   <ul className="space-y-2">
@@ -374,20 +378,24 @@ const ServiceSelection = () => {
               <CardHeader>
                 <CardTitle className="text-2xl text-podcast-accent">{pkg.name}</CardTitle>
                 <CardDescription className="text-[#eee]">{pkg.description}</CardDescription>
-                
-                {/* Moved button between description and price */}
-                <Button 
-                  variant="default"
-                  className="w-full mt-4 bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
-                  onClick={() => handleServiceSelect('hourPackage', pkg)}
-                >
-                  Choisir
-                </Button>
               </CardHeader>
               <CardContent className="flex-grow text-[15px]">
-                <p className="text-3xl font-bold text-white mb-6">
+                <p className="text-3xl font-bold text-white mb-4">
                   {pkg.price_per_hour}€<span className="text-lg font-normal">/heure</span>
                 </p>
+                
+                {/* Button moved below price with separator lines */}
+                <div className="my-4">
+                  <div className="border-t border-gray-700 my-3"></div>
+                  <Button 
+                    variant="default"
+                    className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
+                    onClick={() => handleServiceSelect('hourPackage', pkg)}
+                  >
+                    Choisir
+                  </Button>
+                  <div className="border-b border-gray-700 my-3"></div>
+                </div>
                 
                 <div className="mb-6">
                   <ul className="space-y-2">

@@ -315,19 +315,10 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
             </div>
           )}
           
-          {selectedTimeSlot && (
-            <div className="mt-4 p-3 bg-[#1a1a1c] border border-[#292930] rounded-lg">
-              <p className="text-sm text-gray-300">
-                <span className="font-semibold">Horaire sélectionné:</span> {selectedTimeSlot.start_time} → {calculateEndTime(selectedTimeSlot.start_time, bookingDuration)} 
-                ({bookingDuration} heure{bookingDuration > 1 ? 's' : ''})
-              </p>
-            </div>
-          )}
-          
-          {/* Continue button */}
+          {/* Continue button - moved up and removed the selected time text */}
           <div className="mt-8 flex justify-center">
             <Button
-              className="bg-gradient-to-r from-podcast-accent to-pink-500 text-white px-8 py-2 rounded-full disabled:opacity-50"
+              className="bg-podcast-accent text-white px-8 py-2 rounded-full disabled:opacity-50"
               disabled={!selectedTimeSlot}
               onClick={handleContinue}
             >
