@@ -109,6 +109,19 @@ const BookingPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // New handler for stepper navigation
+  const handleStepClick = (stepId) => {
+    // Only allow going back to previous steps
+    const currentIndex = STEPS.findIndex(step => step.id === currentStep);
+    const targetIndex = STEPS.findIndex(step => step.id === stepId);
+    
+    if (targetIndex <= currentIndex) {
+      setCurrentStep(stepId);
+      // Scroll to top when changing steps
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 'studio':
@@ -140,8 +153,12 @@ const BookingPage = () => {
         <BookingHeader />
         
         <div className="container mx-auto px-4 py-8 relative">
-          {/* Step Progress Indicator */}
-          <StepperProgress steps={STEPS} currentStep={currentStep} />
+          {/* Step Progress Indicator - now with click handler */}
+          <StepperProgress 
+            steps={STEPS} 
+            currentStep={currentStep} 
+            onStepClick={handleStepClick}
+          />
           
           <h1 className="text-4xl md:text-5xl font-bold text-center my-6 text-white">
             Réservez Votre Studio

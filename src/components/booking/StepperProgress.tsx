@@ -12,12 +12,20 @@ interface Step {
 interface StepperProgressProps {
   steps: Step[];
   currentStep: string;
+  onStepClick?: (stepId: string) => void;
 }
 
-const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep }) => {
+const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep, onStepClick }) => {
   // Calculate progress percentage
   const currentIndex = steps.findIndex(step => step.id === currentStep);
   const isMobile = useIsMobile();
+  
+  const handleStepClick = (step: Step, index: number) => {
+    // Only allow clicking on completed steps or the current step
+    if (onStepClick && index <= currentIndex) {
+      onStepClick(step.id);
+    }
+  };
   
   return (
     <div className="mb-6">
@@ -27,10 +35,14 @@ const StepperProgress: React.FC<StepperProgressProps> = ({ steps, currentStep })
           const isActive = step.id === currentStep;
           const isCompleted = steps.findIndex(s => s.id === currentStep) > index;
           const isLast = index === steps.length - 1;
+          const isClickable = index <= currentIndex;
           
           return (
             <React.Fragment key={step.id}>
-              <div className="flex flex-col items-center">
+              <div 
+                className={`flex flex-col items-center ${isClickable ? 'cursor-pointer' : ''}`}
+                onClick={() => handleStepClick(step, index)}
+              >
                 <div 
                   className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full mb-1 sm:mb-2
                     ${isActive ? 'bg-podcast-accent text-white' : 

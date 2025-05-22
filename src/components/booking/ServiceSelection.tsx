@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -296,6 +297,15 @@ const ServiceSelection = () => {
               <CardHeader>
                 <CardTitle className="text-2xl text-podcast-accent">{plan.name}</CardTitle>
                 <CardDescription className="text-[#eee]">{plan.description}</CardDescription>
+                
+                {/* Moved button between description and price */}
+                <Button 
+                  variant="default" 
+                  className="w-full mt-4 bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
+                  onClick={() => handleServiceSelect('subscription', plan)}
+                >
+                  Choisir
+                </Button>
               </CardHeader>
               <CardContent className="flex-grow text-[15px]">
                 <p className="text-3xl font-bold text-white mb-6">
@@ -351,15 +361,7 @@ const ServiceSelection = () => {
                   </ul>
                 </div>
               </CardContent>
-              <CardFooter className="mt-auto pt-4">
-                <Button 
-                  variant="default" 
-                  className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
-                  onClick={() => handleServiceSelect('subscription', plan)}
-                >
-                  Choisir
-                </Button>
-              </CardFooter>
+              {/* Removed button from footer */}
             </Card>
           ))}
           
@@ -372,6 +374,15 @@ const ServiceSelection = () => {
               <CardHeader>
                 <CardTitle className="text-2xl text-podcast-accent">{pkg.name}</CardTitle>
                 <CardDescription className="text-[#eee]">{pkg.description}</CardDescription>
+                
+                {/* Moved button between description and price */}
+                <Button 
+                  variant="default"
+                  className="w-full mt-4 bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
+                  onClick={() => handleServiceSelect('hourPackage', pkg)}
+                >
+                  Choisir
+                </Button>
               </CardHeader>
               <CardContent className="flex-grow text-[15px]">
                 <p className="text-3xl font-bold text-white mb-6">
@@ -427,15 +438,7 @@ const ServiceSelection = () => {
                   </ul>
                 </div>
               </CardContent>
-              <CardFooter className="mt-auto pt-4">
-                <Button 
-                  variant="default"
-                  className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
-                  onClick={() => handleServiceSelect('hourPackage', pkg)}
-                >
-                  Choisir
-                </Button>
-              </CardFooter>
+              {/* Removed button from footer */}
             </Card>
           ))}
         </div>
