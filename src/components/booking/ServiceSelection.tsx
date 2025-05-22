@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -15,7 +16,7 @@ interface SubscriptionPlan {
   price: number;
   price_interval: string;
   features: string[];
-  missing_features?: string[]; // Added this property
+  missing_features?: string[];
   after_session_features?: string[];
   is_popular: boolean;
 }
@@ -26,7 +27,7 @@ interface HourPackage {
   description: string;
   price_per_hour: number;
   features: string[];
-  missing_features?: string[]; // Added this property
+  missing_features?: string[];
   after_session_features?: string[];
 }
 
@@ -202,24 +203,24 @@ const ServiceSelection = () => {
 
   return (
     <div className="py-8 px-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full mx-auto">
         <h2 className="text-3xl font-bold text-center text-podcast-accent mb-8">
           Choisissez votre formule
         </h2>
         
-        {/* Updated grid layout to display all services in a single row on desktop */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 max-w-[1200px] mx-auto">
+        {/* Updated grid layout with more spacing between cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 w-full max-w-[1400px] mx-auto">
           {/* Left side - Subscription Plans */}
           {subscriptionPlans.map(plan => (
             <Card 
               key={plan.id} 
-              className="bg-[#1a1a1a] border border-podcast-border-gray rounded-xl flex flex-col min-w-[300px]"
+              className="bg-[#1a1a1a] border border-podcast-border-gray rounded-xl flex flex-col min-w-[280px]"
             >
               <CardHeader>
                 <CardTitle className="text-2xl text-podcast-accent">{plan.name}</CardTitle>
                 <CardDescription className="text-[#eee]">{plan.description}</CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow">
+              <CardContent className="flex-grow text-[15px]">
                 <p className="text-3xl font-bold text-white mb-6">
                   {plan.price}€<span className="text-lg font-normal">/{plan.price_interval}</span>
                 </p>
@@ -237,7 +238,7 @@ const ServiceSelection = () => {
                     ))}
                     
                     {/* Missing features with red X */}
-                    {plan.missing_features?.map((feature, index) => (
+                    {plan.missing_features && plan.missing_features.length > 0 && plan.missing_features.map((feature, index) => (
                       <li key={`missing-${index}`} className="flex items-center text-[#eee]">
                         <span className="mr-2 text-red-500">
                           <X size={18} className="stroke-2" />
@@ -251,7 +252,7 @@ const ServiceSelection = () => {
                 <div>
                   <h4 className="text-lg font-medium text-white mb-4">Ce que vous obtenez après la session:</h4>
                   <ul className="space-y-3">
-                    {plan.after_session_features?.map((feature, index) => (
+                    {plan.after_session_features && plan.after_session_features.map((feature, index) => (
                       <li key={index} className="flex items-center text-[#eee]">
                         <span className="mr-2 text-green-500">
                           <Check size={18} className="stroke-2" />
@@ -278,13 +279,13 @@ const ServiceSelection = () => {
           {hourPackages.map(pkg => (
             <Card 
               key={pkg.id} 
-              className="bg-[#1a1a1a] border border-podcast-border-gray rounded-xl flex flex-col min-w-[300px]"
+              className="bg-[#1a1a1a] border border-podcast-border-gray rounded-xl flex flex-col min-w-[280px]"
             >
               <CardHeader>
                 <CardTitle className="text-2xl text-podcast-accent">{pkg.name}</CardTitle>
                 <CardDescription className="text-[#eee]">{pkg.description}</CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow">
+              <CardContent className="flex-grow text-[15px]">
                 <p className="text-3xl font-bold text-white mb-6">
                   {pkg.price_per_hour}€<span className="text-lg font-normal">/heure</span>
                 </p>
@@ -302,7 +303,7 @@ const ServiceSelection = () => {
                     ))}
                     
                     {/* Missing features with red X */}
-                    {pkg.missing_features?.map((feature, index) => (
+                    {pkg.missing_features && pkg.missing_features.length > 0 && pkg.missing_features.map((feature, index) => (
                       <li key={`missing-${index}`} className="flex items-center text-[#eee]">
                         <span className="mr-2 text-red-500">
                           <X size={18} className="stroke-2" />
@@ -316,7 +317,7 @@ const ServiceSelection = () => {
                 <div>
                   <h4 className="text-lg font-medium text-white mb-4">Ce que vous obtenez après la session:</h4>
                   <ul className="space-y-3">
-                    {pkg.after_session_features?.map((feature, index) => (
+                    {pkg.after_session_features && pkg.after_session_features.map((feature, index) => (
                       <li key={index} className="flex items-center text-[#eee]">
                         <span className="mr-2 text-green-500">
                           <Check size={18} className="stroke-2" />
@@ -341,7 +342,7 @@ const ServiceSelection = () => {
         </div>
         
         {state.bookingData && (
-          <div className="mt-12 p-6 bg-[#1a1a1a] border border-podcast-border-gray rounded-xl max-w-[1200px] mx-auto">
+          <div className="mt-12 p-6 bg-[#1a1a1a] border border-podcast-border-gray rounded-xl max-w-[1400px] mx-auto">
             <h3 className="text-xl font-semibold text-podcast-accent mb-3">Récapitulatif de la réservation</h3>
             <p className="text-[#eee] mb-2 border-b border-podcast-border-gray pb-4">Date: {state.bookingData.date}</p>
             <p className="text-[#eee] mb-2 border-b border-podcast-border-gray pb-4">Horaire: {state.bookingData.start_time} - {state.bookingData.end_time}</p>
