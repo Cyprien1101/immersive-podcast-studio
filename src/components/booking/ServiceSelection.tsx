@@ -80,11 +80,10 @@ const ServiceSelection = () => {
           if (plan.name === "Standard") {
             return {
               ...plan,
-              missing_features: ["Montage", "Mixage"],
+              missing_features: ["24/7 support technique", "Mixage professionnel"],
               after_session_features: [
-                "Fichiers vidéo avec mix en live"
-                "Accès à vos fichiers pendant 7 jours",
-                "Support technique par email/téléphone"
+                "Accès à vos fichiers audio pendant 30 jours",
+                "Support technique par email"
               ]
             };
           } else {
@@ -92,9 +91,10 @@ const ServiceSelection = () => {
               ...plan,
               missing_features: [],
               after_session_features: [
-                "Fichiers vidéo avec mix en live"
-                "Accès à vos fichiers pendant 7 jours",
-                "Support technique par email/téléphone",
+                "Accès à vos fichiers audio pendant 30 jours",
+                "Support technique par email",
+                "24/7 support technique",
+                "Mixage professionnel"
               ]
             };
           }
@@ -105,7 +105,7 @@ const ServiceSelection = () => {
           if (pkg.name === "Basic Studio Time") {
             return {
               ...pkg,
-              missing_features: ["Montage", "Mixage"],
+              missing_features: ["Ingénieur du son dédié", "Édition post-production"],
               after_session_features: [
                 "Fichiers audio bruts",
                 "Notes de session"
