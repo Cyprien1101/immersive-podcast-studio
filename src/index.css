@@ -231,7 +231,7 @@
 
   /* New utility classes for booking/profile pages */
   .booking-card {
-    @apply bg-podcast-soft-black border border-podcast-border-gray rounded-xl;
+    @apply bg-podcast-soft-black border border-podcast-border-gray rounded-xl min-h-[28rem] lg:min-h-[32rem];
   }
 
   .booking-section {
