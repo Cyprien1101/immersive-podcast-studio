@@ -10,7 +10,6 @@ import { Loader2, Calendar } from 'lucide-react';
 import DateTimeSelection from '@/components/booking/DateTimeSelection';
 import ServiceSelection from '@/components/booking/ServiceSelection';
 import { BookingProvider } from '@/context/BookingContext';
-import { toast } from 'sonner';
 
 // Define booking steps with the datetime step
 const STEPS = [
@@ -103,7 +102,7 @@ const BookingPage = () => {
     
     localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
     
-    toast.success("Informations de réservation enregistrées");
+    // Removed toast notification for booking info saved
     setCurrentStep('service');
     
     // Scroll to top when moving to next step

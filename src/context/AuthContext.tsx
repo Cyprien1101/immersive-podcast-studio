@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Session, User } from '@supabase/supabase-js';
@@ -57,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null);
       setSession(null);
       
-      toast.success('Vous avez été déconnecté avec succès');
+      // Removed success toast for logout
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
       toast.error('Erreur lors de la déconnexion');
@@ -74,11 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         setLoading(false);
 
-        if (event === 'SIGNED_IN') {
-          toast.success('Connexion réussie');
-        } else if (event === 'SIGNED_OUT') {
-          toast.success('Déconnexion réussie');
-        }
+        // Removed success toasts for login/logout
       }
     );
 

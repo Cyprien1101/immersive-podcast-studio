@@ -1,55 +1,88 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { format } from 'date-fns';
-import { Calendar, Clock } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Loader2 } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
-interface BookingType {
+// Define proper type for bookings with a string literal type for status
+type BookingType = {
   id: string;
-  created_at: string;
+  user_id: string;
+  studio_id: string;
   date: string;
   start_time: string;
   end_time: string;
-  studio_id: string;
-  status: 'upcoming' | 'completed' | 'cancelled';
-  total_price: number;
   number_of_guests: number;
-}
+  created_at: string;
+  updated_at: string;
+  total_price: number;
+  status: "upcoming" | "completed" | "cancelled";
+};
 
-interface UserBookingsProps {
-  userId: string;
-}
-
-const UserBookings = ({ userId }: UserBookingsProps) => {
+const UserBookings = () => {
+  const { user } = useAuth();
   const [bookings, setBookings] = useState<BookingType[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
+  const [studios, setStudios] = useState<Record<string, any>>({});
 
   useEffect(() => {
     const fetchBookings = async () => {
+      if (!user) return;
+      
       try {
         setLoading(true);
-        const { data, error } = await supabase
+        
+        // Fetch user's bookings
+        const { data: bookingsData, error: bookingsError } = await supabase
           .from('bookings')
           .select('*')
-          .eq('user_id', userId)
+          .eq('user_id', user.id)
           .order('date', { ascending: false });
-          
-        if (error) {
-          throw error;
-        }
         
-        setBookings(data || []);
+        if (bookingsError) throw bookingsError;
+        
+        if (bookingsData) {
+          // Convert the status string to the appropriate enum value
+          const typedBookings = bookingsData.map(booking => {
+            // Ensure status is one of the allowed values
+            let typedStatus: "upcoming" | "completed" | "cancelled" = "upcoming"; // Default
+            
+            // Map the string status to our enum
+            if (booking.status === "completed") typedStatus = "completed";
+            else if (booking.status === "cancelled") typedStatus = "cancelled";
+            
+            return {
+              ...booking,
+              status: typedStatus
+            } as BookingType;
+          });
+          
+          setBookings(typedBookings);
+          
+          // Get unique studio IDs
+          const studioIds = [...new Set(bookingsData.map(booking => booking.studio_id))];
+          
+          // Fetch studio details for all studios
+          if (studioIds.length > 0) {
+            const { data: studiosData } = await supabase
+              .from('studios')
+              .select('id, name, location')
+              .in('id', studioIds);
+            
+            // Create a lookup map for studio details
+            const studioMap: Record<string, any> = {};
+            studiosData?.forEach(studio => {
+              studioMap[studio.id] = studio;
+            });
+            
+            setStudios(studioMap);
+          }
+        }
       } catch (error) {
         console.error('Error fetching bookings:', error);
       } finally {
@@ -58,80 +91,105 @@ const UserBookings = ({ userId }: UserBookingsProps) => {
     };
     
     fetchBookings();
-  }, [userId]);
+  }, [user]);
 
-  const getStatusBadge = (status: string) => {
-    switch(status) {
+  // Function to get the status badge color
+  const getStatusColor = (status: BookingType['status']) => {
+    switch (status) {
       case 'upcoming':
-        return <Badge className="bg-green-500 hover:bg-green-600">À venir</Badge>;
+        return 'bg-green-500 hover:bg-green-600';
       case 'completed':
-        return <Badge className="bg-gray-500 hover:bg-gray-600">Terminée</Badge>;
+        return 'bg-blue-500 hover:bg-blue-600';
       case 'cancelled':
-        return <Badge className="bg-red-500 hover:bg-red-600">Annulée</Badge>;
+        return 'bg-red-500 hover:bg-red-600';
       default:
-        return <Badge>{status}</Badge>;
+        return 'bg-gray-500 hover:bg-gray-600';
+    }
+  };
+
+  // Function to translate status
+  const translateStatus = (status: BookingType['status']) => {
+    switch (status) {
+      case 'upcoming':
+        return 'À venir';
+      case 'completed':
+        return 'Terminé';
+      case 'cancelled':
+        return 'Annulé';
+      default:
+        return status;
     }
   };
 
   if (loading) {
-    return <div className="text-center py-8">Chargement de vos réservations...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-white" />
+      </div>
+    );
   }
 
   if (bookings.length === 0) {
     return (
-      <div className="text-center py-8 bg-gray-800 rounded-xl p-10">
-        <h3 className="text-xl font-medium text-white mb-2">Aucune réservation</h3>
-        <p className="text-gray-400">
-          Vous n'avez pas encore effectué de réservation. 
-          <br />
-          Réservez dès maintenant votre session de studio !
-        </p>
-      </div>
+      <Alert>
+        <AlertTitle>Aucune réservation</AlertTitle>
+        <AlertDescription>
+          Vous n'avez pas encore de réservation. Réservez un studio pour commencer.
+        </AlertDescription>
+      </Alert>
     );
   }
 
   return (
     <div className="space-y-6">
-      <h3 className="text-xl font-bold mb-4">Historique des réservations</h3>
+      <h2 className="text-2xl font-bold text-white">Mes réservations</h2>
       
-      <div className="overflow-x-auto rounded-lg border border-gray-700">
-        <Table>
-          <TableCaption>Liste de vos réservations</TableCaption>
-          <TableHeader>
-            <TableRow className="bg-gray-800 hover:bg-gray-800">
-              <TableHead className="text-white">Date</TableHead>
-              <TableHead className="text-white">Horaire</TableHead>
-              <TableHead className="text-white">Invités</TableHead>
-              <TableHead className="text-white">Prix</TableHead>
-              <TableHead className="text-white">Statut</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {bookings.map((booking) => (
-              <TableRow key={booking.id} className="bg-gray-900 hover:bg-gray-800 border-b border-gray-800">
-                <TableCell className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-podcast-accent" />
-                  {format(new Date(booking.date), 'dd MMMM yyyy', { locale: fr })}
-                </TableCell>
-                <TableCell className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-podcast-accent" />
-                  {booking.start_time} - {booking.end_time}
-                </TableCell>
-                <TableCell>{booking.number_of_guests}</TableCell>
-                <TableCell>{booking.total_price}€</TableCell>
-                <TableCell>{getStatusBadge(booking.status)}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-      
-      <div className="bg-gray-800 p-4 rounded-lg">
-        <p className="text-gray-400 text-sm">
-          Pour toute modification ou annulation de réservation, veuillez nous contacter au 07 66 80 50 41 
-          au moins 48h à l'avance.
-        </p>
-      </div>
+      {bookings.map((booking) => {
+        const studio = studios[booking.studio_id] || { name: 'Studio inconnu', location: '?' };
+        const bookingDate = parseISO(booking.date);
+        
+        return (
+          <Card key={booking.id} className="bg-gray-800 border-gray-700">
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="text-white">
+                    {studio.name}
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    {studio.location} • {format(bookingDate, 'EEEE dd MMMM yyyy', { locale: fr })}
+                  </CardDescription>
+                </div>
+                <Badge className={`${getStatusColor(booking.status)}`}>
+                  {translateStatus(booking.status)}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-400">Horaires</p>
+                  <p className="text-white font-medium">{booking.start_time} - {booking.end_time}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400">Personnes</p>
+                  <p className="text-white font-medium">{booking.number_of_guests}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400">Prix total</p>
+                  <p className="text-white font-medium">{booking.total_price}€</p>
+                </div>
+                <div>
+                  <p className="text-gray-400">Réservé le</p>
+                  <p className="text-white font-medium">
+                    {format(parseISO(booking.created_at), 'dd/MM/yyyy')}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 };
