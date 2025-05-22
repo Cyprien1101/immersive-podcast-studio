@@ -45,3 +45,6 @@ verify_jwt = true
 
 [functions.callback-google-calendar]
 verify_jwt = false
+
+[functions.create-calendar-event]
+verify_jwt = true

@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import BookingHeader from '@/components/booking/BookingHeader';
+import AdminCalendar from '@/components/admin/AdminCalendar';
 
 const Admin = () => {
   const { user, loading } = useAuth();
@@ -132,7 +133,7 @@ const Admin = () => {
     <div className="min-h-screen bg-podcast-dark text-white">
       <BookingHeader />
       
-      <div className="container mx-auto pt-24 px-4">
+      <div className="container mx-auto pt-24 px-4 pb-12">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-8">Panneau d'administration</h1>
           
@@ -173,33 +174,39 @@ const Admin = () => {
           </Card>
           
           {calendarConnected && (
-            <Card className="booking-card overflow-hidden">
-              <CardHeader>
-                <CardTitle className="text-xl">Gestion des disponibilités</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-4">
-                  Vous pouvez rafraîchir manuellement les disponibilités du studio en fonction de votre calendrier Google.
-                </p>
-                <Button
-                  onClick={refreshAvailability}
-                  disabled={refreshingAvailability}
-                  className="flex items-center gap-2 bg-podcast-accent text-black hover:bg-podcast-accent/80"
-                >
-                  {refreshingAvailability ? (
-                    <>
-                      <RotateCw className="h-4 w-4 animate-spin" />
-                      Mise à jour en cours...
-                    </>
-                  ) : (
-                    <>
-                      <RotateCw className="h-4 w-4" />
-                      Mettre à jour les disponibilités
-                    </>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
+            <>
+              <Card className="booking-card overflow-hidden mb-8">
+                <CardHeader>
+                  <CardTitle className="text-xl">Gestion des disponibilités</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="mb-4">
+                    Vous pouvez rafraîchir manuellement les disponibilités du studio en fonction de votre calendrier Google.
+                  </p>
+                  <Button
+                    onClick={refreshAvailability}
+                    disabled={refreshingAvailability}
+                    className="flex items-center gap-2 bg-podcast-accent text-black hover:bg-podcast-accent/80"
+                  >
+                    {refreshingAvailability ? (
+                      <>
+                        <RotateCw className="h-4 w-4 animate-spin" />
+                        Mise à jour en cours...
+                      </>
+                    ) : (
+                      <>
+                        <RotateCw className="h-4 w-4" />
+                        Mettre à jour les disponibilités
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <div className="mb-8">
+                <AdminCalendar />
+              </div>
+            </>
           )}
         </div>
       </div>
