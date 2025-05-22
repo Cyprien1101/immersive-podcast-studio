@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useBooking } from '@/context/BookingContext';
 import AuthDialog from './AuthDialog';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from "sonner";
 
 interface SubscriptionPlan {
   id: string;
@@ -213,8 +213,10 @@ const ServiceSelection = () => {
     if (state.bookingData) {
       try {
         const servicePrice = serviceType === 'subscription' ? (service as SubscriptionPlan).price : (service as HourPackage).price_per_hour;
+        
+        // Create the booking
         const {
-          error
+          error: bookingError
         } = await supabase.from('bookings').insert({
           user_id: userId,
           studio_id: state.bookingData.studio_id,
@@ -225,12 +227,37 @@ const ServiceSelection = () => {
           total_price: servicePrice,
           status: 'upcoming'
         });
-        if (error) throw error;
+        
+        if (bookingError) throw bookingError;
+
+        // If the service type is a subscription, also create a subscription record
+        if (serviceType === 'subscription') {
+          const subscriptionPlan = service as SubscriptionPlan;
+          const {
+            error: subscriptionError
+          } = await supabase.from('subscriptions').insert({
+            user_id: userId,
+            plan_id: subscriptionPlan.id,
+            plan_name: subscriptionPlan.name,
+            price: subscriptionPlan.price,
+            price_interval: subscriptionPlan.price_interval,
+            status: 'active',
+            // By default, start_date is set to now() in the database
+          });
+          
+          if (subscriptionError) {
+            console.error('Error creating subscription:', subscriptionError);
+            toast.error("Réservation créée mais l'abonnement n'a pas pu être enregistré.");
+          } else {
+            toast.success("Abonnement créé avec succès !");
+          }
+        }
 
         // Redirect to the booking confirmation page
         navigate('/booking-confirmation');
       } catch (error) {
         console.error('Error saving booking:', error);
+        toast.error("Une erreur s'est produite lors de la création de votre réservation.");
       }
     }
   };
