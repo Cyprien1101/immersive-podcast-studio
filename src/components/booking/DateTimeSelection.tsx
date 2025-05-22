@@ -48,7 +48,8 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
     
     setLoading(true);
     try {
-      const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+      // Format date as YYYY-MM-DD without timezone adjustment
+      const formattedDate = selectedDate.toISOString().split('T')[0];
       
       const { data, error } = await supabase
         .from('studio_availability')
@@ -76,7 +77,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
   
   // Check if a slot can accommodate the selected duration
   const canSelectTimeSlot = (slotIndex: number): boolean => {
-    if (!timeSlots || timeSlots.length === 0 || bookingDuration <= 1) return true;
+    if (!timeSlots || timeSlots.length === 0 || bookingDuration <= 0) return false;
     
     // For multi-hour bookings, check consecutive slots
     const hoursNeeded = bookingDuration;
@@ -99,6 +100,20 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
         if (prevEndTime !== currStartTime) return false;
       }
     }
+    
+    // Check if the booking would end after the closing time (19:30)
+    const startSlot = timeSlots[slotIndex];
+    const [startHour, startMinute] = startSlot.start_time.split(':').map(Number);
+    
+    const endHour = startHour + Math.floor((startMinute + bookingDuration * 60) / 60);
+    const endMinute = (startMinute + bookingDuration * 60) % 60;
+    
+    const formattedEndHour = endHour.toString().padStart(2, '0');
+    const formattedEndMinute = endMinute.toString().padStart(2, '0');
+    const calculatedEndTime = `${formattedEndHour}:${formattedEndMinute}`;
+    
+    // Check if the calculated end time is after closing time (19:30)
+    if (calculatedEndTime > '19:30') return false;
     
     return true;
   };
@@ -133,9 +148,13 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       // Calculate the proper end time based on duration
       const endTime = calculateEndTime(selectedTimeSlot.start_time, bookingDuration);
       
+      // IMPORTANT FIX: Use direct ISO date string format without timezone adjustment
+      // This ensures the date remains the same regardless of timezone
+      const formattedDate = selectedDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+      
       // Set the date and time info in the booking context
       setDateTimeInfo({
-        date: selectedDate.toISOString().split('T')[0],
+        date: formattedDate,
         start_time: selectedTimeSlot.start_time,
         end_time: endTime,
         number_of_guests: guestCount
@@ -147,7 +166,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
         end_time: endTime
       };
       
-      // Call the onDateTimeSelect callback with the updated end time
+      // Call the onDateTimeSelect callback with the updated end time and the original date object
       onDateTimeSelect(
         selectedDate,
         updatedTimeSlot,

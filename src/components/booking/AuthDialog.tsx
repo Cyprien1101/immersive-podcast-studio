@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, LogIn } from "lucide-react";
 import { toast } from "sonner";
 
 interface AuthDialogProps {
@@ -23,6 +22,7 @@ const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, 
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>("connexion");
   const [loading, setLoading] = useState<boolean>(false);
+  const [googleLoading, setGoogleLoading] = useState<boolean>(false);
   
   // État pour le formulaire de connexion
   const [loginEmail, setLoginEmail] = useState<string>("");
@@ -33,6 +33,37 @@ const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, 
   const [registerPassword, setRegisterPassword] = useState<string>("");
   const [registerFullName, setRegisterFullName] = useState<string>("");
   const [registerPhone, setRegisterPhone] = useState<string>("");
+  
+  // Gestionnaire de connexion avec Google
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    
+    try {
+      // Sauvegarder la sélection de service avant la redirection
+      localStorage.setItem('selectedService', JSON.stringify({
+        id: serviceId,
+        name: serviceName,
+        type: serviceType
+      }));
+      
+      // Redirection vers l'authentification Google avec scope calendrier
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/booking-confirmation`,
+          scopes: 'https://www.googleapis.com/auth/calendar'
+        }
+      });
+      
+      if (error) throw error;
+      
+      // La redirection sera gérée par Supabase
+    } catch (error: any) {
+      console.error("Erreur de connexion Google:", error);
+      toast.error(error.message || "Erreur lors de la connexion avec Google");
+      setGoogleLoading(false);
+    }
+  };
   
   // Gestionnaire de connexion
   const handleLogin = async (e: React.FormEvent) => {
@@ -139,6 +170,27 @@ const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, 
             </TabsList>
             
             <TabsContent value="connexion" className="mt-4">
+              <div className="mb-4">
+                <Button 
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  className="w-full flex items-center justify-center gap-2 bg-white text-black hover:bg-gray-100"
+                  disabled={googleLoading}
+                >
+                  {googleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
+                  Se connecter avec Google
+                </Button>
+              </div>
+              
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-600"></span>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-podcast-soft-black px-2 text-gray-400">OU</span>
+                </div>
+              </div>
+              
               <form onSubmit={handleLogin}>
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -178,6 +230,27 @@ const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, 
             </TabsContent>
             
             <TabsContent value="inscription" className="mt-4">
+              <div className="mb-4">
+                <Button 
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  className="w-full flex items-center justify-center gap-2 bg-white text-black hover:bg-gray-100"
+                  disabled={googleLoading}
+                >
+                  {googleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
+                  S'inscrire avec Google
+                </Button>
+              </div>
+              
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-600"></span>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-podcast-soft-black px-2 text-gray-400">OU</span>
+                </div>
+              </div>
+              
               <form onSubmit={handleRegister}>
                 <div className="space-y-4">
                   <div className="space-y-2">

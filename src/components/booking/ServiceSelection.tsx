@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, SUPABASE_URL_ENDPOINT } from "@/integrations/supabase/client";
 import { Loader2, Check, X } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -217,6 +216,7 @@ const ServiceSelection = () => {
         
         // Create the booking
         const {
+          data: bookingData,
           error: bookingError
         } = await supabase.from('bookings').insert({
           user_id: userId,
@@ -227,7 +227,7 @@ const ServiceSelection = () => {
           number_of_guests: state.bookingData.number_of_guests,
           total_price: servicePrice,
           status: 'upcoming'
-        });
+        }).select('*, studio:studio_id (name, location)').single();
         
         if (bookingError) throw bookingError;
 
@@ -251,6 +251,66 @@ const ServiceSelection = () => {
             toast.error("Réservation créée mais l'abonnement n'a pas pu être enregistré.");
           } else {
             toast.success("Abonnement créé avec succès !");
+          }
+        }
+
+        // Create Google Calendar event if booking was created successfully
+        if (bookingData) {
+          try {
+            const { data: userData } = await supabase
+              .from('profiles')
+              .select('full_name, email')
+              .eq('id', userId)
+              .single();
+
+            // Format the event data
+            const formattedDate = state.bookingData.date;
+            const eventData = {
+              summary: `Réservation Studio: ${bookingData.studio?.name || 'Podcast Studio'}`,
+              description: `Réservation par: ${userData?.full_name || 'Client'}\nEmail: ${userData?.email || ''}\nNombre de personnes: ${state.bookingData.number_of_guests}\nFormule: ${service.name}`,
+              start: {
+                dateTime: `${formattedDate}T${state.bookingData.start_time}:00`,
+                timeZone: 'Europe/Paris'
+              },
+              end: {
+                dateTime: `${formattedDate}T${state.bookingData.end_time}:00`,
+                timeZone: 'Europe/Paris'
+              },
+              location: bookingData.studio?.location || 'Studio',
+              colorId: "5", // Color for events (5 is yellow)
+              attendees: [
+                { email: userData?.email || '' }
+              ],
+              studioId: state.bookingData.studio_id // Add the studio_id to the event data
+            };
+            
+            // Call the edge function to create the calendar event
+            const { data: sessionData } = await supabase.auth.getSession();
+            
+            const response = await fetch(
+              `${SUPABASE_URL_ENDPOINT}/functions/v1/create-calendar-event`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${sessionData?.session?.access_token}`
+                },
+                body: JSON.stringify(eventData)
+              }
+            );
+            
+            const calendarResult = await response.json();
+            if (calendarResult.error) {
+              console.error('Error creating calendar event:', calendarResult.error);
+              // Still proceed with the booking - consider this a non-critical error
+            } else {
+              console.log('Calendar event created successfully:', calendarResult);
+              // Set flag in localStorage for BookingConfirmation page
+              localStorage.setItem('calendar_event_created', 'true');
+            }
+          } catch (calendarError) {
+            console.error('Error with calendar integration:', calendarError);
+            // Still proceed with the booking - consider this a non-critical error
           }
         }
 
