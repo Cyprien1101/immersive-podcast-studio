@@ -91,11 +91,12 @@ const BookingPage = () => {
     setGuestCount(guests);
     
     // Store the booking data in localStorage for persistence
+    // Important: Use ISO format for the date to avoid timezone issues
     const bookingData = {
       studio_id: selectedStudio.id,
       date: date.toISOString().split('T')[0], // Format: YYYY-MM-DD
       start_time: timeSlot.start_time,
-      end_time: timeSlot.end_time, // This now comes correctly calculated from DateTimeSelection
+      end_time: timeSlot.end_time,
       number_of_guests: guests,
       created_at: new Date().toISOString()
     };
