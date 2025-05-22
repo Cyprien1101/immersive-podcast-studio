@@ -1,4 +1,3 @@
-
 // Follow this setup guide to integrate the Deno language server with your editor:
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
@@ -151,7 +150,11 @@ serve(async (req: Request) => {
     const endHour = endDateTime.getHours();
     const endMin = endDateTime.getMinutes();
     
-    const studio_id = "d9c24a0a-d94a-4cbc-b489-fa5cfe73ce08"; // ID fixe du studio Lyon
+    const studio_id = eventData.studioId; // Il faut s'assurer que cette information est incluse dans eventData
+    
+    if (!studio_id) {
+      throw new Error("ID du studio manquant dans les données d'événement");
+    }
     
     // Mettre à jour tous les créneaux de 30 minutes concernés
     for (let hour = startHour; hour <= endHour; hour++) {

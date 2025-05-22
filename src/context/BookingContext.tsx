@@ -149,13 +149,6 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   const setStudioInfo = (data: { studio_id: string }) => {
     dispatch({ type: 'SET_STUDIO_INFO', payload: data });
-    
-    // Mettre à jour localStorage pour persister le studio_id
-    const bookingData = {
-      ...state.bookingData,
-      ...data
-    };
-    localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
   };
 
   const setDateTimeInfo = (data: { date: string; start_time: string; end_time: string; number_of_guests: number }) => {
@@ -171,13 +164,6 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   const setPriceInfo = (data: { total_price: number }) => {
     dispatch({ type: 'SET_PRICE_INFO', payload: data });
-    
-    // Mettre à jour localStorage
-    const bookingData = {
-      ...state.bookingData,
-      ...data
-    };
-    localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
   };
   
   const setServiceInfo = (data: SelectedService) => {
