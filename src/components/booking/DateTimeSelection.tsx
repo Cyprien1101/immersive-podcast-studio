@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Calendar, Minus, Plus } from 'lucide-react';
+import { Loader2, Calendar as CalendarIcon, Minus, Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format, isBefore, addDays, parseISO, addHours, addMinutes } from 'date-fns';
@@ -9,6 +8,7 @@ import { fr } from 'date-fns/locale';
 import { useBooking } from '@/context/BookingContext';
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
 
 interface TimeSlot {
   start_time: string;
@@ -189,7 +189,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
   return (
     <div className="py-8">
       <h2 className="text-2xl font-semibold text-center text-white mb-8">
-        <Calendar className="inline-block mr-2 mb-1" /> Sélectionnez une Date et une Heure
+        <CalendarIcon className="inline-block mr-2 mb-1" /> Sélectionnez une Date et une Heure
       </h2>
       
       {/* Duration and Guest Count Selectors - Updated UI */}
