@@ -119,8 +119,7 @@ const BookingConfirmation = () => {
     );
   }
 
-  // Fix for date display - Parse the date directly from the ISO string format
-  const formattedDate = format(new Date(booking.date), 'dd MMMM yyyy', { locale: fr });
+  const formattedDate = format(parseISO(booking.date), 'dd MMMM yyyy', { locale: fr });
   const bookingDuration = calculateDuration(booking.start_time, booking.end_time);
 
   return (

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Calendar as CalendarIcon, Minus, Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { format, parseISO, addHours, addMinutes } from 'date-fns';
+import { format, isBefore, addDays, parseISO, addHours, addMinutes } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useBooking } from '@/context/BookingContext';
 import { Slider } from "@/components/ui/slider";
@@ -49,8 +49,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
     
     setLoading(true);
     try {
-      // Ensure we use YYYY-MM-DD format for the date without any timezone adjustments
-      const formattedDate = selectedDate.toISOString().split('T')[0];
+      const formattedDate = format(selectedDate, 'yyyy-MM-dd');
       
       const { data, error } = await supabase
         .from('studio_availability')
@@ -149,12 +148,9 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       // Calculate the proper end time based on duration
       const endTime = calculateEndTime(selectedTimeSlot.start_time, bookingDuration);
       
-      // Important: Use ISO string date format to avoid timezone issues
-      const isoDateString = selectedDate.toISOString().split('T')[0];
-      
       // Set the date and time info in the booking context
       setDateTimeInfo({
-        date: isoDateString,
+        date: selectedDate.toISOString().split('T')[0],
         start_time: selectedTimeSlot.start_time,
         end_time: endTime,
         number_of_guests: guestCount
