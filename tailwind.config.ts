@@ -68,7 +68,10 @@ export default {
 					light: '#f5f5f7',
 					accent: '#9b87f5',
 					'accent-hover': '#7E69AB',
-					muted: '#2a2a2a'
+					muted: '#2a2a2a',
+					// New colors for the booking/profile pages
+					'soft-black': '#1a1a1a',
+					'border-gray': '#303030'
 				}
 			},
 			borderRadius: {

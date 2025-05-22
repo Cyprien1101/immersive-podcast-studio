@@ -31,7 +31,7 @@ const StudioSelection: React.FC<StudioSelectionProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {studios.map((studio) => (
           <ScrollAnimationWrapper animation="fade-up" key={studio.id}>
-            <Card className="rounded-2xl overflow-hidden bg-black border-gray-800 text-white hover:shadow-lg hover:shadow-podcast-accent/20 transition-all">
+            <Card className="rounded-2xl overflow-hidden booking-card hover:shadow-lg hover:shadow-podcast-accent/20 transition-all">
               <div className="relative h-64 overflow-hidden">
                 <img 
                   src={getStudioImage(studio.id)} 

@@ -85,7 +85,7 @@ const BookingConfirmation = () => {
       <div className="min-h-screen bg-podcast-dark pt-20">
         <BookingHeader />
         <div className="container mx-auto px-4 py-12">
-          <Card className="bg-black border-gray-800">
+          <Card className="booking-card">
             <CardHeader>
               <CardTitle className="text-2xl text-white">Aucune réservation trouvée</CardTitle>
             </CardHeader>
@@ -111,7 +111,7 @@ const BookingConfirmation = () => {
       
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto">
-          <Card className="bg-black border-gray-800 overflow-hidden">
+          <Card className="booking-card overflow-hidden">
             <div className="bg-gradient-to-r from-podcast-accent to-pink-500 h-2"></div>
             
             <CardHeader>
@@ -125,8 +125,8 @@ const BookingConfirmation = () => {
             </CardHeader>
             
             <CardContent className="space-y-6">
-              <div className="bg-gray-900 rounded-lg p-6 space-y-4">
-                <div className="flex items-start gap-4">
+              <div className="bg-podcast-soft-black rounded-lg p-6 space-y-4 border border-podcast-border-gray">
+                <div className="flex items-start gap-4 booking-section">
                   <Calendar className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
                   <div>
                     <p className="text-sm text-gray-400">Date</p>
@@ -134,7 +134,7 @@ const BookingConfirmation = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-4 booking-section">
                   <Clock className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
                   <div>
                     <p className="text-sm text-gray-400">Horaire</p>
@@ -142,7 +142,7 @@ const BookingConfirmation = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-4 booking-section">
                   <MapPin className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
                   <div>
                     <p className="text-sm text-gray-400">Studio</p>
@@ -161,7 +161,7 @@ const BookingConfirmation = () => {
               </div>
               
               {booking.total_price > 0 && (
-                <div className="border-t border-gray-800 pt-6">
+                <div className="border-t border-podcast-border-gray pt-6">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Total</span>
                     <span className="text-white font-bold">{booking.total_price} €</span>
@@ -180,7 +180,7 @@ const BookingConfirmation = () => {
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/')} 
-                className="w-full border-gray-700 text-white hover:bg-gray-800"
+                className="w-full border-podcast-border-gray text-white hover:bg-gray-800"
               >
                 Retour à l'accueil
               </Button>

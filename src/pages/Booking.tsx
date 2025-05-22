@@ -6,7 +6,7 @@ import StudioSelection from '@/components/booking/StudioSelection';
 import StepperProgress from '@/components/booking/StepperProgress';
 import BookingHeader from '@/components/booking/BookingHeader';
 import Footer from '@/components/Footer';
-import { Loader2, Calendar } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import DateTimeSelection from '@/components/booking/DateTimeSelection';
 import ServiceSelection from '@/components/booking/ServiceSelection';
 import { BookingProvider } from '@/context/BookingContext';

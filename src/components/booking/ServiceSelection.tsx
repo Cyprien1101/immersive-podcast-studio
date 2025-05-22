@@ -156,11 +156,11 @@ const ServiceSelection = () => {
         </h2>
         
         {state.bookingData && (
-          <div className="mb-8 p-6 bg-black border border-gray-800 rounded-lg">
+          <div className="mb-8 p-6 booking-card">
             <h3 className="text-xl font-semibold text-podcast-accent mb-3">Récapitulatif de la réservation</h3>
-            <p className="text-gray-300 mb-2">Date: {state.bookingData.date}</p>
-            <p className="text-gray-300 mb-2">Horaire: {state.bookingData.start_time} - {state.bookingData.end_time}</p>
-            <p className="text-gray-300 mb-2">Personnes: {state.bookingData.number_of_guests}</p>
+            <p className="text-gray-300 mb-2 booking-section">Date: {state.bookingData.date}</p>
+            <p className="text-gray-300 mb-2 booking-section">Horaire: {state.bookingData.start_time} - {state.bookingData.end_time}</p>
+            <p className="text-gray-300">Personnes: {state.bookingData.number_of_guests}</p>
           </div>
         )}
         
@@ -168,7 +168,7 @@ const ServiceSelection = () => {
           <h3 className="text-2xl font-semibold text-center text-white mb-6">Abonnements</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {subscriptionPlans.map((plan) => (
-              <Card key={plan.id} className={`bg-black border-gray-700 ${plan.is_popular ? 'ring-2 ring-podcast-accent' : ''}`}>
+              <Card key={plan.id} className={`booking-card ${plan.is_popular ? 'ring-2 ring-podcast-accent' : ''}`}>
                 <CardHeader>
                   {plan.is_popular && (
                     <div className="absolute top-0 right-0 bg-podcast-accent text-black px-3 py-1 rounded-bl-lg rounded-tr-lg text-sm font-semibold">
@@ -209,7 +209,7 @@ const ServiceSelection = () => {
           <h3 className="text-2xl font-semibold text-center text-white mb-6">Forfaits à l'heure</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {hourPackages.map((pkg) => (
-              <Card key={pkg.id} className="bg-black border-gray-700">
+              <Card key={pkg.id} className="booking-card">
                 <CardHeader>
                   <CardTitle className="text-podcast-accent">{pkg.name}</CardTitle>
                   <CardDescription>{pkg.description}</CardDescription>

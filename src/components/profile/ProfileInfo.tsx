@@ -10,7 +10,7 @@ interface ProfileInfoProps {
 const ProfileInfo = ({ user }: ProfileInfoProps) => {
   return (
     <div className="space-y-6">
-      <Card className="bg-gray-800 border-gray-700">
+      <Card className="booking-card">
         <CardHeader>
           <CardTitle className="text-white">Informations personnelles</CardTitle>
           <CardDescription className="text-gray-400">
@@ -18,12 +18,12 @@ const ProfileInfo = ({ user }: ProfileInfoProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
+          <div className="booking-section">
             <h3 className="text-sm font-medium text-gray-400">Nom complet</h3>
             <p className="text-white">{user.user_metadata?.full_name || 'Non renseigné'}</p>
           </div>
           
-          <div>
+          <div className="booking-section">
             <h3 className="text-sm font-medium text-gray-400">Email</h3>
             <p className="text-white">{user.email}</p>
           </div>
@@ -35,7 +35,7 @@ const ProfileInfo = ({ user }: ProfileInfoProps) => {
         </CardContent>
       </Card>
       
-      <Card className="bg-gray-800 border-gray-700">
+      <Card className="booking-card">
         <CardHeader>
           <CardTitle className="text-white">Aide et assistance</CardTitle>
         </CardHeader>

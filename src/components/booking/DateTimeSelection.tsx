@@ -134,7 +134,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       
       {/* Duration and Guest Count Selectors - Updated UI */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-black rounded-2xl p-6 border border-gray-800">
+        <div className="booking-card p-6">
           <h3 className="text-xl font-medium text-podcast-accent mb-4">Durée de la Session</h3>
           <div className="flex items-center justify-center">
             <Button
@@ -161,7 +161,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
           </div>
         </div>
         
-        <div className="bg-black rounded-2xl p-6 border border-gray-800">
+        <div className="booking-card p-6">
           <h3 className="text-xl font-medium text-podcast-accent mb-4">Nombre de Personnes</h3>
           <div className="flex items-center justify-center">
             <Button
@@ -191,14 +191,14 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Calendar section */}
-        <div className="bg-black rounded-2xl p-6 border border-gray-800">
+        <div className="booking-card p-6">
           <h3 className="text-xl font-medium text-podcast-accent mb-4">Date</h3>
           <div className="flex justify-center">
             <Calendar
               mode="single"
               selected={selectedDate}
               onSelect={handleDateChange}
-              className="bg-black text-white"
+              className="bg-podcast-soft-black text-white"
               locale={fr}
               disabled={(date) => {
                 // Disable past dates
@@ -211,7 +211,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
         </div>
         
         {/* Time slots section */}
-        <div className="bg-black rounded-2xl p-6 border border-gray-800">
+        <div className="booking-card p-6">
           <h3 className="text-xl font-medium text-podcast-accent mb-4">Horaires Disponibles</h3>
           
           {!selectedDate ? (
@@ -236,7 +236,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
                     "py-2 px-1 rounded-lg text-center cursor-pointer transition-all text-sm",
                     selectedTimeSlot?.start_time === slot.start_time
                       ? "bg-podcast-accent text-white shadow-lg"
-                      : "bg-gray-800 text-white hover:bg-gray-700"
+                      : "bg-podcast-soft-black border border-podcast-border-gray text-white hover:bg-gray-800"
                   )}
                 >
                   {slot.start_time}
@@ -260,7 +260,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       
       {/* Studio information - Simplified */}
       {studio && (
-        <div className="mt-8 p-5 rounded-xl bg-gray-900 border border-gray-800">
+        <div className="mt-8 p-5 rounded-xl booking-card">
           <h3 className="text-lg font-semibold text-podcast-accent mb-2">
             {studio.name}
           </h3>

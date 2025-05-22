@@ -35,12 +35,12 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-podcast-dark text-white">
       <BookingHeader />
       
       <div className="container mx-auto pt-24 px-4">
         <div className="max-w-4xl mx-auto">
-          <Card className="bg-gray-900 border-gray-800 rounded-xl overflow-hidden">
+          <Card className="booking-card overflow-hidden">
             <CardContent className="p-0">
               <div className="bg-gradient-to-r from-podcast-accent to-pink-500 p-8">
                 <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -49,7 +49,7 @@ const Profile = () => {
                       src={user.user_metadata?.avatar_url || ''}
                       alt={user.user_metadata?.full_name || 'Profil utilisateur'}
                     />
-                    <AvatarFallback className="text-2xl bg-black text-podcast-accent">
+                    <AvatarFallback className="text-2xl bg-podcast-soft-black text-podcast-accent">
                       {user.user_metadata?.full_name?.charAt(0) || user.email?.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
@@ -67,7 +67,7 @@ const Profile = () => {
                 onValueChange={setActiveTab} 
                 className="p-6"
               >
-                <TabsList className="grid w-full grid-cols-2 bg-gray-800">
+                <TabsList className="grid w-full grid-cols-2 bg-podcast-soft-black border border-podcast-border-gray">
                   <TabsTrigger 
                     value="profile"
                     className="data-[state=active]:bg-podcast-accent data-[state=active]:text-black"
