@@ -20,7 +20,7 @@ interface TimeSlot {
 
 interface DateTimeSelectionProps {
   studio: any;
-  onDateTimeSelect: (date: Date | null, timeSlot: TimeSlot | null) => void;
+  onDateTimeSelect: (date: Date | null, timeSlot: TimeSlot | null, duration: number, guests: number) => void;
 }
 
 const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTimeSelect }) => {
@@ -153,7 +153,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
 
   const handleProceed = () => {
     if (date && selectedTimeSlot) {
-      onDateTimeSelect(date, selectedTimeSlot);
+      onDateTimeSelect(date, selectedTimeSlot, duration, guestCount);
     }
   };
 
@@ -313,17 +313,13 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
         </div>
       </div>
       
-      {/* Studio information */}
+      {/* Studio information - Simplified */}
       {studio && (
         <div className="mt-8 p-5 rounded-xl bg-gray-900 border border-gray-800">
           <h3 className="text-lg font-semibold text-podcast-accent mb-2">
-            Studio sélectionné : {studio.name}
+            {studio.name}
           </h3>
-          <p className="text-gray-300 mb-2">{studio.description}</p>
-          <div className="flex items-center text-gray-400">
-            <Users className="h-4 w-4 mr-1" />
-            <span>{studio.max_guests} personnes</span>
-          </div>
+          <p className="text-gray-300">{studio.description}</p>
         </div>
       )}
     </div>
