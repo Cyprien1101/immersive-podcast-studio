@@ -116,42 +116,44 @@ const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, 
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-black rounded-2xl border border-gray-800">
         <DialogHeader>
-          <DialogTitle className="text-center text-xl">
+          <DialogTitle className="text-center text-xl text-white">
             {activeTab === "connexion" ? "Connexion" : "Créer un compte"}
           </DialogTitle>
         </DialogHeader>
         
         <div className="py-4">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="connexion">Connexion</TabsTrigger>
-              <TabsTrigger value="inscription">Inscription</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-gray-900">
+              <TabsTrigger value="connexion" className="text-white data-[state=active]:bg-podcast-accent data-[state=active]:text-black">Connexion</TabsTrigger>
+              <TabsTrigger value="inscription" className="text-white data-[state=active]:bg-podcast-accent data-[state=active]:text-black">Inscription</TabsTrigger>
             </TabsList>
             
             <TabsContent value="connexion" className="mt-4">
               <form onSubmit={handleLogin}>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
+                    <Label htmlFor="login-email" className="text-white">Email</Label>
                     <Input 
                       id="login-email" 
                       type="email" 
                       value={loginEmail} 
                       onChange={(e) => setLoginEmail(e.target.value)} 
                       required
+                      className="bg-gray-800 border-gray-700 text-white"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">Mot de passe</Label>
+                    <Label htmlFor="login-password" className="text-white">Mot de passe</Label>
                     <Input 
                       id="login-password" 
                       type="password" 
                       value={loginPassword} 
                       onChange={(e) => setLoginPassword(e.target.value)} 
                       required
+                      className="bg-gray-800 border-gray-700 text-white"
                     />
                   </div>
                   
@@ -171,29 +173,31 @@ const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, 
               <form onSubmit={handleRegister}>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="register-fullname">Nom complet</Label>
+                    <Label htmlFor="register-fullname" className="text-white">Nom complet</Label>
                     <Input 
                       id="register-fullname" 
                       type="text" 
                       value={registerFullName} 
                       onChange={(e) => setRegisterFullName(e.target.value)} 
                       required
+                      className="bg-gray-800 border-gray-700 text-white"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="register-email">Email</Label>
+                    <Label htmlFor="register-email" className="text-white">Email</Label>
                     <Input 
                       id="register-email" 
                       type="email" 
                       value={registerEmail} 
                       onChange={(e) => setRegisterEmail(e.target.value)} 
                       required
+                      className="bg-gray-800 border-gray-700 text-white"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="register-phone">
+                    <Label htmlFor="register-phone" className="text-white">
                       Numéro de téléphone <span className="text-red-500">*</span>
                     </Label>
                     <Input 
@@ -202,17 +206,19 @@ const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, 
                       value={registerPhone} 
                       onChange={(e) => setRegisterPhone(e.target.value)} 
                       required
+                      className="bg-gray-800 border-gray-700 text-white"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="register-password">Mot de passe</Label>
+                    <Label htmlFor="register-password" className="text-white">Mot de passe</Label>
                     <Input 
                       id="register-password" 
                       type="password" 
                       value={registerPassword} 
                       onChange={(e) => setRegisterPassword(e.target.value)} 
                       required
+                      className="bg-gray-800 border-gray-700 text-white"
                     />
                   </div>
                   
