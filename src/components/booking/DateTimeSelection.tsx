@@ -99,17 +99,18 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       
       // We need to check additional slots
       let isValid = startSlot.is_available; // Start with the first slot
-      let currentHour = startHour;
-      let currentMinute = startMinute;
       
       // How many additional 30-min slots we need to check
       // Each hour needs 2 slots
       const additionalSlotsNeeded = (duration * 2) - 1;
       
-      for (let i = 0; i < additionalSlotsNeeded; i++) {
-        // Move to the next 30-minute slot
-        currentMinute += 30;
-        if (currentMinute >= 60) {
+      // Check each subsequent slot
+      for (let i = 0; i < additionalSlotsNeeded && isValid; i++) {
+        let currentHour = startHour;
+        let currentMinute = startMinute + ((i + 1) * 30); // Move to next 30-min increments
+        
+        // Normalize hours and minutes
+        while (currentMinute >= 60) {
           currentHour += 1;
           currentMinute -= 60;
         }
