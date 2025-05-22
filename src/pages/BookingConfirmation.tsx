@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -138,6 +137,9 @@ const BookingConfirmation = () => {
               <CardTitle className="text-3xl text-center text-white">Réservation confirmée!</CardTitle>
               <CardDescription className="text-center text-gray-400">
                 Votre session au studio a été réservée avec succès.
+                <span className="block mt-2 text-xs text-podcast-accent">
+                  Un événement a été ajouté au calendrier de l'équipe.
+                </span>
               </CardDescription>
             </CardHeader>
             
