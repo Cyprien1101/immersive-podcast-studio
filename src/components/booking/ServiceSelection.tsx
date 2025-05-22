@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from 'lucide-react';
+import { Loader2, Check, X } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useBooking } from '@/context/BookingContext';
@@ -73,22 +73,55 @@ const ServiceSelection = () => {
         });
         if (packagesError) throw packagesError;
         
-        // Add some after session features for demo purposes
-        const enhancedPlansData = plansData?.map(plan => ({
-          ...plan,
-          after_session_features: [
-            "Accès à vos fichiers audio pendant 30 jours",
-            "Support technique par email"
-          ]
-        }));
+        // Enhanced plans with missing features for standard plan
+        const enhancedPlansData = plansData?.map(plan => {
+          if (plan.name === "Standard") {
+            return {
+              ...plan,
+              missing_features: ["24/7 support technique", "Mixage professionnel"],
+              after_session_features: [
+                "Accès à vos fichiers audio pendant 30 jours",
+                "Support technique par email"
+              ]
+            };
+          } else {
+            return {
+              ...plan,
+              missing_features: [],
+              after_session_features: [
+                "Accès à vos fichiers audio pendant 30 jours",
+                "Support technique par email",
+                "24/7 support technique",
+                "Mixage professionnel"
+              ]
+            };
+          }
+        });
         
-        const enhancedPackagesData = packagesData?.map(pkg => ({
-          ...pkg,
-          after_session_features: [
-            "Fichiers audio bruts",
-            "Notes de session"
-          ]
-        }));
+        // Enhanced packages with missing features for basic studio time
+        const enhancedPackagesData = packagesData?.map(pkg => {
+          if (pkg.name === "Basic Studio Time") {
+            return {
+              ...pkg,
+              missing_features: ["Ingénieur du son dédié", "Édition post-production"],
+              after_session_features: [
+                "Fichiers audio bruts",
+                "Notes de session"
+              ]
+            };
+          } else {
+            return {
+              ...pkg,
+              missing_features: [],
+              after_session_features: [
+                "Fichiers audio bruts",
+                "Notes de session",
+                "Ingénieur du son dédié",
+                "Édition post-production"
+              ]
+            };
+          }
+        });
         
         setSubscriptionPlans(enhancedPlansData || []);
         setHourPackages(enhancedPackagesData || []);
@@ -182,7 +215,7 @@ const ServiceSelection = () => {
               {subscriptionPlans.map(plan => (
                 <Card 
                   key={plan.id} 
-                  className="bg-[#1a1a1a] border border-podcast-border-gray rounded-xl min-h-[36rem] flex flex-col min-w-[320px]"
+                  className="bg-[#1a1a1a] border border-podcast-border-gray rounded-xl flex flex-col min-w-[320px]"
                 >
                   <CardHeader>
                     <CardTitle className="text-2xl text-podcast-accent">{plan.name}</CardTitle>
@@ -198,8 +231,20 @@ const ServiceSelection = () => {
                       <ul className="space-y-3">
                         {plan.features.map((feature, index) => (
                           <li key={index} className="flex items-center text-[#eee]">
-                            <span className="mr-2 text-green-500">✅</span>
+                            <span className="mr-2 text-green-500">
+                              <Check size={18} className="stroke-2" />
+                            </span>
                             <span>{feature}</span>
+                          </li>
+                        ))}
+                        
+                        {/* Missing features with red X */}
+                        {plan.missing_features?.map((feature, index) => (
+                          <li key={`missing-${index}`} className="flex items-center text-[#eee]">
+                            <span className="mr-2 text-red-500">
+                              <X size={18} className="stroke-2" />
+                            </span>
+                            <span className="text-[#9b9b9b]">{feature}</span>
                           </li>
                         ))}
                       </ul>
@@ -210,7 +255,9 @@ const ServiceSelection = () => {
                       <ul className="space-y-3">
                         {plan.after_session_features?.map((feature, index) => (
                           <li key={index} className="flex items-center text-[#eee]">
-                            <span className="mr-2 text-green-500">✅</span>
+                            <span className="mr-2 text-green-500">
+                              <Check size={18} className="stroke-2" />
+                            </span>
                             <span>{feature}</span>
                           </li>
                         ))}
@@ -238,7 +285,7 @@ const ServiceSelection = () => {
               {hourPackages.map(pkg => (
                 <Card 
                   key={pkg.id} 
-                  className="bg-[#1a1a1a] border border-podcast-border-gray rounded-xl min-h-[36rem] flex flex-col min-w-[320px]"
+                  className="bg-[#1a1a1a] border border-podcast-border-gray rounded-xl flex flex-col min-w-[320px]"
                 >
                   <CardHeader>
                     <CardTitle className="text-2xl text-podcast-accent">{pkg.name}</CardTitle>
@@ -254,8 +301,20 @@ const ServiceSelection = () => {
                       <ul className="space-y-3">
                         {pkg.features.map((feature, index) => (
                           <li key={index} className="flex items-center text-[#eee]">
-                            <span className="mr-2 text-green-500">✅</span>
+                            <span className="mr-2 text-green-500">
+                              <Check size={18} className="stroke-2" />
+                            </span>
                             <span>{feature}</span>
+                          </li>
+                        ))}
+                        
+                        {/* Missing features with red X */}
+                        {pkg.missing_features?.map((feature, index) => (
+                          <li key={`missing-${index}`} className="flex items-center text-[#eee]">
+                            <span className="mr-2 text-red-500">
+                              <X size={18} className="stroke-2" />
+                            </span>
+                            <span className="text-[#9b9b9b]">{feature}</span>
                           </li>
                         ))}
                       </ul>
@@ -266,7 +325,9 @@ const ServiceSelection = () => {
                       <ul className="space-y-3">
                         {pkg.after_session_features?.map((feature, index) => (
                           <li key={index} className="flex items-center text-[#eee]">
-                            <span className="mr-2 text-green-500">✅</span>
+                            <span className="mr-2 text-green-500">
+                              <Check size={18} className="stroke-2" />
+                            </span>
                             <span>{feature}</span>
                           </li>
                         ))}
