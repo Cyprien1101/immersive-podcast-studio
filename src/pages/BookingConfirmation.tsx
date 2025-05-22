@@ -212,7 +212,7 @@ const BookingConfirmation = () => {
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/')} 
-                className="w-full border-[#292930] text-gray-200 hover:bg-gray-800 hover:text-white"
+                className="w-full border-[#292930] text-black hover:bg-gray-800 hover:text-white"
               >
                 Retour à l'accueil
               </Button>
