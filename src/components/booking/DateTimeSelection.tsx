@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
@@ -130,13 +129,13 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
               Aucun créneau disponible pour cette date
             </p>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-64 overflow-y-auto pr-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-2">
               {timeSlots.map((slot) => (
                 <div
                   key={slot.id}
                   onClick={() => handleTimeSlotSelect(slot)}
                   className={cn(
-                    "p-3 rounded-lg text-center cursor-pointer transition-all",
+                    "py-2 px-3 rounded-xl text-center cursor-pointer transition-all text-sm whitespace-nowrap",
                     slot.is_available 
                       ? selectedTimeSlot?.id === slot.id
                         ? "bg-podcast-accent text-white shadow-lg"
@@ -144,9 +143,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
                       : "bg-gray-900 text-gray-500 cursor-not-allowed opacity-60"
                   )}
                 >
-                  <p className="font-medium">
-                    {slot.start_time} - {slot.end_time}
-                  </p>
+                  {slot.start_time}
                 </div>
               ))}
             </div>
