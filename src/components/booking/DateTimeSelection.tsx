@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
@@ -89,9 +90,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
     // Helper function to check if a set of consecutive slots are all available
     const areConsecutiveSlotsAvailable = (startSlot: TimeSlot, requiredSlots: number) => {
       // Parse the start time
-      const [startHourStr, startMinuteStr] = startSlot.start_time.split(':');
-      const startHour = parseInt(startHourStr, 10);
-      const startMinute = parseInt(startMinuteStr, 10);
+      const [startHour, startMinute] = startSlot.start_time.split(':').map(Number);
       
       // If we only need one slot, just check if it's available
       if (requiredSlots <= 1) {
@@ -100,36 +99,33 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       
       // We need to check additional slots
       let isValid = startSlot.is_available; // Start with the first slot
+      let currentHour = startHour;
+      let currentMinute = startMinute;
       
-      // For debugging
-      console.log(`Checking consecutive slots for ${startSlot.start_time}, need ${requiredSlots} slots`);
+      // How many additional 30-min slots we need to check
+      // Each hour needs 2 slots
+      const additionalSlotsNeeded = (duration * 2) - 1;
       
-      // Loop through all needed consecutive time slots
-      for (let i = 1; i < requiredSlots && isValid; i++) {
-        // Calculate the next time slot (each slot is 30 minutes)
-        let nextHour = startHour;
-        let nextMinute = startMinute + (i * 30);
-        
-        // Handle minute overflow
-        while (nextMinute >= 60) {
-          nextHour += 1;
-          nextMinute -= 60;
+      for (let i = 0; i < additionalSlotsNeeded; i++) {
+        // Move to the next 30-minute slot
+        currentMinute += 30;
+        if (currentMinute >= 60) {
+          currentHour += 1;
+          currentMinute -= 60;
         }
         
         // Format the time for comparison
-        const nextTimeStr = `${nextHour.toString().padStart(2, '0')}:${nextMinute.toString().padStart(2, '0')}`;
+        const nextTimeStr = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
         
         // Find the corresponding slot
         const nextSlot = allTimeSlots.find(
           slot => slot.start_time === nextTimeStr
         );
         
-        // For debugging
-        console.log(`Looking for slot at ${nextTimeStr}, found: ${nextSlot ? 'Yes' : 'No'}, available: ${nextSlot?.is_available}`);
-        
         // If we can't find the slot or it's not available, this sequence isn't valid
         if (!nextSlot || !nextSlot.is_available) {
           isValid = false;
+          break;
         }
       }
       
