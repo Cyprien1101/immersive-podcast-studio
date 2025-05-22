@@ -1,8 +1,9 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { Loader2, Calendar, Users, Clock, MapPin, CheckCircle } from 'lucide-react';
+import { Loader2, Calendar, Users, Clock, MapPin, CheckCircle, PhoneOutgoing } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useAuth } from '@/context/AuthContext';
@@ -181,6 +182,16 @@ const BookingConfirmation = () => {
                 </div>
               </div>
               
+              <div className="bg-[#1a1a1c] rounded-lg p-6 border border-[#292930]">
+                <div className="flex items-start gap-4">
+                  <PhoneOutgoing className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
+                  <div>
+                    <p className="text-white font-medium">À votre arrivée sur les lieux</p>
+                    <p className="text-gray-400">Merci d'appeler le <span className="text-podcast-accent">07 66 80 50 41</span> pour que nous puissions vous accueillir.</p>
+                  </div>
+                </div>
+              </div>
+              
               {booking.total_price > 0 && (
                 <div className="border-t border-[#292930] pt-6">
                   <div className="flex justify-between">
@@ -201,7 +212,7 @@ const BookingConfirmation = () => {
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/')} 
-                className="w-full border-[#292930] text-white hover:bg-gray-800"
+                className="w-full border-[#292930] text-gray-200 hover:bg-gray-800 hover:text-white"
               >
                 Retour à l'accueil
               </Button>

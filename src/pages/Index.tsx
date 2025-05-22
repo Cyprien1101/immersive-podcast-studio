@@ -10,11 +10,10 @@ import ServiceSection from '@/components/ServiceSection';
 import FaqSection from '@/components/FaqSection';
 import Footer from '@/components/Footer';
 
-// Apply a global style to override button font-weight
 const Index = () => {
   return (
     <div className="min-h-screen bg-podcast-dark relative">
-      <style jsx global>{`
+      <style>{`
         .button-weight-normal {
           font-weight: normal !important;
         }
