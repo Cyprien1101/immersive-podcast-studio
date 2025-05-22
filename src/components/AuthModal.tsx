@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Google } from "lucide-react";
 import { toast } from "sonner";
 
 interface AuthModalProps {
@@ -17,6 +17,7 @@ interface AuthModalProps {
 const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const [activeTab, setActiveTab] = useState<string>("connexion");
   const [loading, setLoading] = useState<boolean>(false);
+  const [googleLoading, setGoogleLoading] = useState<boolean>(false);
   
   // État pour le formulaire de connexion
   const [loginEmail, setLoginEmail] = useState<string>("");
@@ -41,6 +42,36 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         sessionStorage.removeItem(key);
       }
     });
+  };
+  
+  // Gestionnaire de connexion avec Google
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    
+    try {
+      cleanupAuthState();
+      
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        // Continuer même si cela échoue
+      }
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+      
+      if (error) throw error;
+      
+      // La redirection sera gérée par Supabase
+    } catch (error: any) {
+      console.error("Erreur de connexion Google:", error);
+      toast.error(error.message || "Erreur lors de la connexion avec Google");
+      setGoogleLoading(false);
+    }
   };
   
   // Gestionnaire de connexion
@@ -133,6 +164,27 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
             </TabsList>
             
             <TabsContent value="connexion" className="mt-4">
+              <div className="mb-4">
+                <Button 
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  className="w-full flex items-center justify-center gap-2 bg-white text-black hover:bg-gray-100"
+                  disabled={googleLoading}
+                >
+                  {googleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Google className="h-4 w-4" />}
+                  Se connecter avec Google
+                </Button>
+              </div>
+              
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-600"></span>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-podcast-soft-black px-2 text-gray-400">OU</span>
+                </div>
+              </div>
+              
               <form onSubmit={handleLogin}>
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -172,6 +224,27 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
             </TabsContent>
             
             <TabsContent value="inscription" className="mt-4">
+              <div className="mb-4">
+                <Button 
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  className="w-full flex items-center justify-center gap-2 bg-white text-black hover:bg-gray-100"
+                  disabled={googleLoading}
+                >
+                  {googleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Google className="h-4 w-4" />}
+                  S'inscrire avec Google
+                </Button>
+              </div>
+              
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-600"></span>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-podcast-soft-black px-2 text-gray-400">OU</span>
+                </div>
+              </div>
+              
               <form onSubmit={handleRegister}>
                 <div className="space-y-4">
                   <div className="space-y-2">
