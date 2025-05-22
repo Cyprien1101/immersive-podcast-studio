@@ -79,64 +79,71 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
 
   // Filter time slots based on selected duration
   useEffect(() => {
-    if (!allTimeSlots.length) {
+    // Only process if we have time slots to work with
+    if (allTimeSlots.length === 0) {
       setFilteredTimeSlots([]);
       return;
     }
 
-    // Helper function to determine if a time slot is valid for the selected duration
-    const isValidTimeSlot = (startSlot: TimeSlot): boolean => {
-      // If duration is 1, only check if the current slot is available
-      if (duration === 1) return startSlot.is_available;
+    console.log(`Filtering time slots for duration: ${duration} hours`);
 
-      const startTime = startSlot.start_time;
-      const [startHour, startMinute] = startTime.split(':').map(Number);
+    // Helper function to check if a set of consecutive slots are all available
+    const areConsecutiveSlotsAvailable = (startSlot: TimeSlot, requiredSlots: number) => {
+      // Parse the start time
+      const [startHour, startMinute] = startSlot.start_time.split(':').map(Number);
       
-      // Find all necessary consecutive slots
-      let consecutiveSlotsAvailable = true;
-      let slotCount = 1;
-      
-      // We need to find (duration - 1) more slots after the starting slot
-      while (slotCount < duration) {
-        // Calculate the time for the next slot
-        let nextHour = startHour;
-        let nextMinute = startMinute + 30 * slotCount;
-        
-        while (nextMinute >= 60) {
-          nextHour += 1;
-          nextMinute -= 60;
-        }
-        
-        const nextTime = `${nextHour.toString().padStart(2, '0')}:${nextMinute.toString().padStart(2, '0')}`;
-        
-        // Find if this next slot exists and is available
-        const nextSlot = allTimeSlots.find(slot => 
-          slot.start_time === nextTime && slot.is_available
-        );
-        
-        if (!nextSlot) {
-          consecutiveSlotsAvailable = false;
-          break;
-        }
-        
-        slotCount += 0.5; // Each slot is 30 minutes
+      // If we only need one slot, just check if it's available
+      if (requiredSlots <= 1) {
+        return startSlot.is_available;
       }
       
-      return consecutiveSlotsAvailable;
-    };
-    
-    // Filter slots based on the selected duration
-    const validTimeSlots = allTimeSlots.filter(slot => {
-      if (!slot.is_available) return false;
+      // We need to check additional slots
+      let isValid = startSlot.is_available; // Start with the first slot
+      let currentHour = startHour;
+      let currentMinute = startMinute;
       
-      // Check if the time slot can accommodate the selected duration
-      return isValidTimeSlot(slot);
+      // How many additional 30-min slots we need to check
+      // Each hour needs 2 slots
+      const additionalSlotsNeeded = (duration * 2) - 1;
+      
+      for (let i = 0; i < additionalSlotsNeeded; i++) {
+        // Move to the next 30-minute slot
+        currentMinute += 30;
+        if (currentMinute >= 60) {
+          currentHour += 1;
+          currentMinute -= 60;
+        }
+        
+        // Format the time for comparison
+        const nextTimeStr = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+        
+        // Find the corresponding slot
+        const nextSlot = allTimeSlots.find(
+          slot => slot.start_time === nextTimeStr
+        );
+        
+        // If we can't find the slot or it's not available, this sequence isn't valid
+        if (!nextSlot || !nextSlot.is_available) {
+          isValid = false;
+          break;
+        }
+      }
+      
+      return isValid;
+    };
+
+    // Filter slots to those that are valid for the selected duration
+    const validSlots = allTimeSlots.filter(slot => {
+      // Each hour needs 2 slots (30 min each)
+      const requiredSlots = duration * 2;
+      return areConsecutiveSlotsAvailable(slot, requiredSlots);
     });
     
-    setFilteredTimeSlots(validTimeSlots);
+    console.log(`Found ${validSlots.length} valid slots for duration: ${duration} hours`);
+    setFilteredTimeSlots(validSlots);
     
-    // Reset selected time slot if it's no longer valid with the new duration
-    if (selectedTimeSlot && !validTimeSlots.find(slot => slot.id === selectedTimeSlot.id)) {
+    // Reset selected time slot if it's no longer valid
+    if (selectedTimeSlot && !validSlots.find(slot => slot.id === selectedTimeSlot.id)) {
       setSelectedTimeSlot(null);
     }
   }, [allTimeSlots, duration]);
@@ -290,13 +297,13 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
               Aucun créneau disponible pour cette date et cette durée
             </p>
           ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-2">
+            <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-2">
               {filteredTimeSlots.map((slot) => (
                 <div
                   key={slot.id}
                   onClick={() => handleTimeSlotSelect(slot)}
                   className={cn(
-                    "py-2 px-3 rounded-xl text-center cursor-pointer transition-all text-sm whitespace-nowrap",
+                    "py-2 px-1 rounded-lg text-center cursor-pointer transition-all text-sm",
                     selectedTimeSlot?.id === slot.id
                       ? "bg-podcast-accent text-white shadow-lg"
                       : "bg-gray-800 text-white hover:bg-gray-700"
