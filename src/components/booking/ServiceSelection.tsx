@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -74,9 +75,9 @@ const ServiceSelection = () => {
         });
         if (packagesError) throw packagesError;
         
-        // Mise à jour des abonnements avec les nouvelles fonctionnalités
+        // Mise à jour des abonnements avec les nouvelles fonctionnalités et noms
         const enhancedPlansData = plansData?.map(plan => {
-          if (plan.name === "Standard") {
+          if (plan.name === "Abonnement Standard") {
             return {
               ...plan,
               features: [
@@ -115,9 +116,9 @@ const ServiceSelection = () => {
           }
         });
         
-        // Mise à jour des forfaits horaires avec les nouvelles fonctionnalités
+        // Mise à jour des forfaits horaires avec les nouveaux noms et fonctionnalités
         const enhancedPackagesData = packagesData?.map(pkg => {
-          if (pkg.name === "Basic Studio Time") {
+          if (pkg.name === "1h Standard") {
             return {
               ...pkg,
               features: [
