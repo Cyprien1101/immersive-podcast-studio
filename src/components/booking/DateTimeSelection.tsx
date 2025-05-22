@@ -1,13 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Calendar as CalendarIcon, Minus, Plus } from 'lucide-react';
+import { Loader2, Calendar, Minus, Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { format, isBefore, addDays } from 'date-fns';
+import { format, isBefore, addDays, parseISO, addHours, addMinutes } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useBooking } from '@/context/BookingContext';
 import { Slider } from "@/components/ui/slider";
@@ -77,24 +74,83 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
     setSelectedTimeSlot(null);
   };
   
-  const handleTimeSlotSelect = (timeSlot: TimeSlot) => {
+  // Check if a slot can accommodate the selected duration
+  const canSelectTimeSlot = (slotIndex: number): boolean => {
+    if (!timeSlots || timeSlots.length === 0 || bookingDuration <= 1) return true;
+    
+    // For multi-hour bookings, check consecutive slots
+    const hoursNeeded = bookingDuration;
+    const slotsNeeded = hoursNeeded * 2; // Assuming 30-minute slots
+    
+    // Check if we have enough slots after the selected one
+    if (slotIndex + slotsNeeded - 1 >= timeSlots.length) return false;
+    
+    // Check if all needed slots are available
+    for (let i = 0; i < slotsNeeded; i++) {
+      const slot = timeSlots[slotIndex + i];
+      if (!slot || !slot.is_available) return false;
+      
+      // For slots other than the first one, ensure they are consecutive
+      if (i > 0) {
+        const prevSlot = timeSlots[slotIndex + i - 1];
+        // Check if this slot starts right after the previous one ends
+        const prevEndTime = prevSlot.end_time;
+        const currStartTime = slot.start_time;
+        if (prevEndTime !== currStartTime) return false;
+      }
+    }
+    
+    return true;
+  };
+  
+  const handleTimeSlotSelect = (timeSlot: TimeSlot, index: number) => {
+    if (!canSelectTimeSlot(index)) {
+      console.log("Cannot select this slot for the current duration");
+      return;
+    }
+    
     setSelectedTimeSlot(timeSlot);
+  };
+  
+  // Calculate end time based on start time and duration
+  const calculateEndTime = (startTime: string, durationInHours: number): string => {
+    // Convert start time to Date object for calculation
+    if (!selectedDate) return startTime;
+    
+    const [hours, minutes] = startTime.split(':').map(Number);
+    let baseDate = new Date(selectedDate);
+    baseDate.setHours(hours, minutes, 0, 0);
+    
+    // Add the duration
+    const endDate = addHours(baseDate, durationInHours);
+    
+    // Format back to HH:MM
+    return `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`;
   };
   
   const handleContinue = () => {
     if (selectedDate && selectedTimeSlot) {
+      // Calculate the proper end time based on duration
+      const endTime = calculateEndTime(selectedTimeSlot.start_time, bookingDuration);
+      
       // Set the date and time info in the booking context
       setDateTimeInfo({
         date: selectedDate.toISOString().split('T')[0],
         start_time: selectedTimeSlot.start_time,
-        end_time: selectedTimeSlot.end_time,
+        end_time: endTime,
         number_of_guests: guestCount
       });
       
-      // Call the onDateTimeSelect callback
+      // Create a new timeSlot object with the calculated end time
+      const updatedTimeSlot: TimeSlot = {
+        ...selectedTimeSlot,
+        end_time: endTime
+      };
+      
+      // Call the onDateTimeSelect callback with the updated end time
       onDateTimeSelect(
         selectedDate,
-        selectedTimeSlot,
+        updatedTimeSlot,
         bookingDuration,
         guestCount
       );
@@ -105,12 +161,16 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
   const incrementDuration = () => {
     if (studio && bookingDuration < studio.max_booking_duration) {
       setBookingDuration(prev => prev + 1);
+      // When duration changes, reset selected time slot since availability may change
+      setSelectedTimeSlot(null);
     }
   };
 
   const decrementDuration = () => {
     if (bookingDuration > 1) {
       setBookingDuration(prev => prev - 1);
+      // When duration changes, reset selected time slot since availability may change
+      setSelectedTimeSlot(null);
     }
   };
 
@@ -129,12 +189,12 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
   return (
     <div className="py-8">
       <h2 className="text-2xl font-semibold text-center text-white mb-8">
-        <CalendarIcon className="inline-block mr-2 mb-1" /> Sélectionnez une Date et une Heure
+        <Calendar className="inline-block mr-2 mb-1" /> Sélectionnez une Date et une Heure
       </h2>
       
       {/* Duration and Guest Count Selectors - Updated UI */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="booking-card p-6">
+        <div className="bg-[#111112] border border-[#292930] rounded-xl p-6">
           <h3 className="text-xl font-medium text-podcast-accent mb-4">Durée de la Session</h3>
           <div className="flex items-center justify-center">
             <Button
@@ -161,7 +221,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
           </div>
         </div>
         
-        <div className="booking-card p-6">
+        <div className="bg-[#111112] border border-[#292930] rounded-xl p-6">
           <h3 className="text-xl font-medium text-podcast-accent mb-4">Nombre de Personnes</h3>
           <div className="flex items-center justify-center">
             <Button
@@ -191,14 +251,14 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Calendar section */}
-        <div className="booking-card p-6">
+        <div className="bg-[#111112] border border-[#292930] rounded-xl p-6">
           <h3 className="text-xl font-medium text-podcast-accent mb-4">Date</h3>
           <div className="flex justify-center">
             <Calendar
               mode="single"
               selected={selectedDate}
               onSelect={handleDateChange}
-              className="bg-podcast-soft-black text-white"
+              className="bg-[#111112] text-white"
               locale={fr}
               disabled={(date) => {
                 // Disable past dates
@@ -211,7 +271,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
         </div>
         
         {/* Time slots section */}
-        <div className="booking-card p-6">
+        <div className="bg-[#111112] border border-[#292930] rounded-xl p-6">
           <h3 className="text-xl font-medium text-podcast-accent mb-4">Horaires Disponibles</h3>
           
           {!selectedDate ? (
@@ -228,20 +288,39 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
             </p>
           ) : (
             <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-2">
-              {timeSlots.map((slot) => (
-                <div
-                  key={slot.start_time}
-                  onClick={() => handleTimeSlotSelect(slot)}
-                  className={cn(
-                    "py-2 px-1 rounded-lg text-center cursor-pointer transition-all text-sm",
-                    selectedTimeSlot?.start_time === slot.start_time
-                      ? "bg-podcast-accent text-white shadow-lg"
-                      : "bg-podcast-soft-black border border-podcast-border-gray text-white hover:bg-gray-800"
-                  )}
-                >
-                  {slot.start_time}
-                </div>
-              ))}
+              {timeSlots.map((slot, index) => {
+                const isSelectable = canSelectTimeSlot(index);
+                const calculatedEndTime = calculateEndTime(slot.start_time, bookingDuration);
+                
+                return (
+                  <div
+                    key={`${slot.start_time}-${index}`}
+                    onClick={() => isSelectable && handleTimeSlotSelect(slot, index)}
+                    className={cn(
+                      "py-2 px-1 rounded-lg text-center cursor-pointer transition-all text-sm",
+                      selectedTimeSlot?.start_time === slot.start_time
+                        ? "bg-podcast-accent text-white shadow-lg"
+                        : isSelectable 
+                          ? "bg-[#111112] border border-[#292930] text-white hover:bg-gray-800"
+                          : "bg-gray-700 text-gray-400 opacity-50 cursor-not-allowed"
+                    )}
+                  >
+                    {slot.start_time}
+                    {bookingDuration > 1 && isSelectable && selectedTimeSlot?.start_time === slot.start_time && (
+                      <div className="text-xs mt-1">→ {calculatedEndTime}</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          
+          {selectedTimeSlot && (
+            <div className="mt-4 p-3 bg-[#1a1a1c] border border-[#292930] rounded-lg">
+              <p className="text-sm text-gray-300">
+                <span className="font-semibold">Horaire sélectionné:</span> {selectedTimeSlot.start_time} → {calculateEndTime(selectedTimeSlot.start_time, bookingDuration)} 
+                ({bookingDuration} heure{bookingDuration > 1 ? 's' : ''})
+              </p>
             </div>
           )}
           
@@ -260,7 +339,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       
       {/* Studio information - Simplified */}
       {studio && (
-        <div className="mt-8 p-5 rounded-xl booking-card">
+        <div className="mt-8 p-5 rounded-xl bg-[#111112] border border-[#292930]">
           <h3 className="text-lg font-semibold text-podcast-accent mb-2">
             {studio.name}
           </h3>

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -72,6 +71,22 @@ const BookingConfirmation = () => {
     fetchLatestBooking();
   }, [user, navigate]);
 
+  // Helper function to calculate booking duration in hours
+  const calculateDuration = (startTime: string, endTime: string): number => {
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+    
+    const startMinutes = startHour * 60 + startMinute;
+    const endMinutes = endHour * 60 + endMinute;
+    
+    // Handle cases where end time is on the next day (e.g., 23:30 - 00:30)
+    const totalMinutes = endMinutes >= startMinutes 
+      ? endMinutes - startMinutes 
+      : (24 * 60 - startMinutes) + endMinutes;
+      
+    return Math.round(totalMinutes / 60);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-podcast-dark flex items-center justify-center">
@@ -85,7 +100,7 @@ const BookingConfirmation = () => {
       <div className="min-h-screen bg-podcast-dark pt-20">
         <BookingHeader />
         <div className="container mx-auto px-4 py-12">
-          <Card className="booking-card">
+          <Card className="bg-[#111112] border border-[#292930]">
             <CardHeader>
               <CardTitle className="text-2xl text-white">Aucune réservation trouvée</CardTitle>
             </CardHeader>
@@ -104,6 +119,7 @@ const BookingConfirmation = () => {
   }
 
   const formattedDate = format(parseISO(booking.date), 'dd MMMM yyyy', { locale: fr });
+  const bookingDuration = calculateDuration(booking.start_time, booking.end_time);
 
   return (
     <div className="min-h-screen bg-podcast-dark pt-20">
@@ -111,7 +127,7 @@ const BookingConfirmation = () => {
       
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto">
-          <Card className="booking-card overflow-hidden">
+          <Card className="bg-[#111112] border border-[#292930] overflow-hidden">
             <div className="bg-gradient-to-r from-podcast-accent to-pink-500 h-2"></div>
             
             <CardHeader>
@@ -125,8 +141,8 @@ const BookingConfirmation = () => {
             </CardHeader>
             
             <CardContent className="space-y-6">
-              <div className="bg-podcast-soft-black rounded-lg p-6 space-y-4 border border-podcast-border-gray">
-                <div className="flex items-start gap-4 booking-section">
+              <div className="bg-[#1a1a1c] rounded-lg p-6 space-y-4 border border-[#292930]">
+                <div className="flex items-start gap-4 border-b border-[#292930] pb-4">
                   <Calendar className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
                   <div>
                     <p className="text-sm text-gray-400">Date</p>
@@ -134,15 +150,20 @@ const BookingConfirmation = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-start gap-4 booking-section">
+                <div className="flex items-start gap-4 border-b border-[#292930] pb-4">
                   <Clock className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
                   <div>
                     <p className="text-sm text-gray-400">Horaire</p>
-                    <p className="text-white font-medium">{booking.start_time} - {booking.end_time}</p>
+                    <p className="text-white font-medium">
+                      {booking.start_time} - {booking.end_time} 
+                      <span className="text-gray-400 text-sm ml-2">
+                        ({bookingDuration} heure{bookingDuration > 1 ? 's' : ''})
+                      </span>
+                    </p>
                   </div>
                 </div>
                 
-                <div className="flex items-start gap-4 booking-section">
+                <div className="flex items-start gap-4 border-b border-[#292930] pb-4">
                   <MapPin className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
                   <div>
                     <p className="text-sm text-gray-400">Studio</p>
@@ -161,7 +182,7 @@ const BookingConfirmation = () => {
               </div>
               
               {booking.total_price > 0 && (
-                <div className="border-t border-podcast-border-gray pt-6">
+                <div className="border-t border-[#292930] pt-6">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Total</span>
                     <span className="text-white font-bold">{booking.total_price} €</span>
@@ -180,7 +201,7 @@ const BookingConfirmation = () => {
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/')} 
-                className="w-full border-podcast-border-gray text-white hover:bg-gray-800"
+                className="w-full border-[#292930] text-white hover:bg-gray-800"
               >
                 Retour à l'accueil
               </Button>

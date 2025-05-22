@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
@@ -93,6 +92,22 @@ const UserBookings = () => {
     fetchBookings();
   }, [user]);
 
+  // Calculate booking duration in hours
+  const calculateDuration = (startTime: string, endTime: string): number => {
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+    
+    const startMinutes = startHour * 60 + startMinute;
+    const endMinutes = endHour * 60 + endMinute;
+    
+    // Handle cases where end time is on the next day (e.g., 23:30 - 00:30)
+    const totalMinutes = endMinutes >= startMinutes 
+      ? endMinutes - startMinutes 
+      : (24 * 60 - startMinutes) + endMinutes;
+      
+    return Math.round(totalMinutes / 60);
+  };
+
   // Function to get the status badge color
   const getStatusColor = (status: BookingType['status']) => {
     switch (status) {
@@ -147,9 +162,10 @@ const UserBookings = () => {
       {bookings.map((booking) => {
         const studio = studios[booking.studio_id] || { name: 'Studio inconnu', location: '?' };
         const bookingDate = parseISO(booking.date);
+        const duration = calculateDuration(booking.start_time, booking.end_time);
         
         return (
-          <Card key={booking.id} className="bg-gray-800 border-gray-700">
+          <Card key={booking.id} className="bg-[#111112] border border-[#292930]">
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
                 <div>
@@ -169,7 +185,12 @@ const UserBookings = () => {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-gray-400">Horaires</p>
-                  <p className="text-white font-medium">{booking.start_time} - {booking.end_time}</p>
+                  <p className="text-white font-medium">
+                    {booking.start_time} - {booking.end_time}
+                    <span className="text-gray-400 text-sm ml-2">
+                      ({duration} heure{duration > 1 ? 's' : ''})
+                    </span>
+                  </p>
                 </div>
                 <div>
                   <p className="text-gray-400">Personnes</p>

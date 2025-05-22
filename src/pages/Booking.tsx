@@ -95,7 +95,7 @@ const BookingPage = () => {
       studio_id: selectedStudio.id,
       date: date.toISOString().split('T')[0], // Format: YYYY-MM-DD
       start_time: timeSlot.start_time,
-      end_time: calculateEndTime(timeSlot.start_time, duration),
+      end_time: timeSlot.end_time, // This now comes correctly calculated from DateTimeSelection
       number_of_guests: guests,
       created_at: new Date().toISOString()
     };
@@ -107,15 +107,6 @@ const BookingPage = () => {
     
     // Scroll to top when moving to next step
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-  
-  // Helper function to calculate end time based on start time and duration
-  const calculateEndTime = (startTime, durationInHours) => {
-    const [hours, minutes] = startTime.split(':').map(Number);
-    const totalMinutes = hours * 60 + minutes + durationInHours * 60;
-    const newHours = Math.floor(totalMinutes / 60);
-    const newMinutes = totalMinutes % 60;
-    return `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
   };
 
   const renderCurrentStep = () => {
