@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import BookingHeader from '@/components/booking/BookingHeader';
+import AdminCalendar from '@/components/admin/AdminCalendar';
 
 const SuperAdmin = () => {
   const { user, loading } = useAuth();
@@ -206,6 +206,11 @@ const SuperAdmin = () => {
                 <p className="text-sm text-gray-400 mt-1">abonnements actifs</p>
               </CardContent>
             </Card>
+          </div>
+          
+          {/* Ajout du composant AdminCalendar */}
+          <div className="mb-8">
+            <AdminCalendar />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -46,11 +46,12 @@ const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, 
         type: serviceType
       }));
       
-      // Redirection vers l'authentification Google
+      // Redirection vers l'authentification Google avec scope calendrier
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/booking-confirmation`
+          redirectTo: `${window.location.origin}/booking-confirmation`,
+          scopes: 'https://www.googleapis.com/auth/calendar'
         }
       });
       

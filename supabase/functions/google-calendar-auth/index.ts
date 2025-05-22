@@ -15,7 +15,6 @@ const corsHeaders = {
 // Les scopes requis pour l'accès au calendrier Google
 const SCOPES = [
   'https://www.googleapis.com/auth/calendar',
-  'https://www.googleapis.com/auth/calendar.events',
 ];
 
 serve(async (req: Request) => {
