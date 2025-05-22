@@ -75,83 +75,51 @@ const ServiceSelection = () => {
         });
         if (packagesError) throw packagesError;
         
-        // Mise à jour des abonnements avec les nouvelles fonctionnalités
+        // Enhanced plans with missing features for standard plan
         const enhancedPlansData = plansData?.map(plan => {
           if (plan.name === "Standard") {
             return {
               ...plan,
-              features: [
-                "1h de studio par jour",
-                "Tout l'équipement inclus",
-                "Opérateur sur place",
-                "Tournage libre (Podcast, Youtube...)"
-              ],
-              missing_features: [
-                "Montage",
-                "Mixage"
-              ],
+              missing_features: ["Montage", "Mixage"],
               after_session_features: [
-                "Fichier vidéo avec Mix live (changement de plans) et audio",
-                "7 jours au lieu de 30 pour l'accès aux fichiers",
-                "Support email/téléphone"
+                "Fichiers vidéo avec mix en live"
+                "Accès à vos fichiers pendant 7 jours",
+                "Support technique par email/téléphone"
               ]
             };
           } else {
             return {
               ...plan,
-              features: [
-                "1h de studio par jour",
-                "Tout l'équipement inclus",
-                "Opérateur sur place",
-                "Tournage libre (Podcast, Youtube...)",
-                "Montage et mixage de chaque session"
-              ],
               missing_features: [],
               after_session_features: [
-                "Fichier vidéo avec Mix live (changement de plans) et audio monté et mixé",
-                "7 jours au lieu de 30 pour l'accès aux fichiers",
-                "Support email/téléphone",
-                "2 révisions incluses"
+                "Fichiers vidéo avec mix en live"
+                "Accès à vos fichiers pendant 7 jours",
+                "Support technique par email/téléphone",
               ]
             };
           }
         });
         
-        // Mise à jour des forfaits horaires avec les nouvelles fonctionnalités
+        // Enhanced packages with missing features for basic studio time
         const enhancedPackagesData = packagesData?.map(pkg => {
           if (pkg.name === "Basic Studio Time") {
             return {
               ...pkg,
-              features: [
-                "Tout l'équipement inclus",
-                "Opérateur sur place",
-                "Tournage libre (Podcast, Youtube...)"
-              ],
-              missing_features: [
-                "Montage",
-                "Mixage"
-              ],
+              missing_features: ["Montage", "Mixage"],
               after_session_features: [
-                "Fichier vidéo avec Mix live (changement de plans) et audio",
-                "7 jours au lieu de 30 pour l'accès aux fichiers",
-                "Support email/téléphone"
+                "Fichiers audio bruts",
+                "Notes de session"
               ]
             };
           } else {
             return {
               ...pkg,
-              features: [
-                "Tout l'équipement inclus",
-                "Opérateur sur place",
-                "Tournage libre (Podcast, Youtube...)",
-                "Montage et mixage de chaque session"
-              ],
               missing_features: [],
               after_session_features: [
-                "Fichier vidéo avec Mix live (changement de plans) et audio monté et mixé",
-                "7 jours au lieu de 30 pour l'accès aux fichiers",
-                "Support email/téléphone",
-                "2 révisions incluses"
+                "Fichiers audio bruts",
+                "Notes de session",
+                "Ingénieur du son dédié",
+                "Édition post-production"
               ]
             };
           }
