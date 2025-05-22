@@ -280,7 +280,8 @@ const ServiceSelection = () => {
               colorId: "5", // Color for events (5 is yellow)
               attendees: [
                 { email: userData?.email || '' }
-              ]
+              ],
+              studioId: state.bookingData.studio_id // Add the studio_id to the event data
             };
             
             // Call the edge function to create the calendar event

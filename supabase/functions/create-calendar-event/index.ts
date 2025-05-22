@@ -38,13 +38,6 @@ serve(async (req: Request) => {
       throw new Error('Utilisateur non authentifié');
     }
 
-    // Récupérer le rôle de l'utilisateur
-    const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
     // Récupérer les données de l'événement
     const eventData = await req.json();
     
@@ -142,6 +135,70 @@ serve(async (req: Request) => {
       throw new Error(`Erreur lors de la création de l'événement: ${responseData.error.message}`);
     }
 
+    // Récupérer les informations de réservation de l'événement
+    // Extraire les heures du début et de fin des données de l'événement
+    const startDateTime = new Date(eventData.start.dateTime);
+    const endDateTime = new Date(eventData.end.dateTime);
+    const bookingDate = startDateTime.toISOString().split('T')[0];
+    
+    // Mettre à jour les créneaux de disponibilité
+    // Nous allons chercher tous les créneaux de 30 minutes entre l'heure de début et l'heure de fin
+    const startHour = startDateTime.getHours();
+    const startMin = startDateTime.getMinutes();
+    const endHour = endDateTime.getHours();
+    const endMin = endDateTime.getMinutes();
+    
+    const studio_id = eventData.studioId; // Il faut s'assurer que cette information est incluse dans eventData
+    
+    if (!studio_id) {
+      throw new Error("ID du studio manquant dans les données d'événement");
+    }
+    
+    // Mettre à jour tous les créneaux de 30 minutes concernés
+    for (let hour = startHour; hour <= endHour; hour++) {
+      // Pour chaque heure complète
+      if (hour === startHour) {
+        // Si c'est l'heure de début, vérifier les minutes
+        if (startMin <= 30) {
+          // Mettre à jour le créneau de XX:00 à XX:30
+          await updateAvailabilitySlot(supabase, studio_id, bookingDate, 
+            `${hour < 10 ? '0' + hour : hour}:00`, 
+            `${hour < 10 ? '0' + hour : hour}:30`);
+        }
+        
+        if (hour < endHour || (hour === endHour && endMin > 30)) {
+          // Mettre à jour le créneau de XX:30 à XX+1:00
+          await updateAvailabilitySlot(supabase, studio_id, bookingDate, 
+            `${hour < 10 ? '0' + hour : hour}:30`, 
+            `${(hour + 1) < 10 ? '0' + (hour + 1) : (hour + 1)}:00`);
+        }
+      } else if (hour === endHour) {
+        // Si c'est l'heure de fin, vérifier les minutes
+        if (endMin > 0) {
+          // Mettre à jour le créneau de XX:00 à XX:30
+          await updateAvailabilitySlot(supabase, studio_id, bookingDate, 
+            `${hour < 10 ? '0' + hour : hour}:00`, 
+            `${hour < 10 ? '0' + hour : hour}:30`);
+        }
+        
+        if (endMin > 30) {
+          // Mettre à jour le créneau de XX:30 à XX+1:00
+          await updateAvailabilitySlot(supabase, studio_id, bookingDate, 
+            `${hour < 10 ? '0' + hour : hour}:30`, 
+            `${(hour + 1) < 10 ? '0' + (hour + 1) : (hour + 1)}:00`);
+        }
+      } else {
+        // Pour les heures intermédiaires, mettre à jour les deux créneaux
+        await updateAvailabilitySlot(supabase, studio_id, bookingDate, 
+          `${hour < 10 ? '0' + hour : hour}:00`, 
+          `${hour < 10 ? '0' + hour : hour}:30`);
+        
+        await updateAvailabilitySlot(supabase, studio_id, bookingDate, 
+          `${hour < 10 ? '0' + hour : hour}:30`, 
+          `${(hour + 1) < 10 ? '0' + (hour + 1) : (hour + 1)}:00`);
+      }
+    }
+
     return new Response(
       JSON.stringify({ success: true, event: responseData }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -158,3 +215,52 @@ serve(async (req: Request) => {
     );
   }
 });
+
+// Fonction pour mettre à jour un créneau de disponibilité
+async function updateAvailabilitySlot(supabase: any, studio_id: string, date: string, start_time: string, end_time: string) {
+  try {
+    // Vérifier si le créneau existe déjà
+    const { data, error: selectError } = await supabase
+      .from('studio_availability')
+      .select('id')
+      .eq('studio_id', studio_id)
+      .eq('date', date)
+      .eq('start_time', start_time)
+      .eq('end_time', end_time)
+      .maybeSingle();
+    
+    if (selectError) {
+      console.error(`Erreur lors de la vérification du créneau: ${selectError.message}`);
+      return;
+    }
+    
+    if (data) {
+      // Si le créneau existe, le mettre à jour
+      const { error: updateError } = await supabase
+        .from('studio_availability')
+        .update({ is_available: false })
+        .eq('id', data.id);
+      
+      if (updateError) {
+        console.error(`Erreur lors de la mise à jour du créneau: ${updateError.message}`);
+      } 
+    } else {
+      // Si le créneau n'existe pas, le créer
+      const { error: insertError } = await supabase
+        .from('studio_availability')
+        .insert({
+          studio_id,
+          date,
+          start_time,
+          end_time,
+          is_available: false
+        });
+      
+      if (insertError) {
+        console.error(`Erreur lors de la création du créneau: ${insertError.message}`);
+      }
+    }
+  } catch (error) {
+    console.error(`Erreur lors de la mise à jour du créneau: ${error.message}`);
+  }
+}
