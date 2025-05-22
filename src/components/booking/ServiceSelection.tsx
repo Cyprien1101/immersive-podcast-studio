@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +17,7 @@ interface SubscriptionPlan {
   features: string[];
   missing_features?: string[];
   after_session_features?: string[];
+  after_session_missing_features?: string[];
   is_popular: boolean;
 }
 
@@ -93,6 +93,11 @@ const ServiceSelection = () => {
               after_session_features: [
                 "Fichier vidéo avec Mix live (changement de plans) et audio",
                 "Accès aux fichiers pendant 7 jours"
+              ],
+              after_session_missing_features: [
+                "Épisode monté et mixé",
+                "5 shorts/reels sous-titrés",
+                "2 révisions incluses"
               ]
             };
           } else {
@@ -107,11 +112,13 @@ const ServiceSelection = () => {
               ],
               missing_features: [],
               after_session_features: [
-                "Fichier vidéo avec Mix live (changement de plans) et audio monté et mixé",
+                "Fichier vidéo avec Mix live (changement de plans) et audio",
+                "Épisode monté et mixé",
                 "Accès aux fichiers pendant 7 jours",
                 "5 shorts/reels sous-titrés",
                 "2 révisions incluses"
-              ]
+              ],
+              after_session_missing_features: []
             };
           }
         });
@@ -133,6 +140,11 @@ const ServiceSelection = () => {
               after_session_features: [
                 "Fichier vidéo avec Mix live (changement de plans) et audio",
                 "Accès aux fichiers pendant 7 jours"
+              ],
+              after_session_missing_features: [
+                "Épisode monté et mixé",
+                "5 shorts/reels sous-titrés",
+                "2 révisions incluses"
               ]
             };
           } else {
@@ -146,11 +158,13 @@ const ServiceSelection = () => {
               ],
               missing_features: [],
               after_session_features: [
-                "Fichier vidéo avec Mix live (changement de plans) et audio monté et mixé",
+                "Fichier vidéo avec Mix live (changement de plans) et audio",
+                "Épisode monté et mixé",
                 "Accès aux fichiers pendant 7 jours",
                 "5 shorts/reels sous-titrés",
                 "2 révisions incluses"
-              ]
+              ],
+              after_session_missing_features: []
             };
           }
         });
@@ -289,6 +303,18 @@ const ServiceSelection = () => {
                         <span>{feature}</span>
                       </li>
                     ))}
+                    
+                    {/* Missing after-session features with red X */}
+                    {plan.after_session_missing_features && plan.after_session_missing_features.length > 0 && 
+                      plan.after_session_missing_features.map((feature, index) => (
+                        <li key={`after-missing-${index}`} className="flex items-center text-[#eee]">
+                          <span className="mr-2 text-red-500">
+                            <X size={16} className="stroke-2" />
+                          </span>
+                          <span className="text-[#9b9b9b]">{feature}</span>
+                        </li>
+                      ))
+                    }
                   </ul>
                 </div>
               </CardContent>
@@ -353,6 +379,18 @@ const ServiceSelection = () => {
                         <span>{feature}</span>
                       </li>
                     ))}
+                    
+                    {/* Missing after-session features with red X */}
+                    {pkg.after_session_missing_features && pkg.after_session_missing_features.length > 0 && 
+                      pkg.after_session_missing_features.map((feature, index) => (
+                        <li key={`after-missing-${index}`} className="flex items-center text-[#eee]">
+                          <span className="mr-2 text-red-500">
+                            <X size={16} className="stroke-2" />
+                          </span>
+                          <span className="text-[#9b9b9b]">{feature}</span>
+                        </li>
+                      ))
+                    }
                   </ul>
                 </div>
               </CardContent>
