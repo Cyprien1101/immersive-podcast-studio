@@ -535,6 +535,10 @@ export type Database = {
         Args: { uid: string }
         Returns: boolean
       }
+      is_specific_admin: {
+        Args: { email_address: string }
+        Returns: boolean
+      }
       migrate_user_hours: {
         Args: { p_user_id: string }
         Returns: undefined

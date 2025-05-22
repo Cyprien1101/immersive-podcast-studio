@@ -11,6 +11,7 @@ import BookingConfirmation from "./pages/BookingConfirmation";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
+import SuperAdmin from "./pages/SuperAdmin";
 import { BookingProvider } from "./context/BookingContext";
 import { AuthProvider } from "./context/AuthContext";
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/booking" element={<Booking />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/super-admin" element={<SuperAdmin />} />
             <Route path="/booking-confirmation" element={
               <BookingProvider>
                 <BookingConfirmation />
