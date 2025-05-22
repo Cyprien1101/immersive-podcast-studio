@@ -86,9 +86,9 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       // Set the date and time info in the booking context
       setDateTimeInfo({
         date: selectedDate.toISOString().split('T')[0],
-        timeSlot: selectedTimeSlot,
-        duration: bookingDuration,
-        guests: guestCount
+        start_time: selectedTimeSlot.start_time,
+        end_time: selectedTimeSlot.end_time,
+        number_of_guests: guestCount
       });
       
       // Call the onDateTimeSelect callback
