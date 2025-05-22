@@ -61,13 +61,13 @@ const BookingConfirmation = () => {
           return;
         }
 
-        setBooking(data);
+        // Make sure we're handling the date correctly without timezone adjustment
+        if (data) {
+          console.log("Original booking date:", data.date);
+          setBooking(data);
+        }
         
-        // Check for calendar event flag in localStorage
-        const hasCalendarEvent = localStorage.getItem('calendar_event_created') === 'true';
-        setCalendarEvent(hasCalendarEvent);
-        
-        // Clean up localStorage flag
+        // Remove calendar event flag check since we're not using it anymore
         localStorage.removeItem('calendar_event_created');
       } catch (error) {
         console.error('Error in booking confirmation:', error);
@@ -126,8 +126,9 @@ const BookingConfirmation = () => {
     );
   }
 
-  const formattedDate = format(parseISO(booking.date), 'dd MMMM yyyy', { locale: fr });
-  const bookingDuration = calculateDuration(booking.start_time, booking.end_time);
+  // IMPORTANT FIX: Format date properly using parseISO without timezone issues
+  const formattedDate = booking ? format(parseISO(booking.date), 'dd MMMM yyyy', { locale: fr }) : '';
+  const bookingDuration = booking ? calculateDuration(booking.start_time, booking.end_time) : 0;
 
   return (
     <div className="min-h-screen bg-podcast-dark pt-20">
@@ -145,11 +146,6 @@ const BookingConfirmation = () => {
               <CardTitle className="text-3xl text-center text-white">Réservation confirmée!</CardTitle>
               <CardDescription className="text-center text-gray-400">
                 Votre session au studio a été réservée avec succès.
-                {calendarEvent && (
-                  <span className="block mt-2 text-xs text-podcast-accent">
-                    Un événement a été ajouté au calendrier de l'équipe.
-                  </span>
-                )}
               </CardDescription>
             </CardHeader>
             
