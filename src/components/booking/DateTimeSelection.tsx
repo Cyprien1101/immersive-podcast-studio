@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from 'lucide-react';
+import { Loader2, Calendar as CalendarIcon, Minus, Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { format, isBefore, addDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useBooking } from '@/context/BookingContext';
 import { Slider } from "@/components/ui/slider";
+import { cn } from "@/lib/utils";
 
 interface TimeSlot {
   start_time: string;
@@ -23,6 +25,7 @@ interface DateTimeSelectionProps {
     name: string;
     max_booking_duration: number;
     max_guests: number;
+    description?: string;
   } | null;
   onDateTimeSelect: (date: Date, timeSlot: TimeSlot, duration: number, guests: number) => void;
 }
@@ -64,7 +67,6 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       setSelectedTimeSlot(null);
     } catch (error) {
       console.error('Error fetching time slots:', error);
-      // Removed toast notification
     } finally {
       setLoading(false);
     }
@@ -83,7 +85,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
     if (selectedDate && selectedTimeSlot) {
       // Set the date and time info in the booking context
       setDateTimeInfo({
-        date: selectedDate,
+        date: selectedDate.toISOString().split('T')[0],
         timeSlot: selectedTimeSlot,
         duration: bookingDuration,
         guests: guestCount
@@ -98,11 +100,30 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       );
     }
   };
-  
-  // Disable dates before today
-  const disabledDates = {
-    before: new Date(),
-    after: addDays(new Date(), 30), // Only allow bookings 30 days in advance
+
+  // Functions to increment/decrement values
+  const incrementDuration = () => {
+    if (studio && bookingDuration < studio.max_booking_duration) {
+      setBookingDuration(prev => prev + 1);
+    }
+  };
+
+  const decrementDuration = () => {
+    if (bookingDuration > 1) {
+      setBookingDuration(prev => prev - 1);
+    }
+  };
+
+  const incrementGuests = () => {
+    if (studio && guestCount < studio.max_guests) {
+      setGuestCount(prev => prev + 1);
+    }
+  };
+
+  const decrementGuests = () => {
+    if (guestCount > 1) {
+      setGuestCount(prev => prev - 1);
+    }
   };
   
   return (
@@ -120,19 +141,19 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
               variant="outline"
               size="icon"
               onClick={decrementDuration}
-              disabled={duration <= 1}
+              disabled={bookingDuration <= 1}
               className="h-10 w-10 rounded-full bg-white border-gray-300"
             >
               <Minus className="h-5 w-5 text-black" />
             </Button>
             <div className="w-20 flex justify-center">
-              <span className="text-3xl font-bold text-white">{duration}<span className="text-sm ml-1">h</span></span>
+              <span className="text-3xl font-bold text-white">{bookingDuration}<span className="text-sm ml-1">h</span></span>
             </div>
             <Button
               variant="outline"
               size="icon"
               onClick={incrementDuration}
-              disabled={duration >= maxDuration}
+              disabled={studio && bookingDuration >= studio.max_booking_duration}
               className="h-10 w-10 rounded-full bg-white border-gray-300"
             >
               <Plus className="h-5 w-5 text-black" />
@@ -159,7 +180,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
               variant="outline"
               size="icon"
               onClick={incrementGuests}
-              disabled={guestCount >= maxGuests}
+              disabled={studio && guestCount >= studio.max_guests}
               className="h-10 w-10 rounded-full bg-white border-gray-300"
             >
               <Plus className="h-5 w-5 text-black" />
@@ -243,7 +264,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
           <h3 className="text-lg font-semibold text-podcast-accent mb-2">
             {studio.name}
           </h3>
-          <p className="text-gray-300">{studio.description}</p>
+          <p className="text-gray-300">{studio.description || ''}</p>
         </div>
       )}
     </div>
