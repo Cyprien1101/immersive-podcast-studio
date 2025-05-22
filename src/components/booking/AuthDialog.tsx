@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ interface AuthDialogProps {
 }
 
 const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, serviceId }: AuthDialogProps) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>("connexion");
   const [loading, setLoading] = useState<boolean>(false);
   
@@ -57,6 +59,9 @@ const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, 
         
         onAuthSuccess(data.user.id);
         onClose();
+        
+        // Rediriger vers la page de confirmation
+        navigate('/booking-confirmation');
       }
       
     } catch (error: any) {
@@ -104,6 +109,9 @@ const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, 
         
         onAuthSuccess(data.user.id);
         onClose();
+        
+        // Rediriger vers la page de confirmation
+        navigate('/booking-confirmation');
       }
       
     } catch (error: any) {

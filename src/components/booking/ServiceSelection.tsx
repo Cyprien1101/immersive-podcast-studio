@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
@@ -27,13 +28,14 @@ interface HourPackage {
 }
 
 const ServiceSelection = () => {
+  const navigate = useNavigate();
   const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
   const [hourPackages, setHourPackages] = useState<HourPackage[]>([]);
   const [loading, setLoading] = useState(true);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<{id: string, name: string, type: 'subscription' | 'hourPackage'} | null>(null);
   
-  const { state, setStudioInfo, setDateTimeInfo } = useBooking();
+  const { state, setStudioInfo, setDateTimeInfo, setServiceInfo } = useBooking();
   
   useEffect(() => {
     const fetchServices = async () => {
@@ -89,11 +91,10 @@ const ServiceSelection = () => {
   
   const handleAuthSuccess = async (userId: string) => {
     if (selectedService) {
-      // Enregistrer la sélection de service
-      toast.success(`Formule "${selectedService.name}" sélectionnée`);
+      // Enregistrer la sélection de service dans le contexte
+      setServiceInfo(selectedService);
       
-      // Ici on pourrait enregistrer la réservation complète dans Supabase
-      // si toutes les informations sont disponibles
+      // Enregistrer la réservation complète dans Supabase
       if (state.bookingData) {
         try {
           const { error } = await supabase.from('bookings').insert({
@@ -112,8 +113,8 @@ const ServiceSelection = () => {
           if (error) throw error;
           toast.success("Votre réservation a été enregistrée avec succès!");
           
-          // Rediriger vers une page de confirmation ou le tableau de bord
-          // window.location.href = '/dashboard';
+          // Rediriger vers la page de confirmation
+          navigate('/booking-confirmation');
           
         } catch (error) {
           console.error('Error saving booking:', error);
@@ -141,7 +142,6 @@ const ServiceSelection = () => {
         {state.bookingData && (
           <div className="mb-8 p-6 bg-black border border-gray-800 rounded-lg">
             <h3 className="text-xl font-semibold text-podcast-accent mb-3">Récapitulatif de la réservation</h3>
-            <p className="text-gray-300 mb-2">Studio: {state.bookingData.studio_id}</p>
             <p className="text-gray-300 mb-2">Date: {state.bookingData.date}</p>
             <p className="text-gray-300 mb-2">Horaire: {state.bookingData.start_time} - {state.bookingData.end_time}</p>
             <p className="text-gray-300 mb-2">Personnes: {state.bookingData.number_of_guests}</p>
