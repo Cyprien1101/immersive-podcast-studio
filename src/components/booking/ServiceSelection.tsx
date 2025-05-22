@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -92,8 +91,7 @@ const ServiceSelection = () => {
               ],
               after_session_features: [
                 "Fichier vidéo avec Mix live (changement de plans) et audio",
-                "7 jours au lieu de 30 pour l'accès aux fichiers",
-                "Support email/téléphone"
+                "Accès aux fichiers pendant 7 jours"
               ]
             };
           } else {
@@ -109,8 +107,8 @@ const ServiceSelection = () => {
               missing_features: [],
               after_session_features: [
                 "Fichier vidéo avec Mix live (changement de plans) et audio monté et mixé",
-                "7 jours au lieu de 30 pour l'accès aux fichiers",
-                "Support email/téléphone",
+                "Accès aux fichiers pendant 7 jours",
+                "5 shorts/reels sous-titrés",
                 "2 révisions incluses"
               ]
             };
@@ -133,8 +131,7 @@ const ServiceSelection = () => {
               ],
               after_session_features: [
                 "Fichier vidéo avec Mix live (changement de plans) et audio",
-                "7 jours au lieu de 30 pour l'accès aux fichiers",
-                "Support email/téléphone"
+                "Accès aux fichiers pendant 7 jours"
               ]
             };
           } else {
@@ -149,8 +146,8 @@ const ServiceSelection = () => {
               missing_features: [],
               after_session_features: [
                 "Fichier vidéo avec Mix live (changement de plans) et audio monté et mixé",
-                "7 jours au lieu de 30 pour l'accès aux fichiers",
-                "Support email/téléphone",
+                "Accès aux fichiers pendant 7 jours",
+                "5 shorts/reels sous-titrés",
                 "2 révisions incluses"
               ]
             };
@@ -257,13 +254,12 @@ const ServiceSelection = () => {
                   {plan.price}€<span className="text-lg font-normal">/{plan.price_interval}</span>
                 </p>
                 
-                <div className="mb-8">
-                  <h4 className="text-lg font-medium text-white mb-4">Ce qui est inclus:</h4>
-                  <ul className="space-y-3">
+                <div className="mb-6">
+                  <ul className="space-y-2">
                     {plan.features.map((feature, index) => (
                       <li key={index} className="flex items-center text-[#eee]">
                         <span className="mr-2 text-green-500">
-                          <Check size={18} className="stroke-2" />
+                          <Check size={16} className="stroke-2" />
                         </span>
                         <span>{feature}</span>
                       </li>
@@ -273,7 +269,7 @@ const ServiceSelection = () => {
                     {plan.missing_features && plan.missing_features.length > 0 && plan.missing_features.map((feature, index) => (
                       <li key={`missing-${index}`} className="flex items-center text-[#eee]">
                         <span className="mr-2 text-red-500">
-                          <X size={18} className="stroke-2" />
+                          <X size={16} className="stroke-2" />
                         </span>
                         <span className="text-[#9b9b9b]">{feature}</span>
                       </li>
@@ -282,12 +278,12 @@ const ServiceSelection = () => {
                 </div>
                 
                 <div>
-                  <h4 className="text-lg font-medium text-white mb-4">Ce que vous obtenez après la session:</h4>
-                  <ul className="space-y-3">
+                  <h4 className="text-lg font-medium text-white mb-2">Après la session:</h4>
+                  <ul className="space-y-2">
                     {plan.after_session_features && plan.after_session_features.map((feature, index) => (
                       <li key={index} className="flex items-center text-[#eee]">
                         <span className="mr-2 text-green-500">
-                          <Check size={18} className="stroke-2" />
+                          <Check size={16} className="stroke-2" />
                         </span>
                         <span>{feature}</span>
                       </li>
@@ -295,7 +291,7 @@ const ServiceSelection = () => {
                   </ul>
                 </div>
               </CardContent>
-              <CardFooter className="mt-auto pt-6">
+              <CardFooter className="mt-auto pt-4">
                 <Button 
                   variant="default" 
                   className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
@@ -322,13 +318,12 @@ const ServiceSelection = () => {
                   {pkg.price_per_hour}€<span className="text-lg font-normal">/heure</span>
                 </p>
                 
-                <div className="mb-8">
-                  <h4 className="text-lg font-medium text-white mb-4">Ce qui est inclus:</h4>
-                  <ul className="space-y-3">
+                <div className="mb-6">
+                  <ul className="space-y-2">
                     {pkg.features.map((feature, index) => (
                       <li key={index} className="flex items-center text-[#eee]">
                         <span className="mr-2 text-green-500">
-                          <Check size={18} className="stroke-2" />
+                          <Check size={16} className="stroke-2" />
                         </span>
                         <span>{feature}</span>
                       </li>
@@ -338,7 +333,7 @@ const ServiceSelection = () => {
                     {pkg.missing_features && pkg.missing_features.length > 0 && pkg.missing_features.map((feature, index) => (
                       <li key={`missing-${index}`} className="flex items-center text-[#eee]">
                         <span className="mr-2 text-red-500">
-                          <X size={18} className="stroke-2" />
+                          <X size={16} className="stroke-2" />
                         </span>
                         <span className="text-[#9b9b9b]">{feature}</span>
                       </li>
@@ -347,12 +342,12 @@ const ServiceSelection = () => {
                 </div>
                 
                 <div>
-                  <h4 className="text-lg font-medium text-white mb-4">Ce que vous obtenez après la session:</h4>
-                  <ul className="space-y-3">
+                  <h4 className="text-lg font-medium text-white mb-2">Après la session:</h4>
+                  <ul className="space-y-2">
                     {pkg.after_session_features && pkg.after_session_features.map((feature, index) => (
                       <li key={index} className="flex items-center text-[#eee]">
                         <span className="mr-2 text-green-500">
-                          <Check size={18} className="stroke-2" />
+                          <Check size={16} className="stroke-2" />
                         </span>
                         <span>{feature}</span>
                       </li>
@@ -360,7 +355,7 @@ const ServiceSelection = () => {
                   </ul>
                 </div>
               </CardContent>
-              <CardFooter className="mt-auto pt-6">
+              <CardFooter className="mt-auto pt-4">
                 <Button 
                   variant="default"
                   className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
