@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Google } from "lucide-react";
+import { Loader2, LogIn } from "lucide-react";
 import { toast } from "sonner";
 
 interface AuthModalProps {
@@ -171,7 +170,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                   className="w-full flex items-center justify-center gap-2 bg-white text-black hover:bg-gray-100"
                   disabled={googleLoading}
                 >
-                  {googleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Google className="h-4 w-4" />}
+                  {googleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
                   Se connecter avec Google
                 </Button>
               </div>
@@ -231,7 +230,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                   className="w-full flex items-center justify-center gap-2 bg-white text-black hover:bg-gray-100"
                   disabled={googleLoading}
                 >
-                  {googleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Google className="h-4 w-4" />}
+                  {googleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
                   S'inscrire avec Google
                 </Button>
               </div>
