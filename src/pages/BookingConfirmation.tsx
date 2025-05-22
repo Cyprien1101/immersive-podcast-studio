@@ -48,21 +48,41 @@ const BookingConfirmation = () => {
       try {
         // Si nous avons des données de réservation en cours et qu'une réservation n'a pas encore été créée
         if (state.bookingData && state.isComplete && !bookingCreated) {
-          const result = await createBooking(user.id);
-          
-          if (!result.success) {
-            toast({
-              title: "Erreur de réservation",
-              description: "Une erreur est survenue lors de la création de votre réservation.",
-              variant: "destructive",
-            });
-            navigate('/booking');
-            return;
+          // Vérifier si une réservation identique existe déjà
+          const { data: existingBookings } = await supabase
+            .from('bookings')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('studio_id', state.bookingData.studio_id)
+            .eq('date', state.bookingData.date)
+            .eq('start_time', state.bookingData.start_time)
+            .eq('end_time', state.bookingData.end_time);
+            
+          // Si une réservation identique existe déjà, l'utiliser
+          let bookingId;
+          if (existingBookings && existingBookings.length > 0) {
+            console.log("Une réservation identique existe déjà, pas besoin d'en créer une nouvelle");
+            bookingId = existingBookings[0].id;
+            setBookingCreated(true);
+          } else {
+            // Créer une nouvelle réservation
+            const result = await createBooking(user.id);
+            
+            if (!result.success) {
+              toast({
+                title: "Erreur de réservation",
+                description: "Une erreur est survenue lors de la création de votre réservation.",
+                variant: "destructive",
+              });
+              navigate('/booking');
+              return;
+            }
+            
+            setBookingCreated(true);
+            bookingId = result.bookingId;
           }
-
-          setBookingCreated(true);
           
-          // Après avoir créé la réservation, récupérer les détails
+          // Après avoir obtenu l'id de réservation, récupérer les détails
           const { data, error } = await supabase
             .from('bookings')
             .select(`
@@ -72,7 +92,7 @@ const BookingConfirmation = () => {
                 location
               )
             `)
-            .eq('id', result.bookingId)
+            .eq('id', bookingId)
             .single();
           
           if (error) {

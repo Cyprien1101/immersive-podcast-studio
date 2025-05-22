@@ -13,3 +13,6 @@ export const SUPABASE_URL_ENDPOINT = SUPABASE_URL;
 // import { supabase } from "@/integrations/supabase/client";
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+// Add extended functionality to the client
+supabase.functions.url = `${SUPABASE_URL}/functions/v1`;

@@ -157,6 +157,25 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     }
     
     try {
+      // Vérifier si une réservation existe déjà avec les mêmes données
+      const { data: existingBookings } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('studio_id', state.bookingData.studio_id)
+        .eq('date', state.bookingData.date)
+        .eq('start_time', state.bookingData.start_time)
+        .eq('end_time', state.bookingData.end_time);
+      
+      // Si une réservation identique existe déjà, ne pas en créer une nouvelle
+      if (existingBookings && existingBookings.length > 0) {
+        console.log("Une réservation identique existe déjà:", existingBookings[0].id);
+        return { 
+          success: true, 
+          bookingId: existingBookings[0].id 
+        };
+      }
+      
       // Si le studio_id n'est pas défini, utilisez l'ID spécifié
       const studioId = state.bookingData.studio_id || "d9c24a0a-d94a-4cbc-b489-fa5cfe73ce08";
       
@@ -200,8 +219,8 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
   // Fonction pour mettre à jour la disponibilité du studio
   const updateStudioAvailability = async (booking: BookingData) => {
     try {
-      // Correction : utiliser le baseURL correct pour les fonctions edge
-      const functionUrl = `${supabase.functions.getBaseUrl()}/update-studio-availability`;
+      // Utiliser l'URL complète pour la fonction edge
+      const functionUrl = `${supabase.functions.url}/update-studio-availability`;
       
       const response = await fetch(
         functionUrl,
