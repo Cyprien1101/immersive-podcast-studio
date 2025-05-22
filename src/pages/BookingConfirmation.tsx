@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,7 +29,6 @@ interface Booking {
 const BookingConfirmation = () => {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
-  const [calendarEvent, setCalendarEvent] = useState<boolean>(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -61,14 +61,7 @@ const BookingConfirmation = () => {
           return;
         }
 
-        // Make sure we're handling the date correctly without timezone adjustment
-        if (data) {
-          console.log("Original booking date:", data.date);
-          setBooking(data);
-        }
-        
-        // Remove calendar event flag check since we're not using it anymore
-        localStorage.removeItem('calendar_event_created');
+        setBooking(data);
       } catch (error) {
         console.error('Error in booking confirmation:', error);
       } finally {
@@ -126,9 +119,8 @@ const BookingConfirmation = () => {
     );
   }
 
-  // IMPORTANT FIX: Format date properly using parseISO without timezone issues
-  const formattedDate = booking ? format(parseISO(booking.date), 'dd MMMM yyyy', { locale: fr }) : '';
-  const bookingDuration = booking ? calculateDuration(booking.start_time, booking.end_time) : 0;
+  const formattedDate = format(parseISO(booking.date), 'dd MMMM yyyy', { locale: fr });
+  const bookingDuration = calculateDuration(booking.start_time, booking.end_time);
 
   return (
     <div className="min-h-screen bg-podcast-dark pt-20">
@@ -220,7 +212,7 @@ const BookingConfirmation = () => {
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/')} 
-                className="w-full border-[#292930] text-gray-200 hover:bg-gray-800 hover:text-white"
+                className="w-full border-[#292930] text-black hover:bg-gray-800 hover:text-white"
               >
                 Retour à l'accueil
               </Button>

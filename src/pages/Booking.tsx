@@ -90,21 +90,19 @@ const BookingPage = () => {
     setBookingDuration(duration);
     setGuestCount(guests);
     
-    // IMPORTANT FIX: Use direct ISO date string format without timezone adjustment
-    const formattedDate = date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-    
     // Store the booking data in localStorage for persistence
     const bookingData = {
       studio_id: selectedStudio.id,
-      date: formattedDate, // Use the fixed formatted date
+      date: date.toISOString().split('T')[0], // Format: YYYY-MM-DD
       start_time: timeSlot.start_time,
-      end_time: timeSlot.end_time,
+      end_time: timeSlot.end_time, // This now comes correctly calculated from DateTimeSelection
       number_of_guests: guests,
       created_at: new Date().toISOString()
     };
     
     localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
     
+    // Removed toast notification for booking info saved
     setCurrentStep('service');
     
     // Scroll to top when moving to next step

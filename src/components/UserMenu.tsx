@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -9,31 +9,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from '@/context/AuthContext';
-import { LogOut, User, BookText, CreditCard, Shield } from 'lucide-react';
+import { LogOut, User, BookText, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 
 const UserMenu = () => {
   const { user, signOut } = useAuth();
-  const [isSpecificAdmin, setIsSpecificAdmin] = useState<boolean>(false);
-  
-  useEffect(() => {
-    const checkIfSpecificAdmin = async () => {
-      if (user) {
-        const { data: userData, error } = await supabase
-          .from('profiles')
-          .select('email')
-          .eq('id', user.id)
-          .single();
-        
-        if (!error && userData) {
-          setIsSpecificAdmin(userData.email === 'cyprien.baudouin4@gmail.com');
-        }
-      }
-    };
-    
-    checkIfSpecificAdmin();
-  }, [user]);
   
   if (!user) return null;
   
@@ -87,18 +67,6 @@ const UserMenu = () => {
             <span>Mes réservations</span>
           </DropdownMenuItem>
         </Link>
-        
-        {isSpecificAdmin && (
-          <>
-            <DropdownMenuSeparator className="bg-gray-700 my-2" />
-            <Link to="/super-admin" className="block w-full">
-              <DropdownMenuItem className="flex items-center gap-2 cursor-pointer hover:bg-gray-800 rounded-lg py-2">
-                <Shield className="h-4 w-4 text-podcast-accent" />
-                <span>Super Admin</span>
-              </DropdownMenuItem>
-            </Link>
-          </>
-        )}
         
         <DropdownMenuSeparator className="bg-gray-700 my-2" />
         

@@ -1,226 +1,164 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
+// Constants
+const STUDIO_ID = 'd9c24a0a-d94a-4cbc-b489-fa5cfe73ce08' // Studio Lyon ID
+const DAYS_TO_MAINTAIN = 30
 
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.2";
-
-// Configuration pour CORS
+// CORS headers for browser requests
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+}
 
-serve(async (req: Request) => {
-  // Gestion des requêtes OPTIONS pour CORS
+Deno.serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders })
   }
-
+  
   try {
-    // Création du client Supabase
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('Pas de token d\'authentification');
-    }
-
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') || '',
-      Deno.env.get('SUPABASE_ANON_KEY') || '',
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    // Vérifier l'authentification de l'utilisateur
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Initialize Supabase client with the project URL and service role key
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
     
-    if (authError || !user) {
-      throw new Error('Utilisateur non authentifié');
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase environment variables')
     }
-
-    // Vérifier si l'utilisateur est un administrateur
-    const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || profileData?.role !== 'admin') {
-      throw new Error('Accès non autorisé - rôle admin requis');
-    }
-
-    // Récupérer le token Google Calendar de l'admin
-    const { data: tokenData, error: tokenError } = await supabase
-      .from('admin_calendar_tokens')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
-
-    if (tokenError || !tokenData) {
-      throw new Error('Aucun token Google Calendar trouvé pour cet administrateur');
-    }
-
-    // Vérifier si le token est expiré et le rafraîchir si nécessaire
-    let accessToken = tokenData.access_token;
-    const expiry = new Date(tokenData.expiry_date);
     
-    if (expiry < new Date()) {
-      // Le token est expiré, il faut le rafraîchir
-      if (!tokenData.refresh_token) {
-        throw new Error('Aucun refresh_token disponible pour renouveler l\'accès');
-      }
-
-      const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          client_id: Deno.env.get('GOOGLE_CLIENT_ID') || '',
-          client_secret: Deno.env.get('GOOGLE_CLIENT_SECRET') || '',
-          refresh_token: tokenData.refresh_token,
-          grant_type: 'refresh_token',
-        }),
-      });
-
-      const newTokenData = await tokenResponse.json();
-      
-      if (newTokenData.error) {
-        throw new Error(`Erreur lors du rafraîchissement du token: ${newTokenData.error}`);
-      }
-
-      // Mettre à jour le token dans la base de données
-      accessToken = newTokenData.access_token;
-      const newExpiry = new Date(Date.now() + (newTokenData.expires_in * 1000)).toISOString();
-      
-      await supabase
-        .from('admin_calendar_tokens')
-        .update({
-          access_token: accessToken,
-          expiry_date: newExpiry,
-        })
-        .eq('user_id', user.id);
-    }
-
-    // Récupérer les studios et leurs disponibilités actuelles
-    const { data: studiosData, error: studiosError } = await supabase
-      .from('studios')
-      .select('*');
+    const supabase = createClient(supabaseUrl, supabaseKey)
+    console.log('Starting availability refresh...')
     
-    if (studiosError) {
-      throw new Error(`Erreur lors de la récupération des studios: ${studiosError.message}`);
-    }
-
-    // Obtenir la date actuelle et les dates pour les 30 prochains jours
-    const today = new Date();
-    const thirtyDaysLater = new Date(today);
-    thirtyDaysLater.setDate(today.getDate() + 30);
-
-    // Formater les dates pour l'API Google Calendar
-    const timeMin = today.toISOString();
-    const timeMax = thirtyDaysLater.toISOString();
-
-    // Récupérer les événements du calendrier Google
-    const calendarResponse = await fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(tokenData.calendar_id)}/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true`,
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      }
-    );
-
-    const calendarData = await calendarResponse.json();
+    // Step 1: Delete past availability slots (before today)
+    console.log('Removing past availability slots...')
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const { error: deleteError, count: deletedCount } = await supabase
+      .from('studio_availability')
+      .delete()
+      .lt('date', today.toISOString().split('T')[0])
     
-    if (calendarData.error) {
-      throw new Error(`Erreur lors de la récupération des événements: ${calendarData.error.message}`);
+    if (deleteError) {
+      throw new Error(`Failed to delete past slots: ${deleteError.message}`)
     }
-
-    // Pour chaque studio, mettre à jour les disponibilités
-    for (const studio of studiosData) {
-      // Créer un tableau de dates pour les 30 prochains jours
-      const dateRange = [];
-      const currDate = new Date(today);
+    console.log(`Deleted ${deletedCount} past availability slots`)
+    
+    // Step 2: Find the latest date with availability slots
+    console.log('Finding latest date with existing availability...')
+    const { data: latestDateData, error: latestDateError } = await supabase
+      .from('studio_availability')
+      .select('date')
+      .order('date', { ascending: false })
+      .limit(1)
+    
+    if (latestDateError) {
+      throw new Error(`Failed to get latest date: ${latestDateError.message}`)
+    }
+    
+    // Determine the start date for adding new slots
+    // If we have existing slots, start from the day after the latest date
+    // Otherwise, start from today
+    const lastDate = latestDateData && latestDateData.length > 0
+      ? new Date(latestDateData[0].date)
+      : new Date(today)
+    
+    // Move to the next day
+    lastDate.setDate(lastDate.getDate() + 1)
+    
+    // Calculate end date (we want to maintain DAYS_TO_MAINTAIN days from today)
+    const endDate = new Date(today)
+    endDate.setDate(today.getDate() + DAYS_TO_MAINTAIN - 1)
+    
+    // Step 3: Generate and insert new availability slots if needed
+    if (lastDate <= endDate) {
+      console.log(`Generating new slots from ${lastDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]}...`)
       
-      while (currDate <= thirtyDaysLater) {
-        dateRange.push(new Date(currDate));
-        currDate.setDate(currDate.getDate() + 1);
-      }
-
-      // Pour chaque date, créer des créneaux horaires standard (par exemple, 9h à 18h par tranches d'une heure)
-      const timeSlots = [];
+      const newSlots = []
+      const currentDate = new Date(lastDate)
       
-      for (const date of dateRange) {
-        const dateStr = date.toISOString().split('T')[0];
+      // Loop through each day from start date to end date
+      while (currentDate <= endDate) {
+        const formattedDate = currentDate.toISOString().split('T')[0]
         
-        // Créneaux de 9h à 18h par défaut
-        for (let hour = 9; hour < 18; hour++) {
-          const startTime = `${hour < 10 ? '0' + hour : hour}:00`;
-          const endTime = `${hour + 1 < 10 ? '0' + (hour + 1) : hour + 1}:00`;
-          
-          // Vérifier si ce créneau est déjà réservé
-          const startDateTime = new Date(`${dateStr}T${startTime}:00`);
-          const endDateTime = new Date(`${dateStr}T${endTime}:00`);
-          
-          // Vérifier si le créneau chevauche un événement existant dans le calendrier
-          const isOverlapping = calendarData.items.some((event: any) => {
-            if (!event.start?.dateTime || !event.end?.dateTime) return false;
+        // Generate slots for each day (8:00 to 20:00, 30-minute intervals)
+        for (let hour = 8; hour < 20; hour++) {
+          for (let minute of [0, 30]) {
+            // Format times
+            const startHour = hour.toString().padStart(2, '0')
+            const startMinute = minute.toString().padStart(2, '0')
+            const startTime = `${startHour}:${startMinute}`
             
-            const eventStart = new Date(event.start.dateTime);
-            const eventEnd = new Date(event.end.dateTime);
+            // Calculate end time
+            const endMinute = minute + 30
+            const endHour = endMinute === 60 ? hour + 1 : hour
+            const formattedEndHour = endHour.toString().padStart(2, '0')
+            const formattedEndMinute = (endMinute % 60).toString().padStart(2, '0')
+            const endTime = `${formattedEndHour}:${formattedEndMinute}`
             
-            return (startDateTime < eventEnd && endDateTime > eventStart);
-          });
-          
-          // Si le créneau ne chevauche pas un événement existant, il est disponible
-          timeSlots.push({
-            studio_id: studio.id,
-            date: dateStr,
-            start_time: startTime,
-            end_time: endTime,
-            is_available: !isOverlapping
-          });
+            // Skip if it would go beyond 20:00
+            if (endHour > 19 || (endHour === 19 && endMinute > 30)) continue
+            
+            newSlots.push({
+              studio_id: STUDIO_ID,
+              date: formattedDate,
+              start_time: startTime,
+              end_time: endTime,
+              is_available: true
+            })
+          }
         }
+        
+        // Move to next day
+        currentDate.setDate(currentDate.getDate() + 1)
       }
-
-      // Mettre à jour les disponibilités dans la base de données
-      // D'abord, supprimer les anciennes disponibilités pour ce studio
-      await supabase
-        .from('studio_availability')
-        .delete()
-        .eq('studio_id', studio.id)
-        .gte('date', today.toISOString().split('T')[0]);
       
-      // Ensuite, insérer les nouvelles disponibilités
-      if (timeSlots.length > 0) {
-        // Insérer par lots de 1000 pour éviter les limitations
-        for (let i = 0; i < timeSlots.length; i += 1000) {
-          const batch = timeSlots.slice(i, i + 1000);
-          
-          await supabase
+      // Insert the new slots in batches for better performance
+      if (newSlots.length > 0) {
+        // Using batches of 100 slots at a time to avoid potential DB limits
+        const BATCH_SIZE = 100
+        for (let i = 0; i < newSlots.length; i += BATCH_SIZE) {
+          const batch = newSlots.slice(i, i + BATCH_SIZE)
+          const { error: insertError } = await supabase
             .from('studio_availability')
-            .upsert(batch);
+            .insert(batch)
+          
+          if (insertError) {
+            throw new Error(`Failed to insert new slots: ${insertError.message}`)
+          }
+          console.log(`Inserted batch of ${batch.length} slots`)
         }
+        console.log(`Generated ${newSlots.length} new availability slots`)
+      } else {
+        console.log('No new slots needed to be generated')
       }
+    } else {
+      console.log('No new availability slots needed')
     }
-
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: 'Disponibilités mises à jour avec succès',
-        studios: studiosData.length,
-        events: calendarData.items.length
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-
-  } catch (error) {
-    console.error('Erreur:', error.message);
     
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    return new Response(JSON.stringify({
+      success: true,
+      message: 'Studio availability refreshed successfully',
+      stats: {
+        deletedCount,
+        newSlotsCount: newSlots?.length || 0
       }
-    );
+    }), {
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders
+      }
+    })
+    
+  } catch (error) {
+    console.error('Error refreshing availability:', error.message)
+    return new Response(JSON.stringify({
+      success: false,
+      error: error.message
+    }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders
+      }
+    })
   }
-});
+})
