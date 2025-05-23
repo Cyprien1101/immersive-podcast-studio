@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,8 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import BookingHeader from '@/components/booking/BookingHeader';
 import Footer from '@/components/Footer';
+import { useBooking } from '@/context/BookingContext';
+import { toast } from '@/components/ui/use-toast';
 
 interface Booking {
   id: string;
@@ -28,9 +31,9 @@ interface Booking {
 const BookingConfirmation = () => {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
-  const [calendarEvent, setCalendarEvent] = useState<boolean>(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { updateStudioAvailability } = useBooking();
 
   useEffect(() => {
     if (!user) {
@@ -65,10 +68,21 @@ const BookingConfirmation = () => {
         if (data) {
           console.log("Original booking date from DB:", data.date);
           setBooking(data);
+          
+          // Update studio availability for this booking
+          try {
+            await updateStudioAvailability(data);
+            console.log("Successfully updated studio availability");
+          } catch (availabilityError) {
+            console.error("Failed to update studio availability:", availabilityError);
+            toast({
+              title: "Avertissement",
+              description: "La réservation a été créée, mais nous n'avons pas pu mettre à jour la disponibilité du studio.",
+              variant: "destructive"
+            });
+          }
         }
         
-        // Remove calendar event flag check since we're not using it anymore
-        localStorage.removeItem('calendar_event_created');
       } catch (error) {
         console.error('Error in booking confirmation:', error);
       } finally {
@@ -77,7 +91,7 @@ const BookingConfirmation = () => {
     };
 
     fetchLatestBooking();
-  }, [user, navigate]);
+  }, [user, navigate, updateStudioAvailability]);
 
   // Helper function to calculate booking duration in hours
   const calculateDuration = (startTime: string, endTime: string): number => {
