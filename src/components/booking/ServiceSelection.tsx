@@ -38,6 +38,7 @@ const ServiceSelection = () => {
   const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
   const [hourPackages, setHourPackages] = useState<HourPackage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [paymentLoading, setPaymentLoading] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<{
     id: string;
@@ -200,135 +201,66 @@ const ServiceSelection = () => {
       type: serviceType
     });
 
-    // If user is already logged in, create booking directly and redirect
+    // If user is already logged in, proceed to Stripe checkout
     if (user) {
-      await createBooking(service, serviceType, user.id);
+      await proceedToCheckout(serviceType, service.id);
     } else {
       // Open auth dialog if not logged in
       setAuthDialogOpen(true);
     }
   };
 
-  const createBooking = async (service: SubscriptionPlan | HourPackage, serviceType: 'subscription' | 'hourPackage', userId: string) => {
-    if (state.bookingData) {
-      try {
-        const servicePrice = serviceType === 'subscription' ? (service as SubscriptionPlan).price : (service as HourPackage).price_per_hour;
-        
-        // Create the booking
-        const {
-          data: bookingData,
-          error: bookingError
-        } = await supabase.from('bookings').insert({
-          user_id: userId,
-          studio_id: state.bookingData.studio_id,
-          date: state.bookingData.date,
-          start_time: state.bookingData.start_time,
-          end_time: state.bookingData.end_time,
-          number_of_guests: state.bookingData.number_of_guests,
-          total_price: servicePrice,
-          status: 'upcoming'
-        }).select('*, studio:studio_id (name, location)').single();
-        
-        if (bookingError) throw bookingError;
-
-        // If the service type is a subscription, also create a subscription record
-        if (serviceType === 'subscription') {
-          const subscriptionPlan = service as SubscriptionPlan;
-          const {
-            error: subscriptionError
-          } = await supabase.from('subscriptions').insert({
-            user_id: userId,
-            plan_id: subscriptionPlan.id,
-            plan_name: subscriptionPlan.name,
-            price: subscriptionPlan.price,
-            price_interval: subscriptionPlan.price_interval,
-            status: 'active',
-            // By default, start_date is set to now() in the database
-          });
-          
-          if (subscriptionError) {
-            console.error('Error creating subscription:', subscriptionError);
-            toast.error("Réservation créée mais l'abonnement n'a pas pu être enregistré.");
-          } else {
-            toast.success("Abonnement créé avec succès !");
-          }
+  const proceedToCheckout = async (serviceType: 'subscription' | 'hourPackage', serviceId: string) => {
+    try {
+      setPaymentLoading(true);
+      
+      // Prepare booking data for the session metadata
+      const bookingData = state.bookingData ? {
+        studio_id: state.bookingData.studio_id,
+        date: state.bookingData.date,
+        start_time: state.bookingData.start_time,
+        end_time: state.bookingData.end_time,
+        number_of_guests: state.bookingData.number_of_guests
+      } : null;
+      
+      // Call the create-checkout edge function
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          serviceType,
+          serviceId,
+          bookingData
         }
-
-        // Create Google Calendar event if booking was created successfully
-        if (bookingData) {
-          try {
-            const { data: userData } = await supabase
-              .from('profiles')
-              .select('full_name, email')
-              .eq('id', userId)
-              .single();
-
-            // Format the event data
-            const formattedDate = state.bookingData.date;
-            const eventData = {
-              summary: `Réservation Studio: ${bookingData.studio?.name || 'Podcast Studio'}`,
-              description: `Réservation par: ${userData?.full_name || 'Client'}\nEmail: ${userData?.email || ''}\nNombre de personnes: ${state.bookingData.number_of_guests}\nFormule: ${service.name}`,
-              start: {
-                dateTime: `${formattedDate}T${state.bookingData.start_time}:00`,
-                timeZone: 'Europe/Paris'
-              },
-              end: {
-                dateTime: `${formattedDate}T${state.bookingData.end_time}:00`,
-                timeZone: 'Europe/Paris'
-              },
-              location: bookingData.studio?.location || 'Studio',
-              colorId: "5", // Color for events (5 is yellow)
-              attendees: [
-                { email: userData?.email || '' }
-              ],
-              studioId: state.bookingData.studio_id // Add the studio_id to the event data
-            };
-            
-            // Call the edge function to create the calendar event
-            const { data: sessionData } = await supabase.auth.getSession();
-            
-            const response = await fetch(
-              `${SUPABASE_URL_ENDPOINT}/functions/v1/create-calendar-event`,
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${sessionData?.session?.access_token}`
-                },
-                body: JSON.stringify(eventData)
-              }
-            );
-            
-            const calendarResult = await response.json();
-            if (calendarResult.error) {
-              console.error('Error creating calendar event:', calendarResult.error);
-              // Still proceed with the booking - consider this a non-critical error
-            } else {
-              console.log('Calendar event created successfully:', calendarResult);
-              // Set flag in localStorage for BookingConfirmation page
-              localStorage.setItem('calendar_event_created', 'true');
-            }
-          } catch (calendarError) {
-            console.error('Error with calendar integration:', calendarError);
-            // Still proceed with the booking - consider this a non-critical error
-          }
-        }
-
-        // Redirect to the booking confirmation page
-        navigate('/booking-confirmation');
-      } catch (error) {
-        console.error('Error saving booking:', error);
-        toast.error("Une erreur s'est produite lors de la création de votre réservation.");
+      });
+      
+      if (error) {
+        console.error('Error creating checkout session:', error);
+        toast.error("Une erreur s'est produite lors de la création de la session de paiement.");
+        return;
       }
+      
+      if (data?.url) {
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
+      } else {
+        toast.error("Une erreur inattendue s'est produite. Veuillez réessayer.");
+      }
+    } catch (err) {
+      console.error('Error proceeding to checkout:', err);
+      toast.error("Une erreur s'est produite lors de la redirection vers la page de paiement.");
+    } finally {
+      setPaymentLoading(false);
     }
   };
 
   const handleAuthSuccess = async (userId: string) => {
     if (selectedService) {
       // Get the selected service details
-      const service = selectedService.type === 'subscription' ? subscriptionPlans.find(p => p.id === selectedService.id) : hourPackages.find(p => p.id === selectedService.id);
+      const service = selectedService.type === 'subscription' 
+        ? subscriptionPlans.find(p => p.id === selectedService.id) 
+        : hourPackages.find(p => p.id === selectedService.id);
+      
       if (service) {
-        await createBooking(service, selectedService.type, userId);
+        await proceedToCheckout(selectedService.type, selectedService.id);
       }
     }
   };
@@ -348,7 +280,7 @@ const ServiceSelection = () => {
         
         {/* Updated grid layout with more spacing between cards */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 w-full max-w-[1400px] mx-auto">
-          {/* Left side - Subscription Plans */}
+          {/* Subscription Plans */}
           {subscriptionPlans.map(plan => (
             <Card 
               key={plan.id} 
@@ -363,19 +295,26 @@ const ServiceSelection = () => {
                   {plan.price}€<span className="text-lg font-normal">/{plan.price_interval === 'month' ? 'mois' : plan.price_interval}</span>
                 </p>
                 
-                {/* Button moved below price with separator lines */}
+                {/* Button below price with separator lines */}
                 <div className="my-4">
                   <div className="border-t border-gray-700 my-3"></div>
                   <Button 
                     variant="default" 
                     className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
                     onClick={() => handleServiceSelect('subscription', plan)}
+                    disabled={paymentLoading}
                   >
-                    Choisir
+                    {paymentLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Chargement...
+                      </>
+                    ) : 'Choisir'}
                   </Button>
                   <div className="border-b border-gray-700 my-3"></div>
                 </div>
                 
+                {/* Features list */}
                 <div className="mb-6">
                   <ul className="space-y-2">
                     {plan.features.map((feature, index) => (
@@ -399,6 +338,7 @@ const ServiceSelection = () => {
                   </ul>
                 </div>
                 
+                {/* After-session features */}
                 <div>
                   <h4 className="text-lg font-medium text-white mb-2">Après la session:</h4>
                   <ul className="space-y-2">
@@ -425,11 +365,10 @@ const ServiceSelection = () => {
                   </ul>
                 </div>
               </CardContent>
-              {/* Removed button from footer */}
             </Card>
           ))}
           
-          {/* Right side - Hour Packages */}
+          {/* Hour Packages */}
           {hourPackages.map(pkg => (
             <Card 
               key={pkg.id} 
@@ -444,19 +383,26 @@ const ServiceSelection = () => {
                   {pkg.price_per_hour}€<span className="text-lg font-normal">/heure</span>
                 </p>
                 
-                {/* Button moved below price with separator lines */}
+                {/* Button below price with separator lines */}
                 <div className="my-4">
                   <div className="border-t border-gray-700 my-3"></div>
                   <Button 
                     variant="default"
                     className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black py-6 text-lg"
                     onClick={() => handleServiceSelect('hourPackage', pkg)}
+                    disabled={paymentLoading}
                   >
-                    Choisir
+                    {paymentLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Chargement...
+                      </>
+                    ) : 'Choisir'}
                   </Button>
                   <div className="border-b border-gray-700 my-3"></div>
                 </div>
                 
+                {/* Features list */}
                 <div className="mb-6">
                   <ul className="space-y-2">
                     {pkg.features.map((feature, index) => (
@@ -480,6 +426,7 @@ const ServiceSelection = () => {
                   </ul>
                 </div>
                 
+                {/* After-session features */}
                 <div>
                   <h4 className="text-lg font-medium text-white mb-2">Après la session:</h4>
                   <ul className="space-y-2">
@@ -506,11 +453,11 @@ const ServiceSelection = () => {
                   </ul>
                 </div>
               </CardContent>
-              {/* Removed button from footer */}
             </Card>
           ))}
         </div>
         
+        {/* Booking summary */}
         {state.bookingData && (
           <div className="mt-12 p-6 bg-[#1a1a1a] border border-podcast-border-gray rounded-xl max-w-[1400px] mx-auto">
             <h3 className="text-xl font-semibold text-podcast-accent mb-3">Récapitulatif de la réservation</h3>
@@ -521,6 +468,7 @@ const ServiceSelection = () => {
         )}
       </div>
       
+      {/* Auth dialog */}
       {selectedService && !user && (
         <AuthDialog 
           isOpen={authDialogOpen} 

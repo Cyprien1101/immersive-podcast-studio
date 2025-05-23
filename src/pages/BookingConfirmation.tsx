@@ -1,252 +1,152 @@
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
-import { Loader2, Calendar, Users, Clock, MapPin, CheckCircle, PhoneOutgoing } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { useAuth } from '@/context/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import BookingHeader from '@/components/booking/BookingHeader';
-import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
 import { useBooking } from '@/context/BookingContext';
-import { toast } from '@/components/ui/use-toast';
-
-interface Booking {
-  id: string;
-  studio_id: string;
-  date: string;
-  start_time: string;
-  end_time: string;
-  number_of_guests: number;
-  total_price: number;
-  status: string;
-  studio: {
-    name: string;
-    location: string;
-  };
-}
+import { useAuth } from '@/context/AuthContext';
+import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import BookingHeader from '@/components/booking/BookingHeader';
 
 const BookingConfirmation = () => {
-  const [booking, setBooking] = useState<Booking | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { resetBooking } = useBooking();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { updateStudioAvailability } = useBooking();
-
+  const location = useLocation();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<'success' | 'failed' | null>(null);
+  const [serviceType, setServiceType] = useState<'subscription' | 'hourPackage' | null>(null);
+  
   useEffect(() => {
-    if (!user) {
-      navigate('/');
-      return;
+    // Extract session_id from URL parameters
+    const queryParams = new URLSearchParams(location.search);
+    const sessionId = queryParams.get('session_id');
+    
+    if (sessionId) {
+      verifyPayment(sessionId);
+    } else {
+      // If no session ID, assume we're coming from a direct booking
+      setPaymentStatus('success');
+      setLoading(false);
     }
-
-    const fetchLatestBooking = async () => {
+    
+    // Reset the booking context data
+    resetBooking();
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
+  
+  const verifyPayment = async (sessionId: string) => {
+    try {
       setLoading(true);
-      try {
-        // Get the latest booking for the current user
-        const { data, error } = await supabase
-          .from('bookings')
-          .select(`
-            *,
-            studio:studio_id (
-              name,
-              location
-            )
-          `)
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-
-        if (error) {
-          console.error('Error fetching booking:', error);
-          return;
-        }
-
-        // Logs pour déboguer le problème de date
-        if (data) {
-          console.log("Original booking date from DB:", data.date);
-          setBooking(data);
-          
-          // Update studio availability for this booking
-          try {
-            await updateStudioAvailability(data);
-            console.log("Successfully updated studio availability");
-          } catch (availabilityError) {
-            console.error("Failed to update studio availability:", availabilityError);
-            toast({
-              title: "Avertissement",
-              description: "La réservation a été créée, mais nous n'avons pas pu mettre à jour la disponibilité du studio.",
-              variant: "destructive"
-            });
-          }
-        }
-        
-      } catch (error) {
-        console.error('Error in booking confirmation:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLatestBooking();
-  }, [user, navigate, updateStudioAvailability]);
-
-  // Helper function to calculate booking duration in hours
-  const calculateDuration = (startTime: string, endTime: string): number => {
-    const [startHour, startMinute] = startTime.split(':').map(Number);
-    const [endHour, endMinute] = endTime.split(':').map(Number);
-    
-    const startMinutes = startHour * 60 + startMinute;
-    const endMinutes = endHour * 60 + endMinute;
-    
-    // Handle cases where end time is on the next day (e.g., 23:30 - 00:30)
-    const totalMinutes = endMinutes >= startMinutes 
-      ? endMinutes - startMinutes 
-      : (24 * 60 - startMinutes) + endMinutes;
       
-    return Math.round(totalMinutes / 60);
+      // Call the verify-payment edge function
+      const { data, error } = await supabase.functions.invoke('verify-payment', {
+        body: { sessionId }
+      });
+      
+      if (error) {
+        console.error('Payment verification error:', error);
+        setError('Une erreur est survenue lors de la vérification du paiement.');
+        setPaymentStatus('failed');
+      } else if (data?.success) {
+        setPaymentStatus('success');
+        setServiceType(data.service_type);
+      } else {
+        setError(data?.message || 'La vérification du paiement a échoué.');
+        setPaymentStatus('failed');
+      }
+    } catch (err) {
+      console.error('Error during payment verification:', err);
+      setError('Une erreur technique est survenue. Veuillez contacter le support.');
+      setPaymentStatus('failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-podcast-dark flex items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-podcast-accent" />
-      </div>
-    );
-  }
-
-  if (!booking) {
-    return (
-      <div className="min-h-screen bg-podcast-dark pt-20">
-        <BookingHeader />
-        <div className="container mx-auto px-4 py-12">
-          <Card className="bg-[#111112] border border-[#292930]">
-            <CardHeader>
-              <CardTitle className="text-2xl text-white">Aucune réservation trouvée</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400">Nous n'avons pas pu trouver votre dernière réservation.</p>
-            </CardContent>
-            <CardFooter>
-              <Button onClick={() => navigate('/booking')} className="bg-podcast-accent hover:bg-podcast-accent/80 text-black">
-                Créer une réservation
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  // Format date safely with parseISO
-  // L'erreur pourrait être ici, assurons-nous que la date est correctement formatée
-  const displayDate = booking ? format(parseISO(booking.date), 'dd MMMM yyyy', { locale: fr }) : '';
-  console.log("Formatted date for display:", displayDate, "Original date from DB:", booking.date);
-  
-  const bookingDuration = booking ? calculateDuration(booking.start_time, booking.end_time) : 0;
-
   return (
-    <div className="min-h-screen bg-podcast-dark pt-20">
+    <div className="min-h-screen bg-podcast-dark">
       <BookingHeader />
       
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto pt-32 pb-20 px-4">
         <div className="max-w-2xl mx-auto">
-          <Card className="bg-[#111112] border border-[#292930] overflow-hidden">
-            <div className="bg-gradient-to-r from-podcast-accent to-pink-500 h-2"></div>
-            
-            <CardHeader>
-              <div className="flex items-center justify-center mb-6">
-                <CheckCircle className="text-green-500 h-16 w-16" />
+          <div className="bg-[#1a1a1a] border border-podcast-border-gray rounded-xl p-8 text-center">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-10">
+                <Loader2 className="h-16 w-16 animate-spin text-podcast-accent mb-6" />
+                <h2 className="text-2xl font-bold text-white mb-2">Vérification du paiement...</h2>
+                <p className="text-gray-300">Veuillez patienter pendant que nous confirmons votre paiement.</p>
               </div>
-              <CardTitle className="text-3xl text-center text-white">Réservation confirmée!</CardTitle>
-              <CardDescription className="text-center text-gray-400">
-                Votre session au studio a été réservée avec succès.
-              </CardDescription>
-            </CardHeader>
-            
-            <CardContent className="space-y-6">
-              <div className="bg-[#1a1a1c] rounded-lg p-6 space-y-4 border border-[#292930]">
-                <div className="flex items-start gap-4 border-b border-[#292930] pb-4">
-                  <Calendar className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
-                  <div>
-                    <p className="text-sm text-gray-400">Date</p>
-                    <p className="text-white font-medium">{displayDate}</p>
-                  </div>
-                </div>
+            ) : paymentStatus === 'success' ? (
+              <div className="flex flex-col items-center py-10">
+                <CheckCircle2 className="h-24 w-24 text-green-500 mb-6" />
+                <h1 className="text-3xl font-bold text-white mb-6">Merci pour votre réservation !</h1>
                 
-                <div className="flex items-start gap-4 border-b border-[#292930] pb-4">
-                  <Clock className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
-                  <div>
-                    <p className="text-sm text-gray-400">Horaire</p>
-                    <p className="text-white font-medium">
-                      {booking.start_time} - {booking.end_time} 
-                      <span className="text-gray-400 text-sm ml-2">
-                        ({bookingDuration} heure{bookingDuration > 1 ? 's' : ''})
-                      </span>
-                    </p>
+                {serviceType === 'subscription' ? (
+                  <div className="text-gray-200 mb-8">
+                    <p className="mb-4">Votre abonnement a été activé avec succès.</p>
+                    <p>Vous pouvez maintenant réserver des créneaux dans votre espace membre.</p>
                   </div>
-                </div>
+                ) : (
+                  <div className="text-gray-200 mb-8">
+                    <p className="mb-4">Votre réservation a été confirmée avec succès.</p>
+                    <p>Vous recevrez bientôt un email avec tous les détails.</p>
+                  </div>
+                )}
                 
-                <div className="flex items-start gap-4 border-b border-[#292930] pb-4">
-                  <MapPin className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
-                  <div>
-                    <p className="text-sm text-gray-400">Studio</p>
-                    <p className="text-white font-medium">{booking.studio?.name}</p>
-                    <p className="text-sm text-gray-400">{booking.studio?.location}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-4">
-                  <Users className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
-                  <div>
-                    <p className="text-sm text-gray-400">Nombre de personnes</p>
-                    <p className="text-white font-medium">{booking.number_of_guests}</p>
-                  </div>
+                {/* Action buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                  <Button 
+                    className="bg-podcast-accent hover:bg-podcast-accent/80 text-black px-6 py-2" 
+                    onClick={() => navigate('/')}
+                  >
+                    Retour à l'accueil
+                  </Button>
+                  
+                  {user && (
+                    <Button 
+                      variant="outline" 
+                      className="border-podcast-accent text-podcast-accent hover:bg-podcast-accent/10" 
+                      onClick={() => navigate('/profile')}
+                    >
+                      Voir mes réservations
+                    </Button>
+                  )}
                 </div>
               </div>
-              
-              <div className="bg-[#1a1a1c] rounded-lg p-6 border border-[#292930]">
-                <div className="flex items-start gap-4">
-                  <PhoneOutgoing className="h-5 w-5 text-podcast-accent shrink-0 mt-1" />
-                  <div>
-                    <p className="text-white font-medium">À votre arrivée sur les lieux</p>
-                    <p className="text-gray-400">Merci d'appeler le <span className="text-podcast-accent">07 66 80 50 41</span> pour que nous puissions vous accueillir.</p>
-                  </div>
+            ) : (
+              <div className="flex flex-col items-center py-10">
+                <XCircle className="h-24 w-24 text-red-500 mb-6" />
+                <h1 className="text-3xl font-bold text-white mb-6">Un problème est survenu</h1>
+                
+                <div className="text-gray-200 mb-8">
+                  <p className="mb-4">{error || "Votre paiement n'a pas pu être traité."}</p>
+                  <p>Veuillez réessayer ou contacter notre service client pour obtenir de l'aide.</p>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                  <Button 
+                    className="bg-podcast-accent hover:bg-podcast-accent/80 text-black px-6 py-2" 
+                    onClick={() => navigate('/booking')}
+                  >
+                    Réessayer
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="border-podcast-accent text-podcast-accent hover:bg-podcast-accent/10" 
+                    onClick={() => navigate('/')}
+                  >
+                    Retour à l'accueil
+                  </Button>
                 </div>
               </div>
-              
-              {booking.total_price > 0 && (
-                <div className="border-t border-[#292930] pt-6">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Total</span>
-                    <span className="text-white font-bold">{booking.total_price} €</span>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-            
-            <CardFooter className="flex flex-col gap-4">
-              <Button 
-                onClick={() => navigate('/profile#bookings')} 
-                className="w-full bg-podcast-accent hover:bg-podcast-accent/80 text-black"
-              >
-                Voir mes réservations
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/')} 
-                className="w-full border-[#292930] text-gray-200 hover:bg-gray-800 hover:text-white"
-              >
-                Retour à l'accueil
-              </Button>
-            </CardFooter>
-          </Card>
+            )}
+          </div>
         </div>
       </div>
-      
-      <Footer />
     </div>
   );
 };
