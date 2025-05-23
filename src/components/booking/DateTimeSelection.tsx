@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Calendar as CalendarIcon, Minus, Plus } from 'lucide-react';
@@ -9,6 +10,7 @@ import { useBooking } from '@/context/BookingContext';
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
+import { useNavigate } from 'react-router-dom';
 
 interface TimeSlot {
   start_time: string;
@@ -34,16 +36,17 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
   const [loading, setLoading] = useState(false);
   const [bookingDuration, setBookingDuration] = useState(1);
   const [guestCount, setGuestCount] = useState(1);
+  const navigate = useNavigate();
   
   const { setDateTimeInfo } = useBooking();
   
   useEffect(() => {
     if (selectedDate && studio) {
-      fetchTimeSlots();
+      fetchAvailableTimeSlots();
     }
   }, [selectedDate, studio]);
   
-  const fetchTimeSlots = async () => {
+  const fetchAvailableTimeSlots = async () => {
     if (!selectedDate || !studio) return;
     
     setLoading(true);
@@ -51,20 +54,26 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       // Formatage de la date pour la requête en utilisant une méthode qui ne souffre pas des problèmes de timezone
       const formattedDate = formatDateToISOString(selectedDate);
       
+      // Using the fixed studio ID from the requirements
+      const studioId = "d9c24a0a-d94a-4cbc-b489-fa5cfe73ce08";
+      
+      // Fetch only available slots from studio_availability table where is_available = true
       const { data, error } = await supabase
         .from('studio_availability')
         .select('*')
-        .eq('studio_id', studio.id)
+        .eq('studio_id', studioId)
         .eq('date', formattedDate)
         .eq('is_available', true)
         .order('start_time');
       
       if (error) throw error;
       
+      console.log("Available time slots:", data);
       setTimeSlots(data || []);
       setSelectedTimeSlot(null);
     } catch (error) {
-      console.error('Error fetching time slots:', error);
+      console.error('Error fetching available time slots:', error);
+      setTimeSlots([]);
     } finally {
       setLoading(false);
     }
@@ -88,26 +97,26 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
     const hoursNeeded = bookingDuration;
     const slotsNeeded = hoursNeeded * 2; // Assuming 30-minute slots
     
-    // Check if we have enough slots after the selected one
+    // Check if we have enough consecutive slots after the selected one
     if (slotIndex + slotsNeeded - 1 >= timeSlots.length) return false;
     
-    // Check if all needed slots are available
-    for (let i = 0; i < slotsNeeded; i++) {
-      const slot = timeSlots[slotIndex + i];
-      if (!slot || !slot.is_available) return false;
+    const startSlot = timeSlots[slotIndex];
+    let currentSlot = startSlot;
+    
+    // Check if all needed slots are available and consecutive
+    for (let i = 1; i < slotsNeeded; i++) {
+      const nextSlot = timeSlots[slotIndex + i];
       
-      // For slots other than the first one, ensure they are consecutive
-      if (i > 0) {
-        const prevSlot = timeSlots[slotIndex + i - 1];
-        // Check if this slot starts right after the previous one ends
-        const prevEndTime = prevSlot.end_time;
-        const currStartTime = slot.start_time;
-        if (prevEndTime !== currStartTime) return false;
-      }
+      // Check if next slot exists and is available
+      if (!nextSlot || !nextSlot.is_available) return false;
+      
+      // Check if this slot starts right after the previous one ends
+      if (currentSlot.end_time !== nextSlot.start_time) return false;
+      
+      currentSlot = nextSlot;
     }
     
     // Check if the booking would end after the closing time (19:30)
-    const startSlot = timeSlots[slotIndex];
     const [startHour, startMinute] = startSlot.start_time.split(':').map(Number);
     
     const endHour = startHour + Math.floor((startMinute + bookingDuration * 60) / 60);
@@ -309,7 +318,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
             </div>
           ) : timeSlots.length === 0 ? (
             <p className="text-gray-400 text-center py-8">
-              Aucun créneau disponible pour cette date et cette durée
+              Aucun créneau disponible pour cette date
             </p>
           ) : (
             <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-2">
@@ -340,7 +349,7 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
             </div>
           )}
           
-          {/* Continue button - moved up and removed the selected time text */}
+          {/* Continue button */}
           <div className="mt-8 flex justify-center">
             <Button
               className="bg-podcast-accent text-white px-8 py-2 rounded-full disabled:opacity-50"
