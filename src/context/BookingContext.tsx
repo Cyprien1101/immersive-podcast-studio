@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { SUPABASE_URL_ENDPOINT } from '@/integrations/supabase/client';
 
 // Define the booking data structure that matches the Supabase bookings table
 export interface BookingData {
@@ -219,8 +220,8 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
   // Fonction pour mettre à jour la disponibilité du studio
   const updateStudioAvailability = async (booking: BookingData) => {
     try {
-      // Utiliser l'URL complète pour la fonction edge
-      const functionUrl = `${supabase.functions.url}/update-studio-availability`;
+      // Construire l'URL de la fonction edge de manière sécurisée
+      const functionUrl = `${SUPABASE_URL_ENDPOINT}/functions/v1/update-studio-availability`;
       
       const response = await fetch(
         functionUrl,
