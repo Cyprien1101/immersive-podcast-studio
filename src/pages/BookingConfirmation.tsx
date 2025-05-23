@@ -35,7 +35,6 @@ const BookingConfirmation = () => {
   const navigate = useNavigate();
   const { state, createBooking, resetBooking } = useBooking();
   const { toast } = useToast();
-  const [bookingCreated, setBookingCreated] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -46,43 +45,21 @@ const BookingConfirmation = () => {
     const createOrFetchBooking = async () => {
       setLoading(true);
       try {
-        // Si nous avons des données de réservation en cours et qu'une réservation n'a pas encore été créée
-        if (state.bookingData && state.isComplete && !bookingCreated) {
-          // Vérifier si une réservation identique existe déjà
-          const { data: existingBookings } = await supabase
-            .from('bookings')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('studio_id', state.bookingData.studio_id)
-            .eq('date', state.bookingData.date)
-            .eq('start_time', state.bookingData.start_time)
-            .eq('end_time', state.bookingData.end_time);
-            
-          // Si une réservation identique existe déjà, l'utiliser
-          let bookingId;
-          if (existingBookings && existingBookings.length > 0) {
-            console.log("Une réservation identique existe déjà, pas besoin d'en créer une nouvelle");
-            bookingId = existingBookings[0].id;
-            setBookingCreated(true);
-          } else {
-            // Créer une nouvelle réservation
-            const result = await createBooking(user.id);
-            
-            if (!result.success) {
-              toast({
-                title: "Erreur de réservation",
-                description: "Une erreur est survenue lors de la création de votre réservation.",
-                variant: "destructive",
-              });
-              navigate('/booking');
-              return;
-            }
-            
-            setBookingCreated(true);
-            bookingId = result.bookingId;
+        // Si nous avons des données de réservation en cours, créer la réservation
+        if (state.bookingData && state.isComplete) {
+          const result = await createBooking(user.id);
+          
+          if (!result.success) {
+            toast({
+              title: "Erreur de réservation",
+              description: "Une erreur est survenue lors de la création de votre réservation.",
+              variant: "destructive",
+            });
+            navigate('/booking');
+            return;
           }
           
-          // Après avoir obtenu l'id de réservation, récupérer les détails
+          // Après avoir créé la réservation, récupérer les détails
           const { data, error } = await supabase
             .from('bookings')
             .select(`
@@ -92,7 +69,7 @@ const BookingConfirmation = () => {
                 location
               )
             `)
-            .eq('id', bookingId)
+            .eq('id', result.bookingId)
             .single();
           
           if (error) {
@@ -103,7 +80,7 @@ const BookingConfirmation = () => {
           setBooking(data);
           resetBooking(); // Réinitialiser les données de réservation en cours
         } else {
-          // Si pas de réservation en cours ou déjà créée, récupérer la dernière réservation
+          // Si pas de réservation en cours, récupérer la dernière réservation
           const { data, error } = await supabase
             .from('bookings')
             .select(`
@@ -138,7 +115,7 @@ const BookingConfirmation = () => {
     };
 
     createOrFetchBooking();
-  }, [user, navigate, state.bookingData, state.isComplete, bookingCreated]);
+  }, [user, navigate, state.bookingData, state.isComplete]);
 
   // Helper function to calculate booking duration in hours
   const calculateDuration = (startTime: string, endTime: string): number => {
