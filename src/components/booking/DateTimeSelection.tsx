@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Calendar as CalendarIcon, Minus, Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -37,7 +36,6 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
   const [guestCount, setGuestCount] = useState(1);
   
   const { setDateTimeInfo } = useBooking();
-  const navigate = useNavigate();
   
   useEffect(() => {
     if (selectedDate && studio) {
@@ -169,21 +167,18 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       });
       
       // Create a new timeSlot object with the calculated end time
-      const updatedTimeSlot = {
+      const updatedTimeSlot: TimeSlot = {
         ...selectedTimeSlot,
         end_time: endTime
       };
       
-      // First call the parent component's onDateTimeSelect for state updates
+      // Call the onDateTimeSelect callback with the updated end time and the original date object
       onDateTimeSelect(
         selectedDate,
         updatedTimeSlot,
         bookingDuration,
         guestCount
       );
-      
-      // Then navigate directly to the booking-confirmation page
-      navigate('/booking-confirmation');
     }
   };
 
