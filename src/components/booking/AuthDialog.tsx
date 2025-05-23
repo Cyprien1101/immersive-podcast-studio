@@ -50,7 +50,8 @@ const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/booking-confirmation`,
+          // Change redirectTo to go back to booking page instead of confirmation
+          redirectTo: `${window.location.origin}/booking`,
           scopes: 'https://www.googleapis.com/auth/calendar'
         }
       });
@@ -91,8 +92,7 @@ const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, 
         onAuthSuccess(data.user.id);
         onClose();
         
-        // Rediriger vers la page de confirmation
-        navigate('/booking-confirmation');
+        // Don't navigate to confirmation page - the onAuthSuccess will handle redirect to Stripe
       }
       
     } catch (error: any) {
@@ -141,8 +141,7 @@ const AuthDialog = ({ isOpen, onClose, onAuthSuccess, serviceName, serviceType, 
         onAuthSuccess(data.user.id);
         onClose();
         
-        // Rediriger vers la page de confirmation
-        navigate('/booking-confirmation');
+        // Don't navigate to confirmation page - the onAuthSuccess will handle redirect to Stripe
       }
       
     } catch (error: any) {
