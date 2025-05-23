@@ -100,10 +100,11 @@ serve(async (req) => {
         logStep("New product created for unknown plan type", { productId });
       }
 
-      // Create a price for the product
+      // Create a price for the product - SET TO 1 EUR FOR TESTING
       const price = await stripe.prices.create({
         product: productId,
-        unit_amount: Math.round(serviceData.price * 100), // Convert to cents
+        // Use 1 EUR (100 cents) instead of the actual price for testing purposes
+        unit_amount: 100, // 1 EUR in cents
         currency: "eur",
         recurring: {
           interval: serviceData.price_interval === "month" ? "month" : "year"
@@ -135,10 +136,11 @@ serve(async (req) => {
       
       // Get the booking duration and calculate the total price
       const bookingDuration = bookingData?.duration || 1;
-      const totalAmount = Math.round(serviceData.price_per_hour * bookingDuration * 100); // Calculate total price and convert to cents
+      // For testing purposes, set price to 1 EUR per hour
+      const totalAmount = 100 * bookingDuration; // 1 EUR (100 cents) * duration
       
       logStep("Calculated price based on duration", { 
-        pricePerHour: serviceData.price_per_hour,
+        pricePerHour: 1, // 1 EUR for testing
         duration: bookingDuration,
         totalAmount: totalAmount / 100 // Log in euros for readability
       });
@@ -156,7 +158,7 @@ serve(async (req) => {
                 duration: bookingDuration
               }
             },
-            unit_amount: totalAmount, // Total price in cents
+            unit_amount: totalAmount, // 1 EUR per hour in cents
           },
           quantity: 1
         }
