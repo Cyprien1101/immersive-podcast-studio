@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Calendar as CalendarIcon, Minus, Plus } from 'lucide-react';
@@ -172,7 +171,8 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
         date: formattedDate,
         start_time: selectedTimeSlot.start_time,
         end_time: endTime,
-        number_of_guests: guestCount
+        number_of_guests: guestCount,
+        duration: bookingDuration // Added duration to the booking context
       });
       
       // Create a new timeSlot object with the calculated end time

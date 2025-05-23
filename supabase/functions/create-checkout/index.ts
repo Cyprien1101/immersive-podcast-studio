@@ -24,7 +24,7 @@ serve(async (req) => {
 
     // Parse request body
     const { serviceType, serviceId, bookingData } = await req.json();
-    logStep("Request parsed", { serviceType, serviceId, hasBookingData: !!bookingData });
+    logStep("Request parsed", { serviceType, serviceId, hasBookingData: !!bookingData, bookingDuration: bookingData?.duration });
 
     // Create a Supabase client
     const supabaseClient = createClient(
@@ -126,6 +126,16 @@ serve(async (req) => {
       if (packageError) throw packageError;
       serviceData = packageData;
       logStep("Hour package data retrieved", serviceData);
+      
+      // Get the booking duration and calculate the total price
+      const bookingDuration = bookingData?.duration || 1;
+      const totalAmount = Math.round(serviceData.price_per_hour * bookingDuration * 100); // Calculate total price and convert to cents
+      
+      logStep("Calculated price based on duration", { 
+        pricePerHour: serviceData.price_per_hour,
+        duration: bookingDuration,
+        totalAmount: totalAmount / 100 // Log in euros for readability
+      });
 
       // For hour packages, create a one-time payment
       lineItems = [
@@ -133,13 +143,14 @@ serve(async (req) => {
           price_data: {
             currency: "eur",
             product_data: {
-              name: serviceData.name,
-              description: serviceData.description || `${serviceData.name} Package`,
+              name: `${serviceData.name} - ${bookingDuration}h`,
+              description: serviceData.description || `${serviceData.name} Package for ${bookingDuration} hour(s)`,
               metadata: {
-                package_id: serviceData.id
+                package_id: serviceData.id,
+                duration: bookingDuration
               }
             },
-            unit_amount: Math.round(serviceData.price_per_hour * 100), // Convert to cents
+            unit_amount: totalAmount, // Total price in cents
           },
           quantity: 1
         }

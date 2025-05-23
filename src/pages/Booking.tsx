@@ -106,6 +106,7 @@ const BookingPage = () => {
       start_time: timeSlot.start_time,
       end_time: timeSlot.end_time,
       number_of_guests: guests,
+      duration: duration, // Add duration to booking data
       created_at: new Date().toISOString()
     };
     

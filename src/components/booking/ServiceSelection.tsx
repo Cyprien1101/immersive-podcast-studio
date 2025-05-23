@@ -220,7 +220,8 @@ const ServiceSelection = () => {
         date: state.bookingData.date,
         start_time: state.bookingData.start_time,
         end_time: state.bookingData.end_time,
-        number_of_guests: state.bookingData.number_of_guests
+        number_of_guests: state.bookingData.number_of_guests,
+        duration: state.bookingData.duration || 1 // Include duration in booking data
       } : null;
       
       // Call the create-checkout edge function
