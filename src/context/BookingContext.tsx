@@ -17,6 +17,14 @@ type ServiceInfo = {
   type: 'subscription' | 'hourPackage';
 };
 
+type DateTimeInfo = {
+  date: string;
+  start_time: string;
+  end_time: string;
+  number_of_guests: number;
+  duration: number;
+};
+
 type BookingContextState = {
   bookingData: BookingData | null;
   serviceInfo: ServiceInfo | null;
@@ -27,6 +35,8 @@ type BookingContextValue = {
   setBookingData: (data: BookingData) => void;
   setServiceInfo: (info: ServiceInfo) => void;
   clearBookingData: () => void;
+  resetBooking: () => void; // Added missing function
+  setDateTimeInfo: (info: DateTimeInfo) => void; // Added missing function
 };
 
 // Create context
@@ -60,8 +70,34 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   };
 
+  // Add the missing setDateTimeInfo function
+  const setDateTimeInfo = (info: DateTimeInfo) => {
+    setState(prev => ({
+      ...prev,
+      bookingData: {
+        ...(prev.bookingData || {}),
+        date: info.date,
+        start_time: info.start_time,
+        end_time: info.end_time,
+        number_of_guests: info.number_of_guests,
+        duration: info.duration,
+        studio_id: prev.bookingData?.studio_id || ''
+      } as BookingData
+    }));
+  };
+
+  // Add resetBooking as an alias for clearBookingData for backward compatibility
+  const resetBooking = clearBookingData;
+
   return (
-    <BookingContext.Provider value={{ state, setBookingData, setServiceInfo, clearBookingData }}>
+    <BookingContext.Provider value={{ 
+      state, 
+      setBookingData, 
+      setServiceInfo, 
+      clearBookingData, 
+      resetBooking, 
+      setDateTimeInfo 
+    }}>
       {children}
     </BookingContext.Provider>
   );
