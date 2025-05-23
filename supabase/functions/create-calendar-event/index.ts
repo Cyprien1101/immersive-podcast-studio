@@ -1,3 +1,4 @@
+
 // Follow this setup guide to integrate the Deno language server with your editor:
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
@@ -138,10 +139,7 @@ serve(async (req: Request) => {
     // Extraire les heures du début et de fin des données de l'événement
     const startDateTime = new Date(eventData.start.dateTime);
     const endDateTime = new Date(eventData.end.dateTime);
-    
-    // Formatage de la date sans décalage de timezone
-    const bookingDate = `${startDateTime.getFullYear()}-${String(startDateTime.getMonth() + 1).padStart(2, '0')}-${String(startDateTime.getDate()).padStart(2, '0')}`;
-    console.log("Date formatée pour la base de données:", bookingDate);
+    const bookingDate = startDateTime.toISOString().split('T')[0];
     
     // Mettre à jour les créneaux de disponibilité
     // Nous allons chercher tous les créneaux de 30 minutes entre l'heure de début et l'heure de fin

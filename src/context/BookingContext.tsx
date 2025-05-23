@@ -1,6 +1,5 @@
 
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 // Define the booking data structure that matches the Supabase bookings table
 export interface BookingData {
@@ -54,9 +53,6 @@ const bookingReducer = (state: BookingContextState, action: BookingAction): Book
         }
       };
     case 'SET_DATE_TIME_INFO':
-      // Log pour s'assurer que la date est bien reçue
-      console.log("Setting date in context:", action.payload.date);
-      
       return {
         ...state,
         bookingData: {
@@ -94,8 +90,6 @@ interface BookingContextProps {
   setPriceInfo: (data: { total_price: number }) => void;
   setServiceInfo: (data: SelectedService) => void;
   resetBooking: () => void;
-  createBooking: (userId: string) => Promise<{ success: boolean; bookingId?: string; error?: any }>;
-  updateStudioAvailability: (booking: BookingData) => Promise<void>;
 }
 
 const BookingContext = createContext<BookingContextProps | undefined>(undefined);
@@ -150,80 +144,6 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     }
   }, []);
 
-  // Fonction pour créer une réservation dans Supabase
-  const createBooking = async (userId: string) => {
-    if (!state.bookingData) {
-      return { success: false, error: "No booking data available" };
-    }
-    
-    try {
-      // Si le studio_id n'est pas défini, utilisez l'ID spécifié
-      const studioId = state.bookingData.studio_id || "d9c24a0a-d94a-4cbc-b489-fa5cfe73ce08";
-      
-      // Créer la réservation dans Supabase
-      const { data, error } = await supabase
-        .from('bookings')
-        .insert({
-          user_id: userId,
-          studio_id: studioId,
-          date: state.bookingData.date,
-          start_time: state.bookingData.start_time,
-          end_time: state.bookingData.end_time,
-          number_of_guests: state.bookingData.number_of_guests,
-          total_price: state.bookingData.total_price || 0,
-          status: 'upcoming'
-        })
-        .select()
-        .single();
-      
-      if (error) {
-        console.error("Erreur lors de la création de la réservation:", error);
-        return { success: false, error };
-      }
-      
-      // Mettre à jour la disponibilité du studio
-      await updateStudioAvailability({
-        ...data,
-        studio_id: studioId,
-      });
-      
-      return { 
-        success: true, 
-        bookingId: data.id 
-      };
-    } catch (error) {
-      console.error("Erreur lors de la création de la réservation:", error);
-      return { success: false, error };
-    }
-  };
-  
-  // Fonction pour mettre à jour la disponibilité du studio
-  const updateStudioAvailability = async (booking: BookingData) => {
-    try {
-      // Correction : utiliser le baseURL correct pour les fonctions edge
-      const functionUrl = `${supabase.functions.getBaseUrl()}/update-studio-availability`;
-      
-      const response = await fetch(
-        functionUrl,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-          },
-          body: JSON.stringify({ booking })
-        }
-      );
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Erreur lors de la mise à jour de la disponibilité:", errorData);
-      }
-    } catch (error) {
-      console.error("Erreur lors de l'appel à la fonction Edge:", error);
-    }
-  };
-
   const setStudioInfo = (data: { studio_id: string }) => {
     dispatch({ type: 'SET_STUDIO_INFO', payload: data });
   };
@@ -261,9 +181,7 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
       setDateTimeInfo, 
       setPriceInfo,
       setServiceInfo,
-      resetBooking,
-      createBooking,
-      updateStudioAvailability
+      resetBooking 
     }}>
       {children}
     </BookingContext.Provider>

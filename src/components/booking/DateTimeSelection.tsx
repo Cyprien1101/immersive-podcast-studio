@@ -48,8 +48,8 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
     
     setLoading(true);
     try {
-      // Formatage de la date pour la requête en utilisant une méthode qui ne souffre pas des problèmes de timezone
-      const formattedDate = formatDateToISOString(selectedDate);
+      // Format date as YYYY-MM-DD without timezone adjustment
+      const formattedDate = selectedDate.toISOString().split('T')[0];
       
       const { data, error } = await supabase
         .from('studio_availability')
@@ -68,11 +68,6 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
     } finally {
       setLoading(false);
     }
-  };
-  
-  // Fonction qui garantit que la date est correctement formatée sans décalage de timezone
-  const formatDateToISOString = (date: Date): string => {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   };
   
   const handleDateChange = (date: Date | undefined) => {
@@ -153,10 +148,9 @@ const DateTimeSelection: React.FC<DateTimeSelectionProps> = ({ studio, onDateTim
       // Calculate the proper end time based on duration
       const endTime = calculateEndTime(selectedTimeSlot.start_time, bookingDuration);
       
-      // Formatage de la date en utilisant la méthode fiable sans décalage de timezone
-      const formattedDate = formatDateToISOString(selectedDate);
-      
-      console.log("Date sélectionnée (handleContinue):", formattedDate, "Date brute:", selectedDate);
+      // IMPORTANT FIX: Use direct ISO date string format without timezone adjustment
+      // This ensures the date remains the same regardless of timezone
+      const formattedDate = selectedDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
       
       // Set the date and time info in the booking context
       setDateTimeInfo({
