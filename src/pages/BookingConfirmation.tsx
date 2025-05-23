@@ -43,7 +43,7 @@ const BookingConfirmation = () => {
     try {
       setLoading(true);
       
-      // Call the verify-payment edge function
+      // Call the verify-payment edge function which now creates the booking record
       const { data, error } = await supabase.functions.invoke('verify-payment', {
         body: { sessionId }
       });
@@ -56,7 +56,7 @@ const BookingConfirmation = () => {
         setPaymentStatus('success');
         setServiceType(data.service_type);
         
-        // Get booking details if it's an hourPackage
+        // Get booking details if it's an hourPackage - booking should now exist
         if (data.service_type === 'hourPackage') {
           await fetchBookingDetails();
         }
@@ -77,7 +77,7 @@ const BookingConfirmation = () => {
     if (!user) return;
     
     try {
-      // Get the most recent booking for this user
+      // Get the most recent booking for this user - should be the one just created
       const { data, error } = await supabase
         .from('bookings')
         .select('*, studios(name, location)')

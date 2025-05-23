@@ -108,44 +108,50 @@ serve(async (req) => {
     else if (serviceType === 'hourPackage') {
       // For hour packages, create a booking record if booking data exists
       if (bookingDataStr) {
-        const bookingData = JSON.parse(bookingDataStr);
-        
-        // Get hour package details
-        const { data: packageData } = await supabaseClient
-          .from('hour_packages')
-          .select('*')
-          .eq('id', serviceId)
-          .single();
-        
-        if (packageData && bookingData) {
-          // Calculate total price based on duration and hourly rate
-          const duration = bookingData.duration || 1;
-          const totalPrice = packageData.price_per_hour * duration;
+        try {
+          const bookingData = JSON.parse(bookingDataStr);
+          logStep("Parsed booking data", bookingData);
           
-          // Create booking record
-          const { data: bookingResult, error: bookingError } = await supabaseClient
-            .from('bookings')
-            .insert({
-              user_id: userId,
-              studio_id: bookingData.studio_id,
-              date: bookingData.date,
-              start_time: bookingData.start_time,
-              end_time: bookingData.end_time,
-              number_of_guests: bookingData.number_of_guests,
-              total_price: totalPrice,
-              status: 'upcoming'
-            });
+          // Get hour package details
+          const { data: packageData } = await supabaseClient
+            .from('hour_packages')
+            .select('*')
+            .eq('id', serviceId)
+            .single();
           
-          if (bookingError) {
-            logStep("Error creating booking", bookingError);
-            throw new Error(`Failed to create booking: ${bookingError.message}`);
-          } else {
-            logStep("Booking created successfully");
+          if (packageData && bookingData) {
+            // Calculate total price based on duration and hourly rate
+            const duration = bookingData.duration || 1;
+            const totalPrice = packageData.price_per_hour * duration;
+            
+            // Create booking record AFTER payment is confirmed
+            const { data: bookingResult, error: bookingError } = await supabaseClient
+              .from('bookings')
+              .insert({
+                user_id: userId,
+                studio_id: bookingData.studio_id,
+                date: bookingData.date,
+                start_time: bookingData.start_time,
+                end_time: bookingData.end_time,
+                number_of_guests: bookingData.number_of_guests,
+                total_price: totalPrice,
+                status: 'upcoming'
+              });
+            
+            if (bookingError) {
+              logStep("Error creating booking", bookingError);
+              throw new Error(`Failed to create booking: ${bookingError.message}`);
+            }
+            
+            logStep("Booking created successfully after payment");
             
             // Update studio availability to mark slots as unavailable
             await updateStudioAvailability(supabaseClient, bookingData);
-            logStep("Studio availability updated");
+            logStep("Studio availability updated after booking creation");
           }
+        } catch (parseError) {
+          logStep("Error parsing booking data", parseError);
+          throw new Error(`Failed to parse booking data: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
         }
       } else {
         logStep("No booking data found in session metadata");

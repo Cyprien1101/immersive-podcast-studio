@@ -201,7 +201,7 @@ const ServiceSelection = () => {
       type: serviceType
     });
 
-    // If user is already logged in, proceed to Stripe checkout
+    // If user is already logged in, proceed to Stripe checkout immediately
     if (user) {
       await proceedToCheckout(serviceType, service.id);
     } else {
@@ -221,7 +221,7 @@ const ServiceSelection = () => {
         start_time: state.bookingData.start_time,
         end_time: state.bookingData.end_time,
         number_of_guests: state.bookingData.number_of_guests,
-        duration: state.bookingData.duration || 1 // Include duration in booking data
+        duration: state.bookingData.duration || 1
       } : null;
       
       // Call the create-checkout edge function
@@ -240,7 +240,7 @@ const ServiceSelection = () => {
       }
       
       if (data?.url) {
-        // Redirect to Stripe checkout
+        // Immediately redirect to Stripe checkout
         window.location.href = data.url;
       } else {
         toast.error("Une erreur inattendue s'est produite. Veuillez réessayer.");
@@ -254,15 +254,9 @@ const ServiceSelection = () => {
   };
 
   const handleAuthSuccess = async (userId: string) => {
+    // After successful authentication, immediately redirect to checkout
     if (selectedService) {
-      // Get the selected service details
-      const service = selectedService.type === 'subscription' 
-        ? subscriptionPlans.find(p => p.id === selectedService.id) 
-        : hourPackages.find(p => p.id === selectedService.id);
-      
-      if (service) {
-        await proceedToCheckout(selectedService.type, selectedService.id);
-      }
+      await proceedToCheckout(selectedService.type, selectedService.id);
     }
   };
 
