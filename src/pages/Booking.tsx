@@ -29,7 +29,7 @@ const BookingContent = () => {
   const [selectedStudio, setSelectedStudio] = useState(null);
   const navigate = useNavigate();
   const { setStudioInfo } = useBooking();
-  const { user, showAuthDialog } = useAuth();
+  const { user } = useAuth();
 
   // Fetch studios and their images from Supabase
   useEffect(() => {
@@ -96,9 +96,10 @@ const BookingContent = () => {
     const formattedDate = formatDateToISOString(date);
     console.log("Date sélectionnée (handleDateTimeSelect):", formattedDate, "Date brute:", date);
     
-    // Si l'utilisateur n'est pas connecté, afficher la popup d'authentification
+    // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
     if (!user) {
-      showAuthDialog();
+      // Modifié pour utiliser le composant AuthModal plutôt que showAuthDialog
+      navigate('/login');
       return;
     }
     

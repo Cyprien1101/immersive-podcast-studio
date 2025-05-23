@@ -35,6 +35,7 @@ const BookingConfirmation = () => {
   const navigate = useNavigate();
   const { state, createBooking, resetBooking } = useBooking();
   const { toast } = useToast();
+  const [bookingCreated, setBookingCreated] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -45,8 +46,8 @@ const BookingConfirmation = () => {
     const createOrFetchBooking = async () => {
       setLoading(true);
       try {
-        // Si nous avons des données de réservation en cours, créer la réservation
-        if (state.bookingData && state.isComplete) {
+        // Si nous avons des données de réservation en cours et qu'une réservation n'a pas encore été créée
+        if (state.bookingData && state.isComplete && !bookingCreated) {
           const result = await createBooking(user.id);
           
           if (!result.success) {
@@ -58,6 +59,8 @@ const BookingConfirmation = () => {
             navigate('/booking');
             return;
           }
+
+          setBookingCreated(true);
           
           // Après avoir créé la réservation, récupérer les détails
           const { data, error } = await supabase
@@ -80,7 +83,7 @@ const BookingConfirmation = () => {
           setBooking(data);
           resetBooking(); // Réinitialiser les données de réservation en cours
         } else {
-          // Si pas de réservation en cours, récupérer la dernière réservation
+          // Si pas de réservation en cours ou déjà créée, récupérer la dernière réservation
           const { data, error } = await supabase
             .from('bookings')
             .select(`
@@ -115,7 +118,7 @@ const BookingConfirmation = () => {
     };
 
     createOrFetchBooking();
-  }, [user, navigate, state.bookingData, state.isComplete]);
+  }, [user, navigate, state.bookingData, state.isComplete, bookingCreated]);
 
   // Helper function to calculate booking duration in hours
   const calculateDuration = (startTime: string, endTime: string): number => {
