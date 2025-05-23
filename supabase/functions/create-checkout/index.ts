@@ -79,10 +79,16 @@ serve(async (req) => {
       serviceData = planData;
       logStep("Subscription plan data retrieved", serviceData);
 
-      // Create a product for this subscription if it doesn't exist
-      let productId = serviceData.stripe_product_id;
-      
-      if (!productId) {
+      // Use specific product IDs based on the plan name
+      let productId;
+      if (serviceData.name === "Abonnement Standard") {
+        productId = "prod_SLwE1PqtMG2ASq";
+        logStep("Using Standard subscription product ID", { productId });
+      } else if (serviceData.name === "Abonnement Premium") {
+        productId = "prod_SMeTGJtL5Xp06U";
+        logStep("Using Premium subscription product ID", { productId });
+      } else {
+        // Create a product for other subscription types if needed
         const product = await stripe.products.create({
           name: serviceData.name,
           description: serviceData.description || `${serviceData.name} Subscription`,
@@ -91,7 +97,7 @@ serve(async (req) => {
           }
         });
         productId = product.id;
-        logStep("New product created", { productId });
+        logStep("New product created for unknown plan type", { productId });
       }
 
       // Create a price for the product
