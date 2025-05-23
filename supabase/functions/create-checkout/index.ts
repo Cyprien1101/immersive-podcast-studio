@@ -40,49 +40,6 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    // For subscriptions with booking data, pre-save the pending booking in the database
-    // This creates a pending/draft booking that will be confirmed after payment
-    if (serviceType === "subscription" && bookingData && bookingData.studio_id) {
-      // Create a Supabase client with service role key for database operations
-      const supabaseAdmin = createClient(
-        Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-        { auth: { persistSession: false } }
-      );
-
-      logStep("Creating pending booking record", bookingData);
-      
-      try {
-        // Create a pending booking record that will be updated after payment
-        const { data: pendingBooking, error: bookingError } = await supabaseAdmin
-          .from('bookings')
-          .insert({
-            user_id: user.id,
-            studio_id: bookingData.studio_id,
-            date: bookingData.date,
-            start_time: bookingData.start_time,
-            end_time: bookingData.end_time,
-            number_of_guests: bookingData.number_of_guests,
-            total_price: 0, // Will be updated after subscription confirmation
-            status: 'pending_payment' // Special status to indicate payment is pending
-          })
-          .select()
-          .single();
-        
-        if (bookingError) {
-          logStep("Error creating pending booking", bookingError);
-        } else if (pendingBooking) {
-          logStep("Pending booking created", { bookingId: pendingBooking.id });
-          // Add the booking ID to booking data for reference in the checkout session
-          bookingData.pending_booking_id = pendingBooking.id;
-        }
-      } catch (bookingCreateError) {
-        logStep("Exception creating pending booking", bookingCreateError);
-        // Continue with checkout even if booking pre-creation fails
-        // The verify-payment function will handle creating it after payment
-      }
-    }
-
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2023-10-16",

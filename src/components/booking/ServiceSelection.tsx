@@ -45,6 +45,7 @@ const ServiceSelection = () => {
     name: string;
     type: 'subscription' | 'hourPackage';
   } | null>(null);
+  const [bookingId, setBookingId] = useState<string | null>(null);
   
   const {
     state,
@@ -201,18 +202,51 @@ const ServiceSelection = () => {
       type: serviceType
     });
 
-    // If user is already logged in, proceed to Stripe checkout immediately
+    // If user is already logged in, create booking and proceed to checkout
     if (user) {
-      await proceedToCheckout(serviceType, service.id);
+      await createBookingAndProceedToCheckout(serviceType, service.id);
     } else {
       // Open auth dialog if not logged in
       setAuthDialogOpen(true);
     }
   };
 
-  const proceedToCheckout = async (serviceType: 'subscription' | 'hourPackage', serviceId: string) => {
+  const createBookingAndProceedToCheckout = async (serviceType: 'subscription' | 'hourPackage', serviceId: string) => {
     try {
       setPaymentLoading(true);
+      
+      // Only create a booking if we have booking data (studio, date, time)
+      if (state.bookingData) {
+        // Create booking record with is_paid = false
+        const { data: bookingData, error: bookingError } = await supabase
+          .from('bookings')
+          .insert({
+            user_id: user!.id,
+            studio_id: state.bookingData.studio_id,
+            date: state.bookingData.date,
+            start_time: state.bookingData.start_time,
+            end_time: state.bookingData.end_time,
+            number_of_guests: state.bookingData.number_of_guests,
+            total_price: serviceType === 'subscription' ? 0 : (state.bookingData.duration || 1) * 100, // 1€ per hour for testing
+            status: 'upcoming',
+            is_paid: false
+          })
+          .select()
+          .single();
+          
+        if (bookingError) {
+          console.error('Error creating booking:', bookingError);
+          toast.error("Une erreur s'est produite lors de la création de la réservation.");
+          setPaymentLoading(false);
+          return;
+        }
+        
+        if (bookingData) {
+          setBookingId(bookingData.id);
+          console.log('Created booking with ID:', bookingData.id);
+          toast.success('Réservation créée avec succès');
+        }
+      }
       
       // Prepare booking data for the session metadata
       const bookingData = state.bookingData ? {
@@ -221,7 +255,8 @@ const ServiceSelection = () => {
         start_time: state.bookingData.start_time,
         end_time: state.bookingData.end_time,
         number_of_guests: state.bookingData.number_of_guests,
-        duration: state.bookingData.duration || 1
+        duration: state.bookingData.duration || 1,
+        booking_id: bookingId // Include the created booking ID
       } : null;
       
       // Call the create-checkout edge function
@@ -254,9 +289,9 @@ const ServiceSelection = () => {
   };
 
   const handleAuthSuccess = async (userId: string) => {
-    // After successful authentication, immediately redirect to checkout
+    // After successful authentication, create booking and redirect to checkout
     if (selectedService) {
-      await proceedToCheckout(selectedService.type, selectedService.id);
+      await createBookingAndProceedToCheckout(selectedService.type, selectedService.id);
     }
   };
 

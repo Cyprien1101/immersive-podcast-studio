@@ -59,7 +59,7 @@ const BookingConfirmation = () => {
         setServiceType(data.service_type);
         toast.success('Paiement confirmé avec succès');
         
-        // Get booking details if it's an hourPackage - booking should now exist
+        // Get booking details if booking_id is available
         if (data.booking_id) {
           await fetchBookingById(data.booking_id);
         } else {
@@ -98,6 +98,21 @@ const BookingConfirmation = () => {
       } else if (data) {
         console.log('Found booking by ID:', data);
         setBookingDetails(data);
+        
+        // If booking exists but is_paid is false, update it to true
+        if (data && data.is_paid === false) {
+          const { error: updateError } = await supabase
+            .from('bookings')
+            .update({ is_paid: true })
+            .eq('id', data.id);
+            
+          if (updateError) {
+            console.error('Error updating booking payment status:', updateError);
+          } else {
+            console.log('Updated booking payment status to true');
+          }
+        }
+        
         toast.success('Détails de réservation récupérés avec succès');
       }
     } catch (err) {
@@ -127,6 +142,21 @@ const BookingConfirmation = () => {
       } else if (data) {
         console.log('Found latest booking:', data);
         setBookingDetails(data);
+        
+        // If booking exists but is_paid is false, update it to true
+        if (data && data.is_paid === false) {
+          const { error: updateError } = await supabase
+            .from('bookings')
+            .update({ is_paid: true })
+            .eq('id', data.id);
+            
+          if (updateError) {
+            console.error('Error updating booking payment status:', updateError);
+          } else {
+            console.log('Updated booking payment status to true');
+          }
+        }
+        
         toast.success('Dernière réservation récupérée');
       }
     } catch (err) {
