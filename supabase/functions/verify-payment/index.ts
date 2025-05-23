@@ -68,41 +68,47 @@ serve(async (req) => {
     }
     
     logStep("Processing payment", { userId, serviceType, serviceId });
+    let bookingId = null;
 
     // Different processing logic based on service type
     if (serviceType === 'subscription') {
       // For subscriptions, update our subscription records
-      const subscription = await stripe.subscriptions.list({
-        customer: session.customer as string,
-        status: 'active',
-        limit: 1
-      });
-      
-      if (subscription.data.length > 0) {
-        const activeSub = subscription.data[0];
-        const subscriptionEnd = new Date(activeSub.current_period_end * 1000);
+      try {
+        const subscription = await stripe.subscriptions.list({
+          customer: typeof session.customer === 'string' ? session.customer : session.customer?.id,
+          status: 'active',
+          limit: 1
+        });
         
-        // Get subscription plan details
-        const { data: planData } = await supabaseClient
-          .from('subscription_plans')
-          .select('*')
-          .eq('id', serviceId)
-          .single();
-        
-        if (planData) {
-          // Create or update subscription record
-          await supabaseClient.from('subscriptions').upsert({
-            user_id: userId,
-            plan_id: serviceId,
-            plan_name: planData.name,
-            price: planData.price,
-            price_interval: planData.price_interval,
-            start_date: new Date().toISOString(),
-            end_date: subscriptionEnd.toISOString(),
-            status: 'active'
-          });
-          logStep("Subscription record updated");
+        if (subscription.data.length > 0) {
+          const activeSub = subscription.data[0];
+          const subscriptionEnd = new Date(activeSub.current_period_end * 1000);
+          
+          // Get subscription plan details
+          const { data: planData } = await supabaseClient
+            .from('subscription_plans')
+            .select('*')
+            .eq('id', serviceId)
+            .single();
+          
+          if (planData) {
+            // Create or update subscription record
+            await supabaseClient.from('subscriptions').upsert({
+              user_id: userId,
+              plan_id: serviceId,
+              plan_name: planData.name,
+              price: planData.price,
+              price_interval: planData.price_interval,
+              start_date: new Date().toISOString(),
+              end_date: subscriptionEnd.toISOString(),
+              status: 'active'
+            });
+            logStep("Subscription record updated");
+          }
         }
+      } catch (subError) {
+        logStep("Error processing subscription", subError);
+        // Continue processing - don't throw error as payment was successful
       }
     } 
     else if (serviceType === 'hourPackage') {
@@ -136,14 +142,19 @@ serve(async (req) => {
                 number_of_guests: bookingData.number_of_guests,
                 total_price: totalPrice,
                 status: 'upcoming'
-              });
+              })
+              .select()
+              .single();
             
             if (bookingError) {
               logStep("Error creating booking", bookingError);
               throw new Error(`Failed to create booking: ${bookingError.message}`);
             }
             
-            logStep("Booking created successfully after payment");
+            if (bookingResult) {
+              bookingId = bookingResult.id;
+              logStep("Booking created successfully after payment", { bookingId });
+            }
             
             // Update studio availability to mark slots as unavailable
             await updateStudioAvailability(supabaseClient, bookingData);
@@ -161,7 +172,8 @@ serve(async (req) => {
     return new Response(JSON.stringify({ 
       success: true,
       status: session.status,
-      service_type: serviceType
+      service_type: serviceType,
+      booking_id: bookingId
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

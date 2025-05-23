@@ -58,7 +58,11 @@ const BookingConfirmation = () => {
         
         // Get booking details if it's an hourPackage - booking should now exist
         if (data.service_type === 'hourPackage') {
-          await fetchBookingDetails();
+          if (data.booking_id) {
+            await fetchBookingById(data.booking_id);
+          } else {
+            await fetchLatestBooking();
+          }
         }
       } else {
         setError(data?.message || 'La vérification du paiement a échoué.');
@@ -73,10 +77,36 @@ const BookingConfirmation = () => {
     }
   };
 
-  const fetchBookingDetails = async () => {
+  // Fetch booking by ID if provided
+  const fetchBookingById = async (bookingId: string) => {
+    try {
+      console.log('Fetching booking by ID:', bookingId);
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*, studios(name, location)')
+        .eq('id', bookingId)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching booking by ID:', error);
+        // Fall back to latest booking if ID fetch fails
+        await fetchLatestBooking();
+      } else if (data) {
+        console.log('Found booking by ID:', data);
+        setBookingDetails(data);
+      }
+    } catch (err) {
+      console.error('Error in fetchBookingById:', err);
+      await fetchLatestBooking();
+    }
+  };
+
+  // Fetch the most recent booking as fallback
+  const fetchLatestBooking = async () => {
     if (!user) return;
     
     try {
+      console.log('Fetching latest booking for user:', user.id);
       // Get the most recent booking for this user - should be the one just created
       const { data, error } = await supabase
         .from('bookings')
@@ -87,12 +117,13 @@ const BookingConfirmation = () => {
         .single();
       
       if (error) {
-        console.error('Error fetching booking details:', error);
+        console.error('Error fetching latest booking:', error);
       } else if (data) {
+        console.log('Found latest booking:', data);
         setBookingDetails(data);
       }
     } catch (err) {
-      console.error('Error in fetchBookingDetails:', err);
+      console.error('Error in fetchLatestBooking:', err);
     }
   };
   
