@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 import { Loader2 } from 'lucide-react';
 import DateTimeSelection from '@/components/booking/DateTimeSelection';
 import ServiceSelection from '@/components/booking/ServiceSelection';
-import { BookingProvider, useBooking } from '@/context/BookingContext';
+import { useBooking } from '@/context/BookingContext';
 import { useAuth } from '@/context/AuthContext';
 
 // Define booking steps with the datetime step
@@ -20,8 +20,7 @@ const STEPS = [
   { id: 'additional', label: 'Services Additionnels' },
 ];
 
-// Contenu principal de la page de réservation
-const BookingContent = () => {
+const Booking = () => {
   const [currentStep, setCurrentStep] = useState('studio');
   const [studios, setStudios] = useState([]);
   const [studioImages, setStudioImages] = useState([]);
@@ -179,12 +178,4 @@ const BookingContent = () => {
   );
 };
 
-const BookingPage = () => {
-  return (
-    <BookingProvider>
-      <BookingContent />
-    </BookingProvider>
-  );
-};
-
-export default BookingPage;
+export default Booking;
