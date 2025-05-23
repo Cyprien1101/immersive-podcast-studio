@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import BookingHeader from '@/components/booking/BookingHeader';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 const BookingConfirmation = () => {
   const { resetBooking } = useBooking();
@@ -52,26 +53,28 @@ const BookingConfirmation = () => {
         console.error('Payment verification error:', error);
         setError('Une erreur est survenue lors de la vérification du paiement.');
         setPaymentStatus('failed');
+        toast.error('Erreur de vérification du paiement');
       } else if (data?.success) {
         setPaymentStatus('success');
         setServiceType(data.service_type);
+        toast.success('Paiement confirmé avec succès');
         
         // Get booking details if it's an hourPackage - booking should now exist
-        if (data.service_type === 'hourPackage') {
-          if (data.booking_id) {
-            await fetchBookingById(data.booking_id);
-          } else {
-            await fetchLatestBooking();
-          }
+        if (data.booking_id) {
+          await fetchBookingById(data.booking_id);
+        } else {
+          await fetchLatestBooking();
         }
       } else {
         setError(data?.message || 'La vérification du paiement a échoué.');
         setPaymentStatus('failed');
+        toast.error('Échec de la vérification du paiement');
       }
     } catch (err) {
       console.error('Error during payment verification:', err);
       setError('Une erreur technique est survenue. Veuillez contacter le support.');
       setPaymentStatus('failed');
+      toast.error('Erreur technique lors de la vérification');
     } finally {
       setLoading(false);
     }
@@ -89,11 +92,13 @@ const BookingConfirmation = () => {
       
       if (error) {
         console.error('Error fetching booking by ID:', error);
+        toast.error('Erreur lors de la récupération des détails de réservation');
         // Fall back to latest booking if ID fetch fails
         await fetchLatestBooking();
       } else if (data) {
         console.log('Found booking by ID:', data);
         setBookingDetails(data);
+        toast.success('Détails de réservation récupérés avec succès');
       }
     } catch (err) {
       console.error('Error in fetchBookingById:', err);
@@ -118,12 +123,15 @@ const BookingConfirmation = () => {
       
       if (error) {
         console.error('Error fetching latest booking:', error);
+        toast.error('Impossible de trouver votre dernière réservation');
       } else if (data) {
         console.log('Found latest booking:', data);
         setBookingDetails(data);
+        toast.success('Dernière réservation récupérée');
       }
     } catch (err) {
       console.error('Error in fetchLatestBooking:', err);
+      toast.error('Erreur lors de la récupération de la réservation');
     }
   };
   
@@ -156,7 +164,35 @@ const BookingConfirmation = () => {
                 {serviceType === 'subscription' ? (
                   <div className="text-gray-200 mb-8">
                     <p className="mb-4">Votre abonnement a été activé avec succès.</p>
-                    <p>Vous pouvez maintenant réserver des créneaux dans votre espace membre.</p>
+                    {bookingDetails ? (
+                      <div className="bg-[#222] p-6 rounded-lg text-left mb-6">
+                        <h3 className="text-xl font-bold text-white mb-4">Détails de la réservation</h3>
+                        
+                        <div className="grid gap-2">
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Studio:</span>
+                            <span className="text-white font-medium">{bookingDetails.studios?.name || 'N/A'}</span>
+                          </div>
+                          
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Date:</span>
+                            <span className="text-white font-medium">{formatDate(bookingDetails.date)}</span>
+                          </div>
+                          
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Horaire:</span>
+                            <span className="text-white font-medium">{bookingDetails.start_time} - {bookingDetails.end_time}</span>
+                          </div>
+                          
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Nombre d'invités:</span>
+                            <span className="text-white font-medium">{bookingDetails.number_of_guests}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p>Vous pouvez maintenant réserver des créneaux dans votre espace membre.</p>
+                    )}
                   </div>
                 ) : bookingDetails ? (
                   <div className="text-gray-200 mb-8">

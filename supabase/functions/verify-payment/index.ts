@@ -69,6 +69,17 @@ serve(async (req) => {
     
     logStep("Processing payment", { userId, serviceType, serviceId });
     let bookingId = null;
+    let bookingData = null;
+
+    if (bookingDataStr) {
+      try {
+        bookingData = JSON.parse(bookingDataStr);
+        logStep("Parsed booking data", bookingData);
+      } catch (parseError) {
+        logStep("Error parsing booking data", parseError);
+        throw new Error(`Failed to parse booking data: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
+      }
+    }
 
     // Different processing logic based on service type
     if (serviceType === 'subscription') {
@@ -104,6 +115,52 @@ serve(async (req) => {
               status: 'active'
             });
             logStep("Subscription record updated");
+            
+            // Now check if there's a pending booking to finalize from the subscription payment
+            if (bookingData && bookingData.pending_booking_id) {
+              // Update the existing pending booking to confirmed status
+              const { data: updatedBooking, error: updateError } = await supabaseClient
+                .from('bookings')
+                .update({ 
+                  status: 'upcoming',  // Change from pending_payment to upcoming
+                  total_price: 0 // Subscription bookings are free
+                })
+                .eq('id', bookingData.pending_booking_id)
+                .select()
+                .single();
+              
+              if (updateError) {
+                logStep("Error updating pending booking", updateError);
+                // If update fails, try to create a new booking as fallback
+                const { data: newBooking, error: createError } = await createNewBookingFromData(supabaseClient, userId, bookingData);
+                
+                if (createError) {
+                  logStep("Error creating fallback booking", createError);
+                } else if (newBooking) {
+                  bookingId = newBooking.id;
+                  logStep("Created fallback booking after subscription payment", { bookingId });
+                }
+              } else if (updatedBooking) {
+                bookingId = updatedBooking.id;
+                logStep("Updated pending booking after subscription payment", { bookingId });
+                
+                // Update studio availability to mark slots as unavailable
+                await updateStudioAvailability(supabaseClient, bookingData);
+              }
+            } else if (bookingData && bookingData.studio_id) {
+              // No pending booking ID, but we have booking data - create a new one
+              const { data: newBooking, error: createError } = await createNewBookingFromData(supabaseClient, userId, bookingData);
+              
+              if (createError) {
+                logStep("Error creating new booking from subscription data", createError);
+              } else if (newBooking) {
+                bookingId = newBooking.id;
+                logStep("Created new booking after subscription payment", { bookingId });
+                
+                // Update studio availability to mark slots as unavailable
+                await updateStudioAvailability(supabaseClient, bookingData);
+              }
+            }
           }
         }
       } catch (subError) {
@@ -113,11 +170,8 @@ serve(async (req) => {
     } 
     else if (serviceType === 'hourPackage') {
       // For hour packages, create a booking record if booking data exists
-      if (bookingDataStr) {
-        try {
-          const bookingData = JSON.parse(bookingDataStr);
-          logStep("Parsed booking data", bookingData);
-          
+      if (bookingData) {
+        try {          
           // Get hour package details
           const { data: packageData } = await supabaseClient
             .from('hour_packages')
@@ -161,8 +215,8 @@ serve(async (req) => {
             logStep("Studio availability updated after booking creation");
           }
         } catch (parseError) {
-          logStep("Error parsing booking data", parseError);
-          throw new Error(`Failed to parse booking data: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
+          logStep("Error creating booking with hourPackage", parseError);
+          throw new Error(`Failed during hourPackage booking: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
         }
       } else {
         logStep("No booking data found in session metadata");
@@ -187,6 +241,36 @@ serve(async (req) => {
     });
   }
 });
+
+// Helper function to create a new booking from booking data
+async function createNewBookingFromData(supabaseClient, userId, bookingData) {
+  if (!bookingData || !bookingData.studio_id) {
+    return { data: null, error: new Error("Insufficient booking data") };
+  }
+  
+  try {
+    // Create booking record
+    return await supabaseClient
+      .from('bookings')
+      .insert({
+        user_id: userId,
+        studio_id: bookingData.studio_id,
+        date: bookingData.date,
+        start_time: bookingData.start_time,
+        end_time: bookingData.end_time,
+        number_of_guests: bookingData.number_of_guests || 1,
+        total_price: 0, // Subscription bookings are free
+        status: 'upcoming'
+      })
+      .select()
+      .single();
+  } catch (error) {
+    return { 
+      data: null, 
+      error: new Error(`Failed to create booking: ${error instanceof Error ? error.message : String(error)}`) 
+    };
+  }
+}
 
 // Function to update studio availability based on booking
 async function updateStudioAvailability(supabaseClient, bookingData) {
