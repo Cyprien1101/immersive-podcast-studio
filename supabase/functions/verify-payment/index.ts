@@ -118,6 +118,10 @@ serve(async (req) => {
           .single();
         
         if (packageData && bookingData) {
+          // Calculate total price based on duration and hourly rate
+          const duration = bookingData.duration || 1;
+          const totalPrice = packageData.price_per_hour * duration;
+          
           // Create booking record
           const { data: bookingResult, error: bookingError } = await supabaseClient
             .from('bookings')
@@ -128,17 +132,19 @@ serve(async (req) => {
               start_time: bookingData.start_time,
               end_time: bookingData.end_time,
               number_of_guests: bookingData.number_of_guests,
-              total_price: packageData.price_per_hour,
+              total_price: totalPrice,
               status: 'upcoming'
             });
           
           if (bookingError) {
             logStep("Error creating booking", bookingError);
+            throw new Error(`Failed to create booking: ${bookingError.message}`);
           } else {
             logStep("Booking created successfully");
             
             // Update studio availability to mark slots as unavailable
             await updateStudioAvailability(supabaseClient, bookingData);
+            logStep("Studio availability updated");
           }
         }
       } else {

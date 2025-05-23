@@ -7,6 +7,7 @@ import { useBooking } from '@/context/BookingContext';
 import { useAuth } from '@/context/AuthContext';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import BookingHeader from '@/components/booking/BookingHeader';
+import { format } from 'date-fns';
 
 const BookingConfirmation = () => {
   const { resetBooking } = useBooking();
@@ -17,6 +18,7 @@ const BookingConfirmation = () => {
   const [error, setError] = useState<string | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<'success' | 'failed' | null>(null);
   const [serviceType, setServiceType] = useState<'subscription' | 'hourPackage' | null>(null);
+  const [bookingDetails, setBookingDetails] = useState<any>(null);
   
   useEffect(() => {
     // Extract session_id from URL parameters
@@ -53,6 +55,11 @@ const BookingConfirmation = () => {
       } else if (data?.success) {
         setPaymentStatus('success');
         setServiceType(data.service_type);
+        
+        // Get booking details if it's an hourPackage
+        if (data.service_type === 'hourPackage') {
+          await fetchBookingDetails();
+        }
       } else {
         setError(data?.message || 'La vérification du paiement a échoué.');
         setPaymentStatus('failed');
@@ -63,6 +70,37 @@ const BookingConfirmation = () => {
       setPaymentStatus('failed');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchBookingDetails = async () => {
+    if (!user) return;
+    
+    try {
+      // Get the most recent booking for this user
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*, studios(name, location)')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching booking details:', error);
+      } else if (data) {
+        setBookingDetails(data);
+      }
+    } catch (err) {
+      console.error('Error in fetchBookingDetails:', err);
+    }
+  };
+  
+  const formatDate = (dateString: string) => {
+    try {
+      return format(new Date(dateString), 'dd/MM/yyyy');
+    } catch (e) {
+      return dateString;
     }
   };
 
@@ -88,6 +126,43 @@ const BookingConfirmation = () => {
                   <div className="text-gray-200 mb-8">
                     <p className="mb-4">Votre abonnement a été activé avec succès.</p>
                     <p>Vous pouvez maintenant réserver des créneaux dans votre espace membre.</p>
+                  </div>
+                ) : bookingDetails ? (
+                  <div className="text-gray-200 mb-8">
+                    <p className="mb-6">Votre réservation a été confirmée avec succès.</p>
+                    
+                    <div className="bg-[#222] p-6 rounded-lg text-left mb-6">
+                      <h3 className="text-xl font-bold text-white mb-4">Détails de la réservation</h3>
+                      
+                      <div className="grid gap-2">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Studio:</span>
+                          <span className="text-white font-medium">{bookingDetails.studios?.name || 'N/A'}</span>
+                        </div>
+                        
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Date:</span>
+                          <span className="text-white font-medium">{formatDate(bookingDetails.date)}</span>
+                        </div>
+                        
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Horaire:</span>
+                          <span className="text-white font-medium">{bookingDetails.start_time} - {bookingDetails.end_time}</span>
+                        </div>
+                        
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Nombre d'invités:</span>
+                          <span className="text-white font-medium">{bookingDetails.number_of_guests}</span>
+                        </div>
+                        
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Total:</span>
+                          <span className="text-white font-medium">{bookingDetails.total_price}€</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <p>Vous recevrez bientôt un email avec tous les détails.</p>
                   </div>
                 ) : (
                   <div className="text-gray-200 mb-8">
