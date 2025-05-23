@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, SUPABASE_URL_ENDPOINT } from "@/integrations/supabase/client";
@@ -216,7 +217,10 @@ const ServiceSelection = () => {
       setPaymentLoading(true);
       
       // Only create a booking if we have booking data (studio, date, time)
+      let createdBookingId = null;
       if (state.bookingData) {
+        console.log("Creating booking with data:", state.bookingData);
+        
         // Create booking record with is_paid = false
         const { data: bookingData, error: bookingError } = await supabase
           .from('bookings')
@@ -242,10 +246,16 @@ const ServiceSelection = () => {
         }
         
         if (bookingData) {
-          setBookingId(bookingData.id);
+          createdBookingId = bookingData.id;
+          setBookingId(createdBookingId);
           console.log('Created booking with ID:', bookingData.id);
           toast.success('Réservation créée avec succès');
         }
+      } else {
+        console.error("No booking data found in context");
+        toast.error("Données de réservation manquantes.");
+        setPaymentLoading(false);
+        return;
       }
       
       // Prepare booking data for the session metadata
@@ -256,8 +266,10 @@ const ServiceSelection = () => {
         end_time: state.bookingData.end_time,
         number_of_guests: state.bookingData.number_of_guests,
         duration: state.bookingData.duration || 1,
-        booking_id: bookingId // Include the created booking ID
+        booking_id: createdBookingId // Include the created booking ID
       } : null;
+      
+      console.log("Sending to checkout with booking data:", bookingData);
       
       // Call the create-checkout edge function
       const { data, error } = await supabase.functions.invoke('create-checkout', {
@@ -289,6 +301,7 @@ const ServiceSelection = () => {
   };
 
   const handleAuthSuccess = async (userId: string) => {
+    console.log('Auth success with user ID:', userId);
     // After successful authentication, create booking and redirect to checkout
     if (selectedService) {
       await createBookingAndProceedToCheckout(selectedService.type, selectedService.id);
