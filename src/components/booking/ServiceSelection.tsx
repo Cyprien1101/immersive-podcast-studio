@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, SUPABASE_URL_ENDPOINT } from "@/integrations/supabase/client";
@@ -46,7 +45,6 @@ const ServiceSelection = () => {
     name: string;
     type: 'subscription' | 'hourPackage';
   } | null>(null);
-  const [bookingId, setBookingId] = useState<string | null>(null);
   
   const {
     state,
@@ -203,60 +201,18 @@ const ServiceSelection = () => {
       type: serviceType
     });
 
-    // If user is already logged in, create booking and proceed to checkout
+    // If user is already logged in, proceed to Stripe checkout immediately
     if (user) {
-      await createBookingAndProceedToCheckout(serviceType, service.id);
+      await proceedToCheckout(serviceType, service.id);
     } else {
       // Open auth dialog if not logged in
       setAuthDialogOpen(true);
     }
   };
 
-  const createBookingAndProceedToCheckout = async (serviceType: 'subscription' | 'hourPackage', serviceId: string) => {
+  const proceedToCheckout = async (serviceType: 'subscription' | 'hourPackage', serviceId: string) => {
     try {
       setPaymentLoading(true);
-      
-      // Only create a booking if we have booking data (studio, date, time)
-      let createdBookingId = null;
-      if (state.bookingData) {
-        console.log("Creating booking with data:", state.bookingData);
-        
-        // Create booking record with is_paid = false
-        const { data: bookingData, error: bookingError } = await supabase
-          .from('bookings')
-          .insert({
-            user_id: user!.id,
-            studio_id: state.bookingData.studio_id,
-            date: state.bookingData.date,
-            start_time: state.bookingData.start_time,
-            end_time: state.bookingData.end_time,
-            number_of_guests: state.bookingData.number_of_guests,
-            total_price: serviceType === 'subscription' ? 0 : (state.bookingData.duration || 1) * 100, // 1€ per hour for testing
-            status: 'upcoming',
-            is_paid: false
-          })
-          .select()
-          .single();
-          
-        if (bookingError) {
-          console.error('Error creating booking:', bookingError);
-          toast.error("Une erreur s'est produite lors de la création de la réservation.");
-          setPaymentLoading(false);
-          return;
-        }
-        
-        if (bookingData) {
-          createdBookingId = bookingData.id;
-          setBookingId(createdBookingId);
-          console.log('Created booking with ID:', bookingData.id);
-          toast.success('Réservation créée avec succès');
-        }
-      } else {
-        console.error("No booking data found in context");
-        toast.error("Données de réservation manquantes.");
-        setPaymentLoading(false);
-        return;
-      }
       
       // Prepare booking data for the session metadata
       const bookingData = state.bookingData ? {
@@ -265,11 +221,8 @@ const ServiceSelection = () => {
         start_time: state.bookingData.start_time,
         end_time: state.bookingData.end_time,
         number_of_guests: state.bookingData.number_of_guests,
-        duration: state.bookingData.duration || 1,
-        booking_id: createdBookingId // Include the created booking ID
+        duration: state.bookingData.duration || 1
       } : null;
-      
-      console.log("Sending to checkout with booking data:", bookingData);
       
       // Call the create-checkout edge function
       const { data, error } = await supabase.functions.invoke('create-checkout', {
@@ -301,10 +254,9 @@ const ServiceSelection = () => {
   };
 
   const handleAuthSuccess = async (userId: string) => {
-    console.log('Auth success with user ID:', userId);
-    // After successful authentication, create booking and redirect to checkout
+    // After successful authentication, immediately redirect to checkout
     if (selectedService) {
-      await createBookingAndProceedToCheckout(selectedService.type, selectedService.id);
+      await proceedToCheckout(selectedService.type, selectedService.id);
     }
   };
 

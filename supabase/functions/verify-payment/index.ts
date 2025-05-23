@@ -68,94 +68,100 @@ serve(async (req) => {
     }
     
     logStep("Processing payment", { userId, serviceType, serviceId });
-    let bookingId = null;
-    let bookingData = null;
-
-    if (bookingDataStr) {
-      try {
-        bookingData = JSON.parse(bookingDataStr);
-        logStep("Parsed booking data", bookingData);
-        
-        // If there's a booking_id in the metadata, use it to update the booking
-        if (bookingData.booking_id) {
-          bookingId = bookingData.booking_id;
-          
-          // Update the existing booking to mark it as paid
-          const { data: updatedBooking, error: updateError } = await supabaseClient
-            .from('bookings')
-            .update({ is_paid: true })
-            .eq('id', bookingId)
-            .select()
-            .single();
-          
-          if (updateError) {
-            logStep("Error updating booking payment status", updateError);
-            throw new Error(`Failed to update booking payment status: ${updateError.message}`);
-          }
-          
-          if (updatedBooking) {
-            logStep("Booking marked as paid", { bookingId });
-          }
-        }
-      } catch (parseError) {
-        logStep("Error parsing booking data", parseError);
-        throw new Error(`Failed to parse booking data: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
-      }
-    }
 
     // Different processing logic based on service type
     if (serviceType === 'subscription') {
       // For subscriptions, update our subscription records
-      try {
-        const subscription = await stripe.subscriptions.list({
-          customer: typeof session.customer === 'string' ? session.customer : session.customer?.id,
-          status: 'active',
-          limit: 1
-        });
+      const subscription = await stripe.subscriptions.list({
+        customer: session.customer as string,
+        status: 'active',
+        limit: 1
+      });
+      
+      if (subscription.data.length > 0) {
+        const activeSub = subscription.data[0];
+        const subscriptionEnd = new Date(activeSub.current_period_end * 1000);
         
-        if (subscription.data.length > 0) {
-          const activeSub = subscription.data[0];
-          const subscriptionEnd = new Date(activeSub.current_period_end * 1000);
+        // Get subscription plan details
+        const { data: planData } = await supabaseClient
+          .from('subscription_plans')
+          .select('*')
+          .eq('id', serviceId)
+          .single();
+        
+        if (planData) {
+          // Create or update subscription record
+          await supabaseClient.from('subscriptions').upsert({
+            user_id: userId,
+            plan_id: serviceId,
+            plan_name: planData.name,
+            price: planData.price,
+            price_interval: planData.price_interval,
+            start_date: new Date().toISOString(),
+            end_date: subscriptionEnd.toISOString(),
+            status: 'active'
+          });
+          logStep("Subscription record updated");
+        }
+      }
+    } 
+    else if (serviceType === 'hourPackage') {
+      // For hour packages, create a booking record if booking data exists
+      if (bookingDataStr) {
+        try {
+          const bookingData = JSON.parse(bookingDataStr);
+          logStep("Parsed booking data", bookingData);
           
-          // Get subscription plan details
-          const { data: planData } = await supabaseClient
-            .from('subscription_plans')
+          // Get hour package details
+          const { data: packageData } = await supabaseClient
+            .from('hour_packages')
             .select('*')
             .eq('id', serviceId)
             .single();
           
-          if (planData) {
-            // Create or update subscription record
-            await supabaseClient.from('subscriptions').upsert({
-              user_id: userId,
-              plan_id: serviceId,
-              plan_name: planData.name,
-              price: planData.price,
-              price_interval: planData.price_interval,
-              start_date: new Date().toISOString(),
-              end_date: subscriptionEnd.toISOString(),
-              status: 'active'
-            });
-            logStep("Subscription record updated");
+          if (packageData && bookingData) {
+            // Calculate total price based on duration and hourly rate
+            const duration = bookingData.duration || 1;
+            const totalPrice = packageData.price_per_hour * duration;
+            
+            // Create booking record AFTER payment is confirmed
+            const { data: bookingResult, error: bookingError } = await supabaseClient
+              .from('bookings')
+              .insert({
+                user_id: userId,
+                studio_id: bookingData.studio_id,
+                date: bookingData.date,
+                start_time: bookingData.start_time,
+                end_time: bookingData.end_time,
+                number_of_guests: bookingData.number_of_guests,
+                total_price: totalPrice,
+                status: 'upcoming'
+              });
+            
+            if (bookingError) {
+              logStep("Error creating booking", bookingError);
+              throw new Error(`Failed to create booking: ${bookingError.message}`);
+            }
+            
+            logStep("Booking created successfully after payment");
+            
+            // Update studio availability to mark slots as unavailable
+            await updateStudioAvailability(supabaseClient, bookingData);
+            logStep("Studio availability updated after booking creation");
           }
+        } catch (parseError) {
+          logStep("Error parsing booking data", parseError);
+          throw new Error(`Failed to parse booking data: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
         }
-      } catch (subError) {
-        logStep("Error processing subscription", subError);
-        // Continue processing - don't throw error as payment was successful
+      } else {
+        logStep("No booking data found in session metadata");
       }
-    } 
-
-    // Update studio availability to mark slots as unavailable
-    if (bookingData && bookingData.studio_id) {
-      await updateStudioAvailability(supabaseClient, bookingData);
-      logStep("Studio availability updated");
     }
 
     return new Response(JSON.stringify({ 
       success: true,
       status: session.status,
-      service_type: serviceType,
-      booking_id: bookingId
+      service_type: serviceType
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
@@ -170,7 +176,7 @@ serve(async (req) => {
   }
 });
 
-// Helper function to update studio availability based on booking
+// Function to update studio availability based on booking
 async function updateStudioAvailability(supabaseClient, bookingData) {
   try {
     // Parse start and end time

@@ -48,7 +48,6 @@ export type Database = {
           date: string
           end_time: string
           id: string
-          is_paid: boolean
           number_of_guests: number
           start_time: string
           status: string
@@ -62,7 +61,6 @@ export type Database = {
           date: string
           end_time: string
           id?: string
-          is_paid?: boolean
           number_of_guests: number
           start_time: string
           status?: string
@@ -76,7 +74,6 @@ export type Database = {
           date?: string
           end_time?: string
           id?: string
-          is_paid?: boolean
           number_of_guests?: number
           start_time?: string
           status?: string
