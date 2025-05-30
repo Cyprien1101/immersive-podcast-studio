@@ -51,21 +51,29 @@ const BookingPage = () => {
         
         if (imageError) throw imageError;
         
-        // Set the Studio Lyon as selected by default
-        const lyonStudio = studioData?.find(studio => studio.name === 'Studio Lyon');
-        if (lyonStudio) {
-          console.log("Found Studio Lyon:", lyonStudio);
-          setSelectedStudio(lyonStudio);
-          // Skip the studio selection step
-          setCurrentStep('datetime');
-        } else {
-          console.log("Studio Lyon not found in:", studioData);
-        }
-        
         setStudios(studioData || []);
         setStudioImages(imageData || []);
+        
+        // Set the Studio Lyon as selected by default using the fixed studio ID
+        // Based on the DateTimeSelection component, we know the studio ID is "d9c24a0a-d94a-4cbc-b489-fa5cfe73ce08"
+        const lyonStudioId = "d9c24a0a-d94a-4cbc-b489-fa5cfe73ce08";
+        const lyonStudio = studioData?.find(studio => studio.id === lyonStudioId);
+        
+        if (lyonStudio) {
+          console.log("Found Studio Lyon by ID:", lyonStudio);
+          setSelectedStudio(lyonStudio);
+          // Skip the studio selection step and go directly to datetime
+          setCurrentStep('datetime');
+        } else {
+          console.log("Studio Lyon not found with ID:", lyonStudioId);
+          console.log("Available studios:", studioData);
+          // If Studio Lyon is not found, stay on studio selection
+          setCurrentStep('studio');
+        }
       } catch (error) {
         console.error('Error fetching studios:', error);
+        // If there's an error, stay on studio selection
+        setCurrentStep('studio');
       } finally {
         setLoading(false);
       }
