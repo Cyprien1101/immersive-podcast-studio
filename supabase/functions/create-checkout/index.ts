@@ -41,12 +41,12 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     // Initialize Stripe
-    // const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-    //   apiVersion: "2023-10-16",
-    // });
-    const stripe = new Stripe("sk_test_51LbTkeGQizmCWGZXipjWk9fuYXnpTNHCYShEqceA31VptbD56BJbmAmVnBhNQ3jbZOsRajqeyruHDe9Cx9juDK7g00mWypY6Vp", {
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2023-10-16",
     });
+    // const stripe = new Stripe("sk_test_51LbTkeGQizmCWGZXipjWk9fuYXnpTNHCYShEqceA31VptbD56BJbmAmVnBhNQ3jbZOsRajqeyruHDe9Cx9juDK7g00mWypY6Vp", {
+    //   apiVersion: "2023-10-16",
+    // });
 
     // Check if a Stripe customer record exists for this user
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
