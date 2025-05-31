@@ -32,13 +32,13 @@ serve(async (req) => {
     );
 
     // Initialize Stripe
-    // const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-    //   apiVersion: "2023-10-16",
-    // });
-    
-    const stripe = new Stripe("sk_test_51LbTkeGQizmCWGZXipjWk9fuYXnpTNHCYShEqceA31VptbD56BJbmAmVnBhNQ3jbZOsRajqeyruHDe9Cx9juDK7g00mWypY6Vp", {
-    apiVersion: "2023-10-16",
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2023-10-16",
     });
+    
+    // const stripe = new Stripe("sk_test_51LbTkeGQizmCWGZXipjWk9fuYXnpTNHCYShEqceA31VptbD56BJbmAmVnBhNQ3jbZOsRajqeyruHDe9Cx9juDK7g00mWypY6Vp", {
+    // apiVersion: "2023-10-16",
+    // });
     // Retrieve the checkout session from Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['customer', 'payment_intent']
