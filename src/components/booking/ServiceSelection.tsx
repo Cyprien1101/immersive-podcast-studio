@@ -217,7 +217,7 @@ const ServiceSelection = () => {
       // Prepare booking data for the session metadata
       const bookingData = state.bookingData ? {
         // studio_id: state.bookingData.studio_id,
-        studio_id: 'd9c24a0a-d94a-4cbc-b489-fa5cfe73ce08'
+        studio_id: 'd9c24a0a-d94a-4cbc-b489-fa5cfe73ce08',
         date: state.bookingData.date,
         start_time: state.bookingData.start_time,
         end_time: state.bookingData.end_time,
