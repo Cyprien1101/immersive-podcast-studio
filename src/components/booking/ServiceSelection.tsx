@@ -223,6 +223,8 @@ const ServiceSelection = () => {
         number_of_guests: state.bookingData.number_of_guests,
         duration: state.bookingData.duration || 1
       } : null;
+
+      console.log("Booking data being sent:", bookingData);
       
       // Call the create-checkout edge function
       const { data, error } = await supabase.functions.invoke('create-checkout', {
