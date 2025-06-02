@@ -15,24 +15,24 @@ import { supabase } from '@/integrations/supabase/client';
 
 const UserMenu = () => {
   const { user, signOut } = useAuth();
-  const [isSpecificAdmin, setIsSpecificAdmin] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   
   useEffect(() => {
-    const checkIfSpecificAdmin = async () => {
+    const checkAdminRole = async () => {
       if (user) {
         const { data: userData, error } = await supabase
           .from('profiles')
-          .select('email')
+          .select('role')
           .eq('id', user.id)
           .single();
         
         if (!error && userData) {
-          setIsSpecificAdmin(userData.email === 'cyprien.baudouin4@gmail.com');
+          setIsAdmin(userData.role === 'admin');
         }
       }
     };
     
-    checkIfSpecificAdmin();
+    checkAdminRole();
   }, [user]);
   
   if (!user) return null;
@@ -88,7 +88,7 @@ const UserMenu = () => {
           </DropdownMenuItem>
         </Link>
         
-        {isSpecificAdmin && (
+        {isAdmin && (
           <>
             <DropdownMenuSeparator className="bg-gray-700 my-2" />
             <Link to="/super-admin" className="block w-full">

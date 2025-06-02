@@ -12,7 +12,7 @@ import AdminCalendar from '@/components/admin/AdminCalendar';
 const SuperAdmin = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [loadingStats, setLoadingStats] = useState<boolean>(true);
   const [stats, setStats] = useState({
@@ -21,32 +21,32 @@ const SuperAdmin = () => {
     activeSubscriptions: 0
   });
 
-  // Vérifier si l'utilisateur est le super admin spécifique
+  // Vérifier si l'utilisateur est admin
   useEffect(() => {
-    const checkSuperAdminStatus = async () => {
+    const checkAdminStatus = async () => {
       if (!user) return;
 
       try {
         const { data: userData, error: userError } = await supabase
           .from('profiles')
-          .select('email')
+          .select('role')
           .eq('id', user.id)
           .single();
 
         if (userError) {
-          console.error('Erreur lors de la vérification du statut super admin:', userError);
+          console.error('Erreur lors de la vérification du statut admin:', userError);
           return;
         }
 
-        // Vérifier si l'email est celui spécifié
-        const userIsSpecificAdmin = userData?.email === 'cyprien.baudouin4@gmail.com';
-        setIsSuperAdmin(userIsSpecificAdmin);
+        // Vérifier si l'utilisateur a le rôle admin
+        const userIsAdmin = userData?.role === 'admin';
+        setIsAdmin(userIsAdmin);
 
-        if (!userIsSpecificAdmin) {
+        if (!userIsAdmin) {
           toast.error("Vous n'avez pas l'accès à cette page");
           navigate('/');
         } else {
-          // Charger les statistiques si c'est le super admin
+          // Charger les statistiques si c'est un admin
           loadStatistics();
         }
       } catch (err) {
@@ -55,7 +55,7 @@ const SuperAdmin = () => {
     };
 
     if (!loading) {
-      checkSuperAdminStatus();
+      checkAdminStatus();
     }
   }, [user, loading, navigate]);
 
@@ -118,8 +118,8 @@ const SuperAdmin = () => {
     }
   };
 
-  // Si en cours de chargement ou non super admin, ne rien afficher
-  if (loading || !isSuperAdmin) {
+  // Si en cours de chargement ou non admin, ne rien afficher
+  if (loading || !isAdmin) {
     return null;
   }
 
