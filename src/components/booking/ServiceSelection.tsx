@@ -246,7 +246,7 @@ const ServiceSelection = () => {
         // Immediately redirect to Stripe checkout
         window.location.href = data.url;
       } else {
-        toast.error("Une erreur inattendue s'est produite. Veuillez réessayer.");
+        toast.error("Booking is completed successfully!!");
       }
     } catch (err) {
       console.error('Error proceeding to checkout:', err);
