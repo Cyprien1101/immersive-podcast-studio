@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -197,25 +196,11 @@
     }
   }
 
-  @keyframes scroll-fast {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(-50%);
-    }
-  }
-
   .logos-carousel {
     animation: scroll 30s linear infinite;
   }
 
-  .logos-carousel-fast {
-    animation: scroll-fast 15s linear infinite;
-  }
-
-  .logos-carousel:hover,
-  .logos-carousel-fast:hover {
+  .logos-carousel:hover {
     animation-play-state: paused;
   }
 

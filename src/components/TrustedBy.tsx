@@ -29,7 +29,7 @@ const TrustedBy = () => {
         <div className="relative overflow-hidden">
           <ScrollAnimationWrapper animation="fade-up">
             <div className="logos-scroll-container overflow-hidden relative">
-              <div className="flex logos-carousel-fast animate-scroll-fast">
+              <div className="flex logos-carousel animate-scroll">
                 {duplicatedLogos.map((logo, i) => (
                   <div key={`${logo.name}-${i}`} className="mx-8 flex-shrink-0 flex items-center justify-center">
                     <img 
