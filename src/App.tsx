@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import SuperAdmin from "./pages/SuperAdmin";
+import Landing from "./pages/Landing";
 import { BookingProvider } from "./context/BookingContext";
 import { AuthProvider } from "./context/AuthContext";
 
@@ -27,6 +28,7 @@ const App = () => (
           <BookingProvider>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/landing" element={<Landing />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/booking" element={<Booking />} />
               <Route path="/booking-confirmation" element={<BookingConfirmation />} />
