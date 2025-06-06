@@ -86,9 +86,7 @@ Toi, tu viens parler au micro et tu repars avec un podcast clé en main.</p>
             <div ref={videoRef} className="mb-12">
               <div className="relative max-w-4xl mx-auto">
                 <div className="mb-4">
-                  <span className="inline-block bg-podcast-accent/20 text-podcast-accent px-4 py-2 rounded-full text-sm font-medium">
-                    Vidéo de présentation temporaire
-                  </span>
+                  
                 </div>
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                   <video className="w-full h-auto max-h-[600px] object-cover" controls poster="">
