@@ -88,3 +88,6 @@ verify_jwt = true
 
 [functions.verify-payment]
 verify_jwt = true
+
+[functions.refresh-studio-calendar]
+schedule = "0 0 * * *"  # Every day at midnight
