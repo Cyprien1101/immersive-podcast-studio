@@ -74,7 +74,7 @@ const StudioCarousel = () => {
                           <div>
                             <Link to="/booking">
                               <Button 
-                                className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent-hover hover:to-pink-600 text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300 font-normal"
+                                className="bg-podcast-accent hover:bg-podcast-accent-hover text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300 font-normal"
                               >
                                 <BookOpen className="h-5 w-5" />
                                 Réserver maintenant

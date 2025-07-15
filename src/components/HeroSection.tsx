@@ -1,10 +1,13 @@
+
 import React, { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+
 const HeroSection = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     // Initial setup - hide elements
     if (titleRef.current) {
@@ -38,9 +41,12 @@ const HeroSection = () => {
         buttonRef.current.style.transform = 'translateY(0)';
       }
     }, 100);
+
     return () => clearTimeout(timer);
   }, []);
-  return <>
+
+  return (
+    <>
       <section className="relative min-h-screen w-full overflow-hidden pt-16">
         {/* Background video */}
         <video className="absolute inset-0 min-h-full min-w-full object-cover" autoPlay muted loop playsInline>
@@ -64,13 +70,15 @@ const HeroSection = () => {
           
           <div ref={buttonRef}>
             <Link to="/booking">
-              <Button size="lg" className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent/90 hover:to-pink-500/90 font-bold text-white rounded-full px-8">
+              <Button size="lg" className="bg-podcast-accent hover:bg-podcast-accent-hover font-bold text-white rounded-full px-8">
                 Réserver
               </Button>
             </Link>
           </div>
         </div>
       </section>
-    </>;
+    </>
+  );
 };
+
 export default HeroSection;

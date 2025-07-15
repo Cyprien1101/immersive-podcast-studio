@@ -60,7 +60,7 @@ const Header = () => {
             
             <Link to="/booking">
               <Button 
-                className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent/90 hover:to-pink-500/90 font-bold text-white rounded-full px-6"
+                className="bg-podcast-accent hover:bg-podcast-accent-hover font-bold text-white rounded-full px-6"
               >
                 Réserver
               </Button>
@@ -113,7 +113,7 @@ const Header = () => {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Button 
-                  className="bg-gradient-to-r from-podcast-accent to-pink-500 hover:from-podcast-accent/90 hover:to-pink-500/90 font-bold text-white w-full rounded-full"
+                  className="bg-podcast-accent hover:bg-podcast-accent-hover font-bold text-white w-full rounded-full"
                 >
                   Réserver
                 </Button>
