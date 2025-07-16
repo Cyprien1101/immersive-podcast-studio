@@ -57,14 +57,14 @@ const HeroSection = () => {
           Your browser does not support HTML5 videos.
         </video>
         
-        {/* Dark overlay with upper part gradient for better integration with header */}
-        <div className="absolute inset-0 hero-overlay"></div>
+        {/* Dark overlay with slightly reduced opacity */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/75"></div>
         
         {/* Centered content with animation */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
           <h1 ref={titleRef} className="mb-6 max-w-3xl text-3xl font-bold leading-tight md:text-5xl lg:text-7xl">
-            <span className="text-gradient-static">Studio Podroom</span> pour vos 
-            <span className="text-gradient-static"> podcasts</span>
+            L'endroit idéal pour vos <span className="text-gradient-static">podcasts vidéos</span> YouTube, 
+            <span className="text-gradient-static"> Shorts</span>...
           </h1>
           
           <p ref={descRef} className="mb-8 max-w-xl text-lg text-white md:text-xl">
