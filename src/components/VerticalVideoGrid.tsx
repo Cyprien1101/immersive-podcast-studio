@@ -51,11 +51,11 @@ const VerticalVideoGrid = () => {
               ))}
             </div>
 
-            {/* Right side - Teaser videos stacked in 16:9 aspect ratio */}
+            {/* Right side - Teaser videos stacked in 16:9 aspect ratio, same size as reels */}
             <div className="space-y-6">
               {/* First teaser */}
               <div className="group overflow-hidden rounded-2xl shadow-xl transition-all hover:shadow-2xl hover:scale-105">
-                <div className="video-container bg-black aspect-video w-full">
+                <div className="bg-black h-[320px] md:h-[360px] w-full flex items-center justify-center">
                   <video
                     className="w-full h-full object-contain rounded-2xl"
                     autoPlay
@@ -71,7 +71,7 @@ const VerticalVideoGrid = () => {
 
               {/* Second teaser (same video for now) */}
               <div className="group overflow-hidden rounded-2xl shadow-xl transition-all hover:shadow-2xl hover:scale-105">
-                <div className="video-container bg-black aspect-video w-full">
+                <div className="bg-black h-[320px] md:h-[360px] w-full flex items-center justify-center">
                   <video
                     className="w-full h-full object-contain rounded-2xl"
                     autoPlay
