@@ -16,6 +16,7 @@ const videoData = [
 ];
 
 const teaserUrl = "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//teaser.mp4";
+const vslUrl = "https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//Teaser%20formation%202.mp4";
 
 const VerticalVideoGrid = () => {
   return (
@@ -31,6 +32,9 @@ const VerticalVideoGrid = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
             {/* Left side - 3 reels in a row */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="text-center mb-4 sm:mb-6 sm:absolute sm:-top-8 sm:left-1/2 sm:transform sm:-translate-x-1/2 w-full">
+                <h3 className="text-white text-lg font-medium">Shorts</h3>
+              </div>
               {videoData.map((item, index) => (
                 <div key={index} className="flex-1 max-w-[200px] mx-auto">
                   <div className="group overflow-hidden rounded-2xl shadow-xl transition-all hover:shadow-2xl hover:scale-105">
@@ -52,36 +56,42 @@ const VerticalVideoGrid = () => {
             </div>
 
             {/* Right side - Teaser videos stacked in 16:9 aspect ratio, same size as reels */}
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* First teaser */}
-              <div className="group overflow-hidden rounded-2xl shadow-xl transition-all hover:shadow-2xl hover:scale-105">
-                <div className="bg-black h-[320px] md:h-[360px] w-full flex items-center justify-center">
-                  <video
-                    className="w-full h-full object-contain rounded-2xl"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                  >
-                    <source src={teaserUrl} type="video/mp4" />
-                    Your browser does not support HTML5 videos.
-                  </video>
+              <div>
+                <h3 className="text-white text-lg font-medium text-center mb-4">Teaser</h3>
+                <div className="group overflow-hidden rounded-2xl shadow-xl transition-all hover:shadow-2xl hover:scale-105">
+                  <div className="bg-black h-[320px] md:h-[360px] w-full flex items-center justify-center">
+                    <video
+                      className="w-full h-full object-contain rounded-2xl"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    >
+                      <source src={teaserUrl} type="video/mp4" />
+                      Your browser does not support HTML5 videos.
+                    </video>
+                  </div>
                 </div>
               </div>
 
-              {/* Second teaser (same video for now) */}
-              <div className="group overflow-hidden rounded-2xl shadow-xl transition-all hover:shadow-2xl hover:scale-105">
-                <div className="bg-black h-[320px] md:h-[360px] w-full flex items-center justify-center">
-                  <video
-                    className="w-full h-full object-contain rounded-2xl"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                  >
-                    <source src={teaserUrl} type="video/mp4" />
-                    Your browser does not support HTML5 videos.
-                  </video>
+              {/* Second teaser - VSL */}
+              <div>
+                <h3 className="text-white text-lg font-medium text-center mb-4">VSL</h3>
+                <div className="group overflow-hidden rounded-2xl shadow-xl transition-all hover:shadow-2xl hover:scale-105">
+                  <div className="bg-black h-[320px] md:h-[360px] w-full flex items-center justify-center">
+                    <video
+                      className="w-full h-full object-contain rounded-2xl"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    >
+                      <source src={vslUrl} type="video/mp4" />
+                      Your browser does not support HTML5 videos.
+                    </video>
+                  </div>
                 </div>
               </div>
             </div>
