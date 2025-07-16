@@ -76,14 +76,14 @@ const HeroSection = () => {
         </video>
         
         {/* Dark overlay with reduced opacity */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/40"></div>
         
         {/* Centered content with animation */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
           <h1 ref={titleRef} className="mb-6 max-w-4xl text-3xl font-bold leading-tight md:text-5xl lg:text-7xl text-white">
             <span className="block">L'endroit idéal pour vos</span>
             <span 
-              className={`text-gradient-static transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+              className={`text-podcast-accent transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
             >
               {words[currentWordIndex]}
             </span>
