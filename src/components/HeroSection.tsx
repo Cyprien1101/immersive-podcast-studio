@@ -1,7 +1,5 @@
-
 import React, { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -45,6 +43,10 @@ const HeroSection = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleWhatsAppRedirect = () => {
+    window.open('https://wa.me/33766805041?text=Je%20souhaiterais%20r%C3%A9server%20une%20session%20pour%20le%20...', '_blank');
+  };
+
   return (
     <>
       <section className="relative min-h-screen w-full overflow-hidden pt-16">
@@ -69,11 +71,13 @@ const HeroSection = () => {
           </p>
           
           <div ref={buttonRef}>
-            <Link to="/booking">
-              <Button size="lg" className="bg-podcast-accent hover:bg-podcast-accent-hover font-bold text-white rounded-full px-8">
-                Réserver
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              className="bg-green-600 hover:bg-green-700 font-bold text-white rounded-full px-8"
+              onClick={handleWhatsAppRedirect}
+            >
+              Réserver via WhatsApp
+            </Button>
           </div>
         </div>
       </section>

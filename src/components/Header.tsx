@@ -35,6 +35,11 @@ const Header = () => {
     if (mobileMenuOpen) setMobileMenuOpen(false);
   };
 
+  const handleWhatsAppRedirect = () => {
+    window.open('https://wa.me/33766805041?text=Je%20souhaiterais%20r%C3%A9server%20une%20session%20pour%20le%20...', '_blank');
+    if (mobileMenuOpen) setMobileMenuOpen(false);
+  };
+
   return (
     <>
       <header 
@@ -58,13 +63,12 @@ const Header = () => {
               Nous contacter
             </Link>
             
-            <Link to="/booking">
-              <Button 
-                className="bg-podcast-accent hover:bg-podcast-accent-hover font-bold text-white rounded-full px-6"
-              >
-                Réserver
-              </Button>
-            </Link>
+            <Button 
+              className="bg-green-600 hover:bg-green-700 font-bold text-white rounded-full px-6"
+              onClick={handleWhatsAppRedirect}
+            >
+              Réserver via WhatsApp
+            </Button>
             
             {loading ? (
               <div className="h-10 w-10 rounded-full bg-gray-800 animate-pulse"></div>
@@ -107,17 +111,12 @@ const Header = () => {
                 Nous contacter
               </Link>
               
-              <Link 
-                to="/booking" 
-                className="w-full px-4"
-                onClick={() => setMobileMenuOpen(false)}
+              <Button 
+                className="bg-green-600 hover:bg-green-700 font-bold text-white w-full mx-4 rounded-full"
+                onClick={handleWhatsAppRedirect}
               >
-                <Button 
-                  className="bg-podcast-accent hover:bg-podcast-accent-hover font-bold text-white w-full rounded-full"
-                >
-                  Réserver
-                </Button>
-              </Link>
+                Réserver via WhatsApp
+              </Button>
               
               {!user && (
                 <Button 

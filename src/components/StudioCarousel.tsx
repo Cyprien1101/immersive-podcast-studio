@@ -11,7 +11,6 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { BookOpen } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 // Mock data for studios - Keep only Studio Eden
@@ -27,6 +26,10 @@ const mockStudios = [
 
 const StudioCarousel = () => {
   const isMobile = useIsMobile();
+
+  const handleWhatsAppRedirect = () => {
+    window.open('https://wa.me/33766805041?text=Je%20souhaiterais%20r%C3%A9server%20une%20session%20pour%20le%20...', '_blank');
+  };
 
   return (
     <section className="py-20 bg-black">
@@ -72,14 +75,13 @@ const StudioCarousel = () => {
                           </p>
                           
                           <div>
-                            <Link to="/booking">
-                              <Button 
-                                className="bg-podcast-accent hover:bg-podcast-accent-hover text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300 font-normal"
-                              >
-                                <BookOpen className="h-5 w-5" />
-                                Réserver maintenant
-                              </Button>
-                            </Link>
+                            <Button 
+                              className="bg-green-600 hover:bg-green-700 text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300 font-normal"
+                              onClick={handleWhatsAppRedirect}
+                            >
+                              <BookOpen className="h-5 w-5" />
+                              Réserver via WhatsApp
+                            </Button>
                           </div>
                         </div>
                       </div>
