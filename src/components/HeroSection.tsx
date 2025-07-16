@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -9,7 +8,7 @@ const HeroSection = () => {
   
   // Animation state for changing words
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const words = ['podcasts vidéos', 'Shorts', 'contenus', 'lives'];
+  const words = ['Podcasts', 'Shorts', 'Vidéos', 'Publicités'];
 
   useEffect(() => {
     // Initial setup - hide elements
@@ -75,7 +74,7 @@ const HeroSection = () => {
         
         {/* Centered content with animation */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-          <h1 ref={titleRef} className="mb-6 max-w-4xl text-3xl font-bold leading-tight md:text-5xl lg:text-7xl">
+          <h1 ref={titleRef} className="mb-6 max-w-4xl text-3xl font-bold leading-tight md:text-5xl lg:text-7xl text-white">
             <span className="block">L'endroit idéal pour vos</span>
             <span className="text-gradient-static transition-opacity duration-600">
               {words[currentWordIndex]}
