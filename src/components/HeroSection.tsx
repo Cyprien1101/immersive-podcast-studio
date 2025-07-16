@@ -83,7 +83,7 @@ const HeroSection = () => {
           <h1 ref={titleRef} className="mb-6 max-w-4xl text-3xl font-bold leading-tight md:text-5xl lg:text-7xl text-white">
             <span className="block">L'endroit idéal pour vos</span>
             <span 
-              className={`text-podcast-accent transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+              className={`bg-gradient-to-r from-[#655dff] to-pink-400 bg-clip-text text-transparent transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
             >
               {words[currentWordIndex]}
             </span>
