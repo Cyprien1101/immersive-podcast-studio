@@ -9,6 +9,7 @@ const HeroSection = () => {
   
   // Animation state for changing words
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(true);
   const words = ['Podcasts', 'Shorts', 'Vidéos', 'Publicités'];
 
   useEffect(() => {
@@ -48,10 +49,14 @@ const HeroSection = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Effect for word rotation
+  // Effect for word rotation with fade animation
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentWordIndex((prevIndex) => (prevIndex + 1) % words.length);
+      setIsVisible(false);
+      setTimeout(() => {
+        setCurrentWordIndex((prevIndex) => (prevIndex + 1) % words.length);
+        setIsVisible(true);
+      }, 300);
     }, 2000);
 
     return () => clearInterval(interval);
@@ -70,14 +75,16 @@ const HeroSection = () => {
           Your browser does not support HTML5 videos.
         </video>
         
-        {/* Dark overlay with slightly reduced opacity */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/35 to-black/70"></div>
+        {/* Dark overlay with reduced opacity */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/50"></div>
         
         {/* Centered content with animation */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
           <h1 ref={titleRef} className="mb-6 max-w-4xl text-3xl font-bold leading-tight md:text-5xl lg:text-7xl text-white">
             <span className="block">L'endroit idéal pour vos</span>
-            <span className="text-gradient-static transition-opacity duration-600">
+            <span 
+              className={`text-gradient-static transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+            >
               {words[currentWordIndex]}
             </span>
           </h1>
