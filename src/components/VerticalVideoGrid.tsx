@@ -63,7 +63,7 @@ const VerticalVideoGrid = () => {
               <div>
                 <h3 className="text-white text-lg font-bold text-center mb-2">Teaser</h3>
                 <div className="group overflow-hidden rounded-2xl shadow-xl transition-all hover:shadow-2xl hover:scale-105">
-                  <div className="bg-black h-[360px] w-full flex items-center justify-center">
+                  <div className="bg-black h-[360px] w-full flex items-center justify-center rounded-2xl">
                     <video
                       className="w-full h-full object-contain rounded-2xl"
                       autoPlay
@@ -82,7 +82,7 @@ const VerticalVideoGrid = () => {
               <div>
                 <h3 className="text-white text-lg font-bold text-center mb-2">VSL</h3>
                 <div className="group overflow-hidden rounded-2xl shadow-xl transition-all hover:shadow-2xl hover:scale-105">
-                  <div className="bg-black h-[360px] w-full flex items-center justify-center">
+                  <div className="bg-black h-[360px] w-full flex items-center justify-center rounded-2xl">
                     <video
                       className="w-full h-full object-contain rounded-2xl"
                       autoPlay
