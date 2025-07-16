@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -73,7 +74,7 @@ const HeroSection = () => {
           <div ref={buttonRef}>
             <Button 
               size="lg" 
-              className="bg-green-600 hover:bg-green-700 font-bold text-white rounded-full px-8"
+              className="bg-podcast-accent hover:bg-podcast-accent-hover font-bold text-white rounded-full px-8"
               onClick={handleWhatsAppRedirect}
             >
               Réserver via WhatsApp

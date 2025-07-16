@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Menu, X } from 'lucide-react';
@@ -14,6 +14,8 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const { user, loading } = useAuth();
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,7 +66,7 @@ const Header = () => {
             </Link>
             
             <Button 
-              className="bg-green-600 hover:bg-green-700 font-bold text-white rounded-full px-6"
+              className="bg-podcast-accent hover:bg-podcast-accent-hover font-bold text-white rounded-full px-6"
               onClick={handleWhatsAppRedirect}
             >
               Réserver via WhatsApp
@@ -74,7 +76,7 @@ const Header = () => {
               <div className="h-10 w-10 rounded-full bg-gray-800 animate-pulse"></div>
             ) : user ? (
               <UserMenu />
-            ) : (
+            ) : !isHomePage && (
               <Button 
                 variant="ghost" 
                 onClick={openAuthModal}
@@ -112,13 +114,13 @@ const Header = () => {
               </Link>
               
               <Button 
-                className="bg-green-600 hover:bg-green-700 font-bold text-white w-full mx-4 rounded-full"
+                className="bg-podcast-accent hover:bg-podcast-accent-hover font-bold text-white w-full mx-4 rounded-full"
                 onClick={handleWhatsAppRedirect}
               >
                 Réserver via WhatsApp
               </Button>
               
-              {!user && (
+              {!user && !isHomePage && (
                 <Button 
                   variant="ghost" 
                   onClick={openAuthModal}
