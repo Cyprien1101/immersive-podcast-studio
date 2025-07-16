@@ -1,11 +1,15 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 const HeroSection = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
+  
+  // Animation state for changing words
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const words = ['podcasts vidéos', 'Shorts', 'contenus', 'lives'];
 
   useEffect(() => {
     // Initial setup - hide elements
@@ -44,6 +48,15 @@ const HeroSection = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Effect for word rotation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentWordIndex((prevIndex) => (prevIndex + 1) % words.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [words.length]);
+
   const handleWhatsAppRedirect = () => {
     window.open('https://wa.me/33766805041?text=Je%20souhaiterais%20r%C3%A9server%20une%20session%20pour%20le%20...', '_blank');
   };
@@ -58,13 +71,15 @@ const HeroSection = () => {
         </video>
         
         {/* Dark overlay with slightly reduced opacity */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/75"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/35 to-black/70"></div>
         
         {/* Centered content with animation */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-          <h1 ref={titleRef} className="mb-6 max-w-3xl text-3xl font-bold leading-tight md:text-5xl lg:text-7xl">
-            L'endroit idéal pour vos <span className="text-gradient-static">podcasts vidéos</span> YouTube, 
-            <span className="text-gradient-static"> Shorts</span>...
+          <h1 ref={titleRef} className="mb-6 max-w-4xl text-3xl font-bold leading-tight md:text-5xl lg:text-7xl">
+            <span className="block">L'endroit idéal pour vos</span>
+            <span className="text-gradient-static transition-opacity duration-600">
+              {words[currentWordIndex]}
+            </span> YouTube...
           </h1>
           
           <p ref={descRef} className="mb-8 max-w-xl text-lg text-white md:text-xl">
