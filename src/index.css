@@ -97,7 +97,7 @@
   }
   
   .text-gradient-static {
-    @apply bg-gradient-to-r from-podcast-accent to-pink-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-purple-800 to-pink-500 bg-clip-text text-transparent;
   }
   
   .text-gradient-hero {
