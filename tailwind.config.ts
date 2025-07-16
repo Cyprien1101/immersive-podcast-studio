@@ -66,8 +66,8 @@ export default {
 				podcast: {
 					dark: '#121212',
 					light: '#f5f5f7',
-					accent: '#9b87f5',
-					'accent-hover': '#7E69AB',
+					accent: '#655dff',
+					'accent-hover': '#5348e6',
 					muted: '#2a2a2a',
 					// New colors for the booking/profile pages
 					'soft-black': '#1a1a1a',
