@@ -82,10 +82,13 @@ const HeroSection = () => {
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
           <h1 ref={titleRef} className="mb-6 max-w-4xl text-3xl font-bold leading-tight md:text-5xl lg:text-7xl text-white">
             <span className="block">L'endroit idéal pour vos</span>
-            <span 
-              className={`bg-gradient-to-r from-[#655dff] to-pink-400 bg-clip-text text-transparent transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-            >
-              {words[currentWordIndex]}
+            <span className="relative inline-block">
+              <div className="absolute inset-x-0 -top-2 -bottom-2 bg-gradient-to-b from-transparent via-black/30 to-transparent blur-sm"></div>
+              <span 
+                className={`relative bg-gradient-to-r from-[#655dff] to-pink-400 bg-clip-text text-transparent transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+              >
+                {words[currentWordIndex]}
+              </span>
             </span>
           </h1>
           
