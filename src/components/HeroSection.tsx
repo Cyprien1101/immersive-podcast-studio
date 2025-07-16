@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -78,11 +79,11 @@ const HeroSection = () => {
             <span className="block">L'endroit idéal pour vos</span>
             <span className="text-gradient-static transition-opacity duration-600">
               {words[currentWordIndex]}
-            </span> YouTube...
+            </span>
           </h1>
           
           <p ref={descRef} className="mb-8 max-w-xl text-lg text-white md:text-xl">
-            Espaces professionnels pour enregistrer, produire et diffuser vos contenus audio et vidéo
+            Espace professionnel clé en main pour enregistrer et produire vos contenus audio et vidéo
           </p>
           
           <div ref={buttonRef}>
