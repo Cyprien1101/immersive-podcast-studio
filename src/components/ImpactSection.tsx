@@ -1,8 +1,11 @@
+
 import React from 'react';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import ScrollAnimationWrapper from './ScrollAnimationWrapper';
+
 const ImpactSection = () => {
-  return <section className="bg-black px-4 mx-0 py-0">
+  return (
+    <section className="bg-black py-12 px-4">
       <div className="container mx-auto">
         {/* Replace animated text with static title */}
         <ScrollAnimationWrapper animation="fade-down">
@@ -20,9 +23,18 @@ const ImpactSection = () => {
             <div className="overflow-hidden rounded-lg bg-black shadow-lg transform hover:scale-[1.02] transition-transform duration-300 h-full">
               <div className="h-full flex flex-col">
                 <div className="flex-grow">
-                  <AspectRatio ratio={16 / 9} className="w-full">
-                    <video className="w-full h-full object-cover" autoPlay muted loop playsInline>
-                      <source src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//videos%20et%20podcast-2.mp4" type="video/mp4" />
+                  <AspectRatio ratio={16/9} className="w-full">
+                    <video
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    >
+                      <source 
+                        src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//videos%20et%20podcast-2.mp4" 
+                        type="video/mp4" 
+                      />
                       Votre navigateur ne prend pas en charge les vidéos HTML5.
                     </video>
                   </AspectRatio>
@@ -40,9 +52,18 @@ const ImpactSection = () => {
             <div className="overflow-hidden rounded-lg bg-black shadow-lg transform hover:scale-[1.02] transition-transform duration-300 h-full">
               <div className="h-full flex flex-col">
                 <div className="flex-grow">
-                  <AspectRatio ratio={16 / 9} className="w-full">
-                    <video className="w-full h-full object-cover" autoPlay muted loop playsInline>
-                      <source src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//videos%20et%20podcast-1.mp4" type="video/mp4" />
+                  <AspectRatio ratio={16/9} className="w-full">
+                    <video
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    >
+                      <source 
+                        src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//videos%20et%20podcast-1.mp4" 
+                        type="video/mp4" 
+                      />
                       Votre navigateur ne prend pas en charge les vidéos HTML5.
                     </video>
                   </AspectRatio>
@@ -60,9 +81,18 @@ const ImpactSection = () => {
             <div className="overflow-hidden rounded-lg bg-black shadow-lg transform hover:scale-[1.02] transition-transform duration-300 h-full">
               <div className="h-full flex flex-col">
                 <div className="flex-grow">
-                  <AspectRatio ratio={16 / 9} className="w-full">
-                    <video className="w-full h-full object-cover" autoPlay muted loop playsInline>
-                      <source src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//reels%20website%20.mp4" type="video/mp4" />
+                  <AspectRatio ratio={16/9} className="w-full">
+                    <video
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    >
+                      <source 
+                        src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//reels%20website%20.mp4" 
+                        type="video/mp4" 
+                      />
                       Votre navigateur ne prend pas en charge les vidéos HTML5.
                     </video>
                   </AspectRatio>
@@ -76,6 +106,8 @@ const ImpactSection = () => {
           </ScrollAnimationWrapper>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default ImpactSection;
