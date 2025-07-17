@@ -75,12 +75,12 @@ const HeroSection = () => {
           Your browser does not support HTML5 videos.
         </video>
         
-        {/* Dark overlay with reduced opacity */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/40"></div>
+        {/* Dark overlay with slightly increased opacity on desktop */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/40 md:from-black/15 md:to-black/45"></div>
         
-        {/* Centered content with animation */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-          <h1 ref={titleRef} className="mb-6 max-w-4xl text-3xl font-bold leading-tight md:text-5xl lg:text-7xl text-white">
+        {/* Centered content with animation - slightly lower on desktop */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center md:justify-center md:pt-8 px-4 text-center">
+          <h1 ref={titleRef} className="mb-6 max-w-4xl text-4xl sm:text-5xl font-bold leading-tight md:text-5xl lg:text-7xl text-white">
             <span className="block">L'endroit idéal pour vos</span>
             <span className="relative inline-block">
               <div className="absolute inset-x-0 -top-2 -bottom-2 bg-gradient-to-b from-transparent via-black/30 to-transparent blur-sm"></div>
