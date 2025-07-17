@@ -7,7 +7,7 @@ const ImpactSection = () => {
         {/* Replace animated text with static title */}
         <ScrollAnimationWrapper animation="fade-down">
           <div className="mb-8 text-center">
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white">
+            <h2 className="md:text-6xl lg:text-7xl font-bold text-white py-[40px] text-[podcast-accent-hover]">
               Studio de podcast à Lyon : Podroom
             </h2>
           </div>
