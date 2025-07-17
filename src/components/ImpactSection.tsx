@@ -1,50 +1,17 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { cn } from "@/lib/utils";
 import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 
-const contentTypes = ["Podcasts", "Vidéos YouTube", "Shorts"];
-
 const ImpactSection = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    // Setup the animation loop
-    timerRef.current = setInterval(() => {
-      setIsAnimating(true);
-      
-      // After fade-out animation completes, change the content
-      setTimeout(() => {
-        setActiveIndex(prev => (prev + 1) % contentTypes.length);
-        setIsAnimating(false);
-      }, 600);
-      
-    }, 3000); // Change every 3 seconds
-
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, []);
-
   return (
     <section className="bg-black py-12 px-4">
       <div className="container mx-auto">
-        {/* 1. Animated Text - Modified layout with REDUCED FONT SIZE */}
+        {/* Replace animated text with static title */}
         <ScrollAnimationWrapper animation="fade-down">
           <div className="mb-8 text-center">
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white flex flex-col items-center">
-              <span className="mb-2">L'endroit idéal pour vos</span>
-              <span className={cn(
-                "text-gradient-static text-5xl md:text-6xl lg:text-7xl transition-opacity duration-600",
-                isAnimating ? "opacity-0" : "opacity-100"
-              )}>
-                {contentTypes[activeIndex]}
-              </span>
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white">
+              Studio de podcast à Lyon : Podroom
             </h2>
           </div>
         </ScrollAnimationWrapper>
