@@ -104,9 +104,18 @@
     @apply bg-gradient-to-r from-podcast-accent via-purple-400 to-pink-500 bg-clip-text text-transparent animate-pulse-slow;
   }
   
+  .text-gradient-animated {
+    background: linear-gradient(45deg, #655dff, #a855f7, #ec4899, #f97316);
+    background-size: 400% 400%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-animation 3s ease-in-out infinite;
+  }
+  
   /* Removed button-gradient class and replaced with simple black background */
   .button-gradient {
-    @apply bg-black text-white hover:bg-gray-800;
+    @apply bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:from-purple-700 hover:to-pink-600;
   }
   
   .video-container {
@@ -203,6 +212,15 @@
     }
     100% {
       transform: translateX(-50%);
+    }
+  }
+
+  @keyframes gradient-animation {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
     }
   }
 

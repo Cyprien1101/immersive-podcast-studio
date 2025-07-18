@@ -28,7 +28,7 @@ const ServiceSection = () => {
       <div className="container px-4 mx-auto">
         <ScrollAnimationWrapper animation="zoom-in">
           <h2 className="mb-4 text-center text-4xl font-bold">
-            <span className="text-gradient">Nos Services</span>
+            <span className="text-gradient-animated">Nos Services</span>
           </h2>
           
           <p className="mx-auto mb-12 max-w-2xl text-center text-gray-300">

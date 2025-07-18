@@ -45,7 +45,7 @@ const FaqSection = () => {
       <div className="container px-4 mx-auto">
         <ScrollAnimationWrapper animation="fade-down">
           <h2 className="mb-12 text-center text-4xl font-bold">
-            <span className="text-gradient">Questions Fréquentes</span>
+            <span className="text-gradient-animated">Questions Fréquentes</span>
           </h2>
         </ScrollAnimationWrapper>
         
