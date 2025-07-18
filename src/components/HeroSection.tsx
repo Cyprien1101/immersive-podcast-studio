@@ -1,17 +1,14 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-
 const HeroSection = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
-  
+
   // Animation state for changing words
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const words = ['Podcasts', 'Shorts', 'Vidéos', 'Publicités'];
-
   useEffect(() => {
     // Initial setup - hide elements
     if (titleRef.current) {
@@ -45,7 +42,6 @@ const HeroSection = () => {
         buttonRef.current.style.transform = 'translateY(0)';
       }
     }, 100);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -54,20 +50,16 @@ const HeroSection = () => {
     const interval = setInterval(() => {
       setIsVisible(false);
       setTimeout(() => {
-        setCurrentWordIndex((prevIndex) => (prevIndex + 1) % words.length);
+        setCurrentWordIndex(prevIndex => (prevIndex + 1) % words.length);
         setIsVisible(true);
       }, 300);
     }, 2000);
-
     return () => clearInterval(interval);
   }, [words.length]);
-
   const handleWhatsAppRedirect = () => {
     window.open('https://wa.me/33766805041?text=Je%20souhaiterais%20r%C3%A9server%20une%20session%20pour%20le%20...', '_blank');
   };
-
-  return (
-    <>
+  return <>
       <section className="relative min-h-screen w-full overflow-hidden pt-16">
         {/* Background video */}
         <video className="absolute inset-0 min-h-full min-w-full object-cover" autoPlay muted loop playsInline>
@@ -84,31 +76,23 @@ const HeroSection = () => {
             <span className="block">L'endroit idéal pour vos</span>
             <span className="relative inline-block">
               <div className="absolute inset-x-0 -top-2 -bottom-2 bg-gradient-to-b from-transparent via-black/30 to-transparent blur-sm"></div>
-              <span 
-                className={`relative bg-gradient-to-r from-[#655dff] to-pink-400 bg-clip-text text-transparent transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-              >
+              <span className={`relative bg-gradient-to-r from-[#655dff] to-pink-400 bg-clip-text text-transparent transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
                 {words[currentWordIndex]}
               </span>
             </span>
           </h1>
           
-          <p ref={descRef} className="mb-8 max-w-xl text-lg text-podcast-accent md:text-xl">
+          <p ref={descRef} className="mb-8 max-w-xl text-lg md:text-xl text-white">
             Espace professionnel clé en main pour enregistrer et produire vos contenus audio et vidéo
           </p>
           
           <div ref={buttonRef}>
-            <Button 
-              size="lg" 
-              className="bg-podcast-accent hover:bg-podcast-accent-hover font-bold text-white rounded-full px-8"
-              onClick={handleWhatsAppRedirect}
-            >
+            <Button size="lg" onClick={handleWhatsAppRedirect} className="hover:bg-podcast-accent-hover font-bold text-white rounded-full px-8 bg-[#8b74fb]">
               Réserver via WhatsApp
             </Button>
           </div>
         </div>
       </section>
-    </>
-  );
+    </>;
 };
-
 export default HeroSection;
