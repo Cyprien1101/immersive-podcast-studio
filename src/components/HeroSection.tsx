@@ -57,7 +57,8 @@ const HeroSection = () => {
     return () => clearInterval(interval);
   }, [words.length]);
   const handleWhatsAppRedirect = () => {
-    window.open('https://wa.me/33766805041?text=Je%20souhaiterais%20r%C3%A9server%20une%20session%20pour%20le%20...', '_blank');
+    const url = 'https://wa.me/33766805041?text=Je%20souhaiterais%20r%C3%A9server%20une%20session%20pour%20le%20...';
+    (window as any).gtag_report_conversion(url);
   };
   return <>
       <section className="relative min-h-screen w-full overflow-hidden pt-16">
