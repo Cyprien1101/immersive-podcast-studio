@@ -52,8 +52,8 @@ const StudioCarousel = () => {
                 {mockStudios.map((studio) => (
                   <CarouselItem key={studio.id} className="pl-4 md:basis-4/5 lg:basis-3/4">
                     <div className="relative rounded-xl overflow-hidden group">
-                      {/* Image container with overflow hidden to contain zoom effect */}
-                      <div className={`w-full ${isMobile ? 'h-[50vh]' : 'h-[70vh]'} relative overflow-hidden`}>
+                      {/* Image container with 16:9 aspect ratio */}
+                      <div className="w-full aspect-video relative overflow-hidden">
                         <div className="w-full h-full flex items-center justify-center">
                           <img
                             src={studio.imageUrl}
