@@ -58,7 +58,7 @@ const StudioCarousel = () => {
                           <img
                             src={studio.imageUrl}
                             alt={`Studio ${studio.name}`}
-                            className="w-full h-full object-cover object-bottom transition-transform duration-700 group-hover:scale-110"
+                            className="w-full h-full object-cover object-[50%_80%] transition-transform duration-700 group-hover:scale-110"
                           />
                         </div>
                         
