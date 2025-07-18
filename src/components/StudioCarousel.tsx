@@ -20,7 +20,7 @@ const mockStudios = [
     name: 'Studio Lyon',
     description: 'Notre studio d\'enregistrement professionnel au centre de Lyon',
     location: '280 Rue Vendôme, Lyon',
-    imageUrl: 'https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//photo%20studio.JPG'
+    imageUrl: 'https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//IMG_0765-2.webp'
   }
 ];
 
