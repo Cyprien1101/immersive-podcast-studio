@@ -1,25 +1,38 @@
+
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import ScrollAnimationWrapper from './ScrollAnimationWrapper';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { BookOpen } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 // Mock data for studios - Keep only Studio Eden
-const mockStudios = [{
-  id: 1,
-  name: 'Studio Lyon',
-  description: 'Notre studio d\'enregistrement professionnel au centre de Lyon',
-  location: '280 Rue Vendôme, Lyon',
-  imageUrl: 'https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//photo%20studio.JPG'
-}];
+const mockStudios = [
+  {
+    id: 1,
+    name: 'Studio Lyon',
+    description: 'Notre studio d\'enregistrement professionnel au centre de Lyon',
+    location: '280 Rue Vendôme, Lyon',
+    imageUrl: 'https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//photo%20studio.JPG'
+  }
+];
+
 const StudioCarousel = () => {
   const isMobile = useIsMobile();
+
   const handleWhatsAppRedirect = () => {
     window.open('https://wa.me/33766805041?text=Je%20souhaiterais%20r%C3%A9server%20une%20session%20pour%20le%20...', '_blank');
   };
-  return <section className="py-20 bg-black">
+
+  return (
+    <section className="py-20 bg-black">
       <div className="container mx-auto">
         <ScrollAnimationWrapper animation="fade-down">
           <h2 className="mb-12 text-center text-5xl md:text-6xl font-bold">
@@ -29,16 +42,24 @@ const StudioCarousel = () => {
         
         <div className="relative w-full overflow-hidden">
           <ScrollAnimationWrapper animation="fade-up" delay={200}>
-            <Carousel opts={{
-            align: "center"
-          }} className="w-full flex justify-center">
+            <Carousel 
+              opts={{
+                align: "center",
+              }}
+              className="w-full flex justify-center"
+            >
               <CarouselContent className="-ml-4 flex justify-center">
-                {mockStudios.map(studio => <CarouselItem key={studio.id} className="pl-4 md:basis-4/5 lg:basis-3/4">
+                {mockStudios.map((studio) => (
+                  <CarouselItem key={studio.id} className="pl-4 md:basis-4/5 lg:basis-3/4">
                     <div className="relative rounded-xl overflow-hidden group">
                       {/* Image container with overflow hidden to contain zoom effect */}
                       <div className={`w-full ${isMobile ? 'h-[50vh]' : 'h-[70vh]'} relative overflow-hidden`}>
                         <div className="w-full h-full flex items-center justify-center">
-                          <img src={studio.imageUrl} alt={`Studio ${studio.name}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                          <img
+                            src={studio.imageUrl}
+                            alt={`Studio ${studio.name}`}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
                         </div>
                         
                         {/* Overlay for better text visibility */}
@@ -54,7 +75,10 @@ const StudioCarousel = () => {
                           </p>
                           
                           <div>
-                            <Button onClick={handleWhatsAppRedirect} className="hover:bg-podcast-accent-hover text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300 font-normal bg-[#8b74fb]">
+                            <Button 
+                              className="bg-podcast-accent hover:bg-podcast-accent-hover text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300 font-normal"
+                              onClick={handleWhatsAppRedirect}
+                            >
                               <BookOpen className="h-5 w-5" />
                               Réserver via WhatsApp
                             </Button>
@@ -62,7 +86,8 @@ const StudioCarousel = () => {
                         </div>
                       </div>
                     </div>
-                  </CarouselItem>)}
+                  </CarouselItem>
+                ))}
               </CarouselContent>
               
               {/* Navigation arrows removed as there's only one studio */}
@@ -70,6 +95,8 @@ const StudioCarousel = () => {
           </ScrollAnimationWrapper>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default StudioCarousel;
