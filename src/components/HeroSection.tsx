@@ -92,7 +92,7 @@ const HeroSection = () => {
             </span>
           </h1>
           
-          <p ref={descRef} className="mb-8 max-w-xl text-lg text-white md:text-xl">
+          <p ref={descRef} className="mb-8 max-w-xl text-lg text-podcast-accent md:text-xl">
             Espace professionnel clé en main pour enregistrer et produire vos contenus audio et vidéo
           </p>
           
