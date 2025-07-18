@@ -11,7 +11,7 @@ const ImpactSection = () => {
         <ScrollAnimationWrapper animation="fade-down">
           <div className="mb-16 text-center">
             <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight">
-              Studio de podcast à Lyon : <span className="text-gradient-animated">Podroom</span>
+              Studio de podcast à Lyon : <span className="text-gradient-hero">Podroom</span>
             </h2>
           </div>
         </ScrollAnimationWrapper>
