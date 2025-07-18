@@ -24,7 +24,7 @@ const VerticalVideoGrid = () => {
       <div className="container px-4 mx-auto max-w-7xl">
         <ScrollAnimationWrapper animation="zoom-in" className="mb-12">
           <h2 className="text-center text-4xl md:text-5xl font-bold">
-            <span className="text-gradient-static">Nos montages</span>
+            <span className="text-gradient-hero">Nos montages</span>
           </h2>
         </ScrollAnimationWrapper>
         
@@ -35,11 +35,11 @@ const VerticalVideoGrid = () => {
               <div className="text-center mb-2">
                 <h3 className="text-white text-lg font-bold">Shorts</h3>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-row gap-2 sm:gap-4 justify-center">
                 {videoData.map((item, index) => (
-                  <div key={index} className="flex-1 max-w-[200px] mx-auto">
+                  <div key={index} className="flex-1 max-w-[120px] sm:max-w-[200px]">
                     <div className="group overflow-hidden rounded-2xl shadow-xl transition-all hover:shadow-2xl hover:scale-105">
-                      <div className="video-container bg-black h-[360px]">
+                      <div className="video-container bg-black h-[200px] sm:h-[360px]">
                         <video
                           className="h-full w-full object-cover rounded-2xl"
                           autoPlay
@@ -57,14 +57,14 @@ const VerticalVideoGrid = () => {
               </div>
             </div>
 
-            {/* Right side - Teaser videos stacked, same height as reels */}
+            {/* Right side - Teaser videos stacked */}
             <div className="space-y-8">
               {/* First teaser */}
               <div>
                 <h3 className="text-white text-lg font-bold text-center mb-2">Teaser</h3>
                 <div className="group overflow-hidden rounded-2xl shadow-xl transition-all hover:shadow-2xl hover:scale-105">
                   <video
-                    className="w-full h-[360px] object-cover rounded-2xl"
+                    className="w-full h-[200px] sm:h-[360px] object-cover rounded-2xl"
                     autoPlay
                     muted
                     loop
@@ -81,7 +81,7 @@ const VerticalVideoGrid = () => {
                 <h3 className="text-white text-lg font-bold text-center mb-2">VSL</h3>
                 <div className="group overflow-hidden rounded-2xl shadow-xl transition-all hover:shadow-2xl hover:scale-105">
                   <video
-                    className="w-full h-[360px] object-cover rounded-2xl"
+                    className="w-full h-[200px] sm:h-[360px] object-cover rounded-2xl"
                     autoPlay
                     muted
                     loop
