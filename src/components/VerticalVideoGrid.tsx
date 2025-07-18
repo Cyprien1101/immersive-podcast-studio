@@ -25,7 +25,7 @@ const VerticalVideoGrid = () => {
                   playsInline
                 >
                   <source 
-                    src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//montage%201.mp4" 
+                    src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images/montage%201.mp4" 
                     type="video/mp4" 
                   />
                   Votre navigateur ne prend pas en charge les vidéos HTML5.
@@ -45,7 +45,7 @@ const VerticalVideoGrid = () => {
                   playsInline
                 >
                   <source 
-                    src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//montage%202.mp4" 
+                    src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images/montage%202.mp4" 
                     type="video/mp4" 
                   />
                   Votre navigateur ne prend pas en charge les vidéos HTML5.
@@ -65,7 +65,7 @@ const VerticalVideoGrid = () => {
                   playsInline
                 >
                   <source 
-                    src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//montage%203.mp4" 
+                    src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images/montage%203.mp4" 
                     type="video/mp4" 
                   />
                   Votre navigateur ne prend pas en charge les vidéos HTML5.
@@ -85,7 +85,7 @@ const VerticalVideoGrid = () => {
                   playsInline
                 >
                   <source 
-                    src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//montage%204.mp4" 
+                    src="https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images/montage%204.mp4" 
                     type="video/mp4" 
                   />
                   Votre navigateur ne prend pas en charge les vidéos HTML5.
