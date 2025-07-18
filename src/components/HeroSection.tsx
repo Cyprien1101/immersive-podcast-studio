@@ -87,7 +87,7 @@ const HeroSection = () => {
           </p>
           
           <div ref={buttonRef}>
-            <Button size="lg" onClick={handleWhatsAppRedirect} className="bg-podcast-accent hover:bg-podcast-accent-hover font-bold text-white rounded-full px-8 bg-[podcast-accent-hover]">
+            <Button size="lg" className="bg-podcast-accent hover:bg-podcast-accent-hover font-bold text-white rounded-full px-8" onClick={handleWhatsAppRedirect}>
               Réserver via WhatsApp
             </Button>
           </div>
