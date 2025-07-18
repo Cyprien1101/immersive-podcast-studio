@@ -5,13 +5,13 @@ import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 
 const ImpactSection = () => {
   return (
-    <section className="bg-black py-12 px-4">
+    <section className="bg-black py-16 px-4">
       <div className="container mx-auto">
         {/* Replace animated text with static title */}
         <ScrollAnimationWrapper animation="fade-down">
-          <div className="mb-8 text-center">
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white">
-              Studio de podcast à Lyon : Podroom
+          <div className="mb-12 text-center">
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight">
+              Studio de podcast à Lyon : <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Podroom</span>
             </h2>
           </div>
         </ScrollAnimationWrapper>
