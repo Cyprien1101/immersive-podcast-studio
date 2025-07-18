@@ -45,9 +45,9 @@ const TrustedBy = () => {
         </div>
 
         <ScrollAnimationWrapper animation="fade-up">
-          <h3 className="text-2xl md:text-3xl text-center mt-8 font-bold text-white">
-            Studio de podcast à Lyon : <span className="text-gradient-hero">Podroom</span>
-          </h3>
+          <h2 className="text-2xl md:text-3xl text-center mt-8 font-bold text-white">
+            Studio de podcast à Lyon : <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Podroom</span>
+          </h2>
         </ScrollAnimationWrapper>
       </div>
     </section>
