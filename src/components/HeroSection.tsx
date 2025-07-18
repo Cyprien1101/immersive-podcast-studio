@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -10,10 +11,10 @@ const HeroSection = () => {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const words = [
-    { text: 'Podcasts', color: '#8b74fb' },
-    { text: 'Shorts', color: '#ec4899' },
-    { text: 'Vidéos', color: '#10b981' },
-    { text: 'Publicités', color: '#f59e0b' }
+    { text: 'Podcasts' },
+    { text: 'Shorts' },
+    { text: 'Vidéos' },
+    { text: 'Publicités' }
   ];
 
   useEffect(() => {
@@ -86,8 +87,7 @@ const HeroSection = () => {
           <span className="relative inline-block">
             <div className="absolute inset-x-0 -top-2 -bottom-2 bg-gradient-to-b from-transparent via-black/30 to-transparent blur-sm"></div>
             <span 
-              className={`relative transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-              style={{ color: words[currentWordIndex].color }}
+              className={`relative transition-opacity duration-300 text-gradient-hero ${isVisible ? 'opacity-100' : 'opacity-0'}`}
             >
               {words[currentWordIndex].text}
             </span>
