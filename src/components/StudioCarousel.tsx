@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -15,19 +14,16 @@ const mockStudios = [{
   location: '280 Rue Vendôme, Lyon',
   imageUrl: 'https://zqnejedmmwcumpqihupt.supabase.co/storage/v1/object/public/studio_images//photo%20studio.JPG'
 }];
-
 const StudioCarousel = () => {
   const isMobile = useIsMobile();
   const handleWhatsAppRedirect = () => {
     window.open('https://wa.me/33766805041?text=Je%20souhaiterais%20r%C3%A9server%20une%20session%20pour%20le%20...', '_blank');
   };
-  
-  return (
-    <section className="py-20 bg-black">
+  return <section className="py-20 bg-black">
       <div className="container mx-auto">
         <ScrollAnimationWrapper animation="fade-down">
-          <h2 className="mb-12 text-center text-5xl md:text-6xl font-bold text-gradient-hero">
-            Notre studio
+          <h2 className="mb-12 text-center text-5xl md:text-6xl font-bold">
+            <span className="text-gradient">Notre studio</span>
           </h2>
         </ScrollAnimationWrapper>
         
@@ -58,7 +54,7 @@ const StudioCarousel = () => {
                           </p>
                           
                           <div>
-                            <Button onClick={handleWhatsAppRedirect} className="hover:bg-podcast-accent-hover text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300 font-normal bg-podcast-accent">
+                            <Button onClick={handleWhatsAppRedirect} className="hover:bg-podcast-accent-hover text-white rounded-full px-6 py-6 flex items-center gap-2 text-lg transition-transform hover:scale-105 duration-300 font-normal bg-[#8b74fb]">
                               <BookOpen className="h-5 w-5" />
                               Réserver via WhatsApp
                             </Button>
@@ -74,8 +70,6 @@ const StudioCarousel = () => {
           </ScrollAnimationWrapper>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default StudioCarousel;
