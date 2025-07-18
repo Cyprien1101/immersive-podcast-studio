@@ -10,16 +10,20 @@ import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 
 const faqItems = [
   {
+    question: "Est-ce que le studio est climatisé ?",
+    answer: "Oui, notre studio dispose d'un système de climatisation pour assurer votre confort tout au long de vos sessions d'enregistrement."
+  },
+  {
+    question: "Est-ce que vous disposez d'un télépromppteur ?",
+    answer: "Oui, nous mettons à disposition un télépromppteur pour vous aider lors de vos enregistrements si nécessaire."
+  },
+  {
     question: "Quels types de podcasts puis-je enregistrer dans vos studios ?",
     answer: "Nos studios sont équipés pour tous les formats de podcast, des interviews individuelles aux tables rondes avec plusieurs invités, narrations solo et podcasts vidéo. Nous adaptons la configuration technique à vos besoins spécifiques."
   },
   {
     question: "Comment se déroule une séance d'enregistrement ?",
-    answer: "À votre arrivée, notre ingénieur du son vous accueille et configure le studio selon vos besoins. Après une courte période de test, vous pouvez commencer l'enregistrement. L'ingénieur reste disponible tout au long de la séance pour vous assister et garantir la qualité technique."
-  },
-  {
-    question: "Combien coûte la location d'un studio ?",
-    answer: "Nos tarifs varient en fonction du studio choisi, de la durée de location et des services supplémentaires. Contactez-nous pour un devis personnalisé adapté à votre projet de podcast."
+    answer: "À votre arrivée, notre opérateur vous accueille et configure le studio selon vos besoins. Après une courte période de test, vous pouvez commencer l'enregistrement. L'opérateur reste disponible tout au long de la séance pour vous assister et garantir la qualité technique."
   },
   {
     question: "Proposez-vous des services de post-production ?",

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import ServiceCard from './ServiceCard';
-import { Mic, Video, Radio, Share2, Palette, BarChart } from 'lucide-react';
+import { Mic, Video, Radio } from 'lucide-react';
 import ScrollAnimationWrapper from './ScrollAnimationWrapper';
 
 const services = [
@@ -19,21 +19,6 @@ const services = [
     title: "Post-production",
     description: "Montage et mixage professionnel disponible avec nos forfaits premium pour un résultat final impeccable.",
     icon: Radio
-  },
-  {
-    title: "Distribution",
-    description: "Diffusez votre podcast sur toutes les plateformes majeures avec nos conseils et outils adaptés.",
-    icon: Share2
-  },
-  {
-    title: "Identité Visuelle",
-    description: "Créez une identité visuelle forte pour votre podcast avec notre équipe de designers créatifs.",
-    icon: Palette
-  },
-  {
-    title: "Analyses & Statistiques",
-    description: "Suivez les performances de votre podcast et obtenez des informations précieuses sur votre audience.",
-    icon: BarChart
   }
 ];
 
